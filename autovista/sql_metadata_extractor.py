@@ -23,8 +23,10 @@ from typing import Protocol
 from autovista.logging_setup import log_object_result
 from autovista.schema import (
     AgentJobEntity,
+    AgentJobStepEntity,
     AssemblyEntity,
     ColumnEntity,
+    ConstraintEntity,
     DatabaseEntity,
     DatabaseSummaryEntity,
     FileEntity,
@@ -42,6 +44,38 @@ from autovista.schema import (
     ViewEntity,
     XmlSchemaCollectionEntity,
 )
+
+# --- SQL Agent decode tables (msdb integer codes -> human text) ---
+_JOB_RUN_STATUS = {0: "Failed", 1: "Succeeded", 2: "Retry", 3: "Canceled", 4: "In Progress"}
+_JOB_STEP_ACTION = {1: "Quit With Success", 2: "Quit With Failure", 3: "Go To Next Step", 4: "Go To Step"}
+_JOB_FREQ_TYPE = {
+    1: "Once", 4: "Daily", 8: "Weekly", 16: "Monthly", 32: "Monthly Relative",
+    64: "Start Automatically When SQL Server Agent Starts", 128: "Start Whenever CPU Is Idle",
+}
+_NOTIFY_LEVEL = {0: "Never", 1: "Always", 2: "On Failure", 3: "On Success"}
+
+
+def _decode_int_date(value) -> str | None:
+    """msdb packs dates as an int YYYYMMDD (e.g. 20240615, 0 = none)."""
+    if not value:
+        return None
+    s = str(int(value)).zfill(8)
+    return f"{s[0:4]}-{s[4:6]}-{s[6:8]}"
+
+
+def _decode_int_time(value) -> str | None:
+    """msdb packs times as an int HHMMSS (e.g. 91530 = 09:15:30)."""
+    if value is None:
+        return None
+    s = str(int(value)).zfill(6)
+    return f"{s[0:2]}:{s[2:4]}:{s[4:6]}"
+
+
+def _decode_schedule_frequency(freq_type, freq_interval) -> str:
+    label = _JOB_FREQ_TYPE.get(freq_type, "Unknown")
+    if freq_type in (4, 8, 16) and freq_interval:
+        return f"{label} (interval={freq_interval})"
+    return label
 
 QUERY_DATABASES = """
 SELECT d.name, SUM(mf.size) * 8.0 / 1024 AS size_mb
@@ -109,17 +143,23 @@ SELECT c.name, ty.name AS data_type, c.is_nullable, c.column_id,
        dc.definition AS default_constraint,
        cc.definition AS check_constraint,
        COLUMNPROPERTY(c.object_id, c.name, 'IsIdentity') AS is_identity,
-       COLUMNPROPERTY(c.object_id, c.name, 'SeedValue') AS identity_seed,
-       COLUMNPROPERTY(c.object_id, c.name, 'IncrementValue') AS identity_increment,
-       COLUMNPROPERTY(c.object_id, c.name, 'IsComputed') AS is_computed,
+       CASE WHEN COLUMNPROPERTY(c.object_id, c.name, 'IsIdentity') = 1
+            THEN IDENT_SEED(QUOTENAME(OBJECT_SCHEMA_NAME(c.object_id)) + '.' + QUOTENAME(OBJECT_NAME(c.object_id)))
+       END AS identity_seed,
+       CASE WHEN COLUMNPROPERTY(c.object_id, c.name, 'IsIdentity') = 1
+            THEN IDENT_INCR(QUOTENAME(OBJECT_SCHEMA_NAME(c.object_id)) + '.' + QUOTENAME(OBJECT_NAME(c.object_id)))
+       END AS identity_increment,
+       cmp.definition AS computed_definition,
        COLUMNPROPERTY(c.object_id, c.name, 'IsPersisted') AS is_persisted,
        c.collation_name,
        COLUMNPROPERTY(c.object_id, c.name, 'IsRowGUIDCol') AS is_rowguid,
-       c.is_sparse
+       c.is_sparse,
+       c.is_filestream, ty.is_assembly_type, c.max_length
 FROM sys.columns c
 JOIN sys.types ty ON ty.user_type_id = c.user_type_id
 LEFT JOIN sys.default_constraints dc ON dc.object_id = c.default_object_id
 LEFT JOIN sys.check_constraints cc ON cc.object_id = c.default_object_id
+LEFT JOIN sys.computed_columns cmp ON cmp.object_id = c.object_id AND cmp.column_id = c.column_id
 WHERE c.object_id = OBJECT_ID(?)
 ORDER BY c.column_id
 """
@@ -142,11 +182,43 @@ CROSS APPLY sys.trigger_events te WHERE te.object_id = tr.object_id
 """
 
 QUERY_AGENT_JOBS = """
-SELECT j.name, j.enabled, s.command, j.owner_sid, j.date_created, j.date_modified,
-       s.retry_attempts, s.retry_interval, j.description
+SELECT j.job_id, j.name, j.enabled, s.command, j.owner_sid, j.date_created, j.date_modified,
+       s.retry_attempts, s.retry_interval, j.description,
+       c.name AS category_name, op.name AS notify_operator_name, j.notify_level_email,
+       s.step_id, s.step_name, s.subsystem, s.database_name,
+       s.on_success_action, s.on_fail_action
 FROM msdb.dbo.sysjobs j
+LEFT JOIN msdb.dbo.syscategories c ON c.category_id = j.category_id
+LEFT JOIN msdb.dbo.sysoperators op ON op.id = j.notify_email_operator_id
 JOIN msdb.dbo.sysjobsteps s ON s.job_id = j.job_id
 ORDER BY j.name, s.step_id
+"""
+
+QUERY_AGENT_JOB_SCHEDULES = """
+SELECT js.job_id, sc.name AS schedule_name, sc.freq_type, sc.freq_interval
+FROM msdb.dbo.sysjobschedules js
+JOIN msdb.dbo.sysschedules sc ON sc.schedule_id = js.schedule_id
+"""
+
+QUERY_AGENT_JOB_NEXT_RUN = """
+SELECT js.job_id, MIN(js.next_run_date) AS next_run_date, MIN(js.next_run_time) AS next_run_time
+FROM msdb.dbo.sysjobschedules js
+WHERE js.next_run_date > 0
+GROUP BY js.job_id
+"""
+
+# instance_id is a monotonically increasing surrogate key on sysjobhistory,
+# so MAX(instance_id) per job reliably identifies its most recent run
+# (per Microsoft's documented sysjobhistory semantics). step_id = 0 is the
+# job-level outcome row, not an individual step's row.
+QUERY_AGENT_JOB_LAST_RUN = """
+SELECT h.job_id, h.run_date, h.run_time, h.run_status
+FROM msdb.dbo.sysjobhistory h
+WHERE h.step_id = 0
+  AND h.instance_id = (
+      SELECT MAX(h2.instance_id) FROM msdb.dbo.sysjobhistory h2
+      WHERE h2.job_id = h.job_id AND h2.step_id = 0
+  )
 """
 
 QUERY_FOREIGN_KEYS = """
@@ -160,7 +232,7 @@ JOIN sys.schemas rs ON rs.schema_id = rt.schema_id
 
 QUERY_INDEXES = """
 SELECT s.name AS schema_name, t.name AS table_name, i.name AS index_name, i.type_desc, i.is_unique, i.has_filter, i.is_disabled,
-       i.fill_factor, i.data_space_id, i.filter_definition, i.object_id, i.index_id
+       i.fill_factor, i.data_space_id, i.filter_definition, i.object_id, i.index_id, i.is_primary_key
 FROM sys.indexes i
 JOIN sys.tables t ON t.object_id = i.object_id
 JOIN sys.schemas s ON s.schema_id = t.schema_id
@@ -169,17 +241,55 @@ ORDER BY s.name, t.name, i.name
 """
 
 # Key vs. included columns, cheap catalog-view lookup (no DMV scan).
-# Fragmentation %, page count, usage stats, and missing-index recommendations
-# would require sys.dm_db_index_physical_stats / sys.dm_db_index_usage_stats,
-# which are DMV scans that can be expensive on large tables -- intentionally
-# left unpopulated (field stays NULL) rather than adding a full-table scan
-# per index, per the "avoid expensive operations on large databases" guidance.
 QUERY_INDEX_COLUMNS = """
-SELECT c.name, ic.is_included_column
+SELECT c.name, ic.is_included_column, ic.is_descending_key
 FROM sys.index_columns ic
 JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id
 WHERE ic.object_id = ? AND ic.index_id = ?
 ORDER BY ic.is_included_column, ic.key_ordinal
+"""
+
+# Filegroup/partition/allocation-unit are cheap catalog-view joins, one call
+# for the whole database (not per-index).
+QUERY_INDEX_STORAGE = """
+SELECT i.object_id, i.index_id, fg.name AS filegroup_name,
+       COUNT(DISTINCT p.partition_number) AS partition_count,
+       MAX(au.type_desc) AS allocation_unit_type
+FROM sys.indexes i
+LEFT JOIN sys.filegroups fg ON fg.data_space_id = i.data_space_id
+LEFT JOIN sys.partitions p ON p.object_id = i.object_id AND p.index_id = i.index_id
+LEFT JOIN sys.allocation_units au ON au.container_id = p.partition_id
+GROUP BY i.object_id, i.index_id, fg.name
+"""
+
+# One call for the whole database (not per-index). SAMPLED mode reads a
+# sample of an index's pages (or all pages if it has fewer than ~10,000)
+# rather than a full scan -- avg_page_space_used_in_percent and record_count
+# are only populated in SAMPLED/DETAILED mode (the cheaper LIMITED mode
+# only returns fragmentation/page_count), so SAMPLED is the minimum needed
+# to answer what this enhancement explicitly asks for. Wrapped by the
+# caller in a try/except since this DMV can be restricted by permissions.
+QUERY_INDEX_PHYSICAL_STATS = """
+SELECT object_id, index_id, avg_fragmentation_in_percent, page_count,
+       avg_page_space_used_in_percent, record_count
+FROM sys.dm_db_index_physical_stats(DB_ID(), NULL, NULL, NULL, 'SAMPLED')
+"""
+
+# In-memory usage counters (no scan); reset on service restart, so seeks/
+# scans/lookups/updates being NULL for a given index is expected, not an error.
+QUERY_INDEX_USAGE_STATS = """
+SELECT s.object_id, s.index_id, s.user_seeks, s.user_scans, s.user_lookups, s.user_updates
+FROM sys.dm_db_index_usage_stats s
+WHERE s.database_id = DB_ID()
+"""
+
+# Table-level reserved size (all of a table's indexes + heap combined),
+# used as the denominator for an index's percent_of_table. One call for the
+# whole database rather than per-table.
+QUERY_TABLE_SIZES_BY_OBJECT = """
+SELECT ps.object_id, SUM(ps.reserved_page_count) * 8.0 / 1024 AS size_mb
+FROM sys.dm_db_partition_stats ps
+GROUP BY ps.object_id
 """
 
 QUERY_FUNCTIONS = """
@@ -245,6 +355,63 @@ FROM sys.database_permissions perm
 JOIN sys.database_principals dp ON dp.principal_id = perm.grantee_principal_id
 """
 
+# --- Constraint discovery (Enhancement 2) ---
+
+# Primary keys and unique constraints are both backed by an index
+# (sys.key_constraints.type 'PK' or 'UQ'), so their columns come from the
+# same index_columns join.
+QUERY_PK_UNIQUE_CONSTRAINTS = """
+SELECT s.name AS schema_name, t.name AS table_name, kc.name AS constraint_name, kc.type,
+       kc.is_system_named, c.name AS column_name, ic.key_ordinal
+FROM sys.key_constraints kc
+JOIN sys.tables t ON t.object_id = kc.parent_object_id
+JOIN sys.schemas s ON s.schema_id = t.schema_id
+JOIN sys.indexes i ON i.object_id = kc.parent_object_id AND i.index_id = kc.unique_index_id
+JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id
+JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id
+ORDER BY s.name, t.name, kc.name, ic.key_ordinal
+"""
+
+QUERY_FOREIGN_KEY_CONSTRAINTS = """
+SELECT ps.name AS parent_schema, pt.name AS parent_table, fk.name AS constraint_name,
+       rs.name AS ref_schema, rt.name AS ref_table,
+       pc.name AS parent_column, rc.name AS ref_column, fkc.constraint_column_id,
+       fk.delete_referential_action_desc, fk.update_referential_action_desc,
+       fk.is_not_trusted, fk.is_disabled, fk.is_system_named
+FROM sys.foreign_keys fk
+JOIN sys.tables pt ON pt.object_id = fk.parent_object_id
+JOIN sys.schemas ps ON ps.schema_id = pt.schema_id
+JOIN sys.tables rt ON rt.object_id = fk.referenced_object_id
+JOIN sys.schemas rs ON rs.schema_id = rt.schema_id
+JOIN sys.foreign_key_columns fkc ON fkc.constraint_object_id = fk.object_id
+JOIN sys.columns pc ON pc.object_id = fkc.parent_object_id AND pc.column_id = fkc.parent_column_id
+JOIN sys.columns rc ON rc.object_id = fkc.referenced_object_id AND rc.column_id = fkc.referenced_column_id
+ORDER BY ps.name, pt.name, fk.name, fkc.constraint_column_id
+"""
+
+# Column-level CHECK constraints have a non-null parent_column_id; table-level
+# ones (referencing multiple columns in the expression) have parent_column_id
+# = 0, so column_name comes back NULL via the LEFT JOIN -- expected, not an error.
+QUERY_CHECK_CONSTRAINTS = """
+SELECT s.name AS schema_name, t.name AS table_name, cc.name AS constraint_name, cc.definition,
+       cc.is_disabled, cc.is_not_trusted, cc.is_system_named, col.name AS column_name
+FROM sys.check_constraints cc
+JOIN sys.tables t ON t.object_id = cc.parent_object_id
+JOIN sys.schemas s ON s.schema_id = t.schema_id
+LEFT JOIN sys.columns col ON col.object_id = cc.parent_object_id AND col.column_id = cc.parent_column_id
+ORDER BY s.name, t.name, cc.name
+"""
+
+QUERY_DEFAULT_CONSTRAINTS = """
+SELECT s.name AS schema_name, t.name AS table_name, dc.name AS constraint_name, dc.definition,
+       dc.is_system_named, col.name AS column_name
+FROM sys.default_constraints dc
+JOIN sys.tables t ON t.object_id = dc.parent_object_id
+JOIN sys.schemas s ON s.schema_id = t.schema_id
+LEFT JOIN sys.columns col ON col.object_id = dc.parent_object_id AND col.column_id = dc.parent_column_id
+ORDER BY s.name, t.name, dc.name
+"""
+
 
 class MetadataSource(Protocol):
     def list_databases(self) -> list[DatabaseEntity]: ...
@@ -265,6 +432,7 @@ class MetadataSource(Protocol):
     def list_security_principals(self, database: str) -> list[SecurityPrincipalEntity]: ...
     def list_permissions(self, database: str) -> list[PermissionEntity]: ...
     def list_database_summary(self, database: str) -> list[DatabaseSummaryEntity]: ...
+    def list_constraints(self, database: str) -> list[ConstraintEntity]: ...
 
 
 @dataclass
@@ -400,13 +568,19 @@ class LiveSqlServerSource:
                         ordinal_position=c[3],
                         default_constraint=c[4],
                         check_constraint=c[5],
-                        identity_seed=int(c[6]) if c[6] is not None else None,
-                        identity_increment=int(c[7]) if c[7] is not None else None,
-                        computed_expression=None if c[8] is None else str(c[8]),
-                        is_persisted=bool(c[9]) if c[9] is not None else None,
-                        collation_name=c[10],
-                        is_rowguid=bool(c[11]) if c[11] is not None else None,
-                        is_sparse=bool(c[12]) if c[12] is not None else None,
+                        # c[6] is is_identity (existence flag only -- no dedicated
+                        # ColumnEntity field for it; identity-ness is implied by
+                        # identity_seed/identity_increment being non-null).
+                        identity_seed=int(c[7]) if c[7] is not None else None,
+                        identity_increment=int(c[8]) if c[8] is not None else None,
+                        computed_expression=None if c[9] is None else str(c[9]),
+                        is_persisted=bool(c[10]) if c[10] is not None else None,
+                        collation_name=c[11],
+                        is_rowguid=bool(c[12]) if c[12] is not None else None,
+                        is_sparse=bool(c[13]) if c[13] is not None else None,
+                        is_filestream=bool(c[14]) if c[14] is not None else None,
+                        is_clr_type=bool(c[15]) if c[15] is not None else None,
+                        max_length=int(c[16]) if c[16] is not None else None,
                     )
                 )
             tables.append(
@@ -433,6 +607,12 @@ class LiveSqlServerSource:
                         round(float(size_mb or 0) / total_database_size_mb * 100.0, 2)
                         if total_database_size_mb else None
                     ),
+                    # Derived from the columns already fetched above -- no extra query.
+                    # These table-level convenience lists were previously never
+                    # populated for live tables (only per-column flags were set).
+                    identity_columns=[c.name for c in columns if c.identity_seed is not None],
+                    computed_columns=[c.name for c in columns if c.computed_expression is not None],
+                    sparse_columns=[c.name for c in columns if c.is_sparse],
                 )
             )
         tables.sort(key=lambda t: t.size_mb, reverse=True)
@@ -474,14 +654,92 @@ class LiveSqlServerSource:
         cur = self.connection.cursor()
         cur.execute(QUERY_AGENT_JOBS)
         jobs: dict[str, AgentJobEntity] = {}
-        for name, enabled, command, owner_sid, date_created, date_modified, retry_attempts, retry_interval, description in cur.fetchall():
+        job_ids_by_name: dict[str, int] = {}
+        for (job_id, name, enabled, command, owner_sid, date_created, date_modified, retry_attempts,
+             retry_interval, description, category_name, notify_operator_name, notify_level_email,
+             step_id, step_name, subsystem, database_name, on_success_action, on_fail_action) in cur.fetchall():
             job = jobs.setdefault(name, AgentJobEntity(name=name, enabled=bool(enabled), owner=str(owner_sid), schedule=description))
             job.steps.append(command)
+            # Preserved exactly as before (Enhancement 1 is additive-only) --
+            # these were already mapped to date_created/date_modified rather
+            # than true run dates; see last_run_date/next_scheduled_run for
+            # the correct values sourced from sysjobhistory/sysjobschedules.
             job.last_run=self._format_datetime(date_created)
             job.next_run=self._format_datetime(date_modified)
             job.retry_attempts=int(retry_attempts or 0)
             job.retry_interval=int(retry_interval or 0)
+
+            job.category = category_name
+            job.description = description
+            job.date_created = self._format_datetime(date_created)
+            job.date_modified = self._format_datetime(date_modified)
+            job.notification_operator = notify_operator_name
+            job.notification_method = _NOTIFY_LEVEL.get(notify_level_email)
+
+            job.step_details.append(
+                AgentJobStepEntity(
+                    step_id=step_id,
+                    name=step_name,
+                    subsystem=subsystem,
+                    database_name=database_name,
+                    command=command,
+                    on_success_action=_JOB_STEP_ACTION.get(on_success_action),
+                    on_fail_action=_JOB_STEP_ACTION.get(on_fail_action),
+                    retry_attempts=int(retry_attempts) if retry_attempts is not None else None,
+                    retry_interval=int(retry_interval) if retry_interval is not None else None,
+                )
+            )
+            job.step_count = len(job.step_details)
+            job_ids_by_name[name] = job_id
+
+        try:
+            self._attach_agent_job_schedules(jobs, job_ids_by_name)
+        except Exception:
+            pass  # sysjobschedules/sysschedules unavailable -- leave schedule/next-run fields empty
+
+        try:
+            self._attach_agent_job_last_run(jobs, job_ids_by_name)
+        except Exception:
+            pass  # sysjobhistory unavailable -- leave last_run_date/status empty
+
         return list(jobs.values())
+
+    def _attach_agent_job_schedules(self, jobs: dict, job_ids_by_name: dict) -> None:
+        id_to_name = {v: k for k, v in job_ids_by_name.items()}
+
+        cur = self.connection.cursor()
+        cur.execute(QUERY_AGENT_JOB_SCHEDULES)
+        for job_id, schedule_name, freq_type, freq_interval in cur.fetchall():
+            job = jobs.get(id_to_name.get(job_id))
+            if job is None:
+                continue
+            job.schedule_names.append(schedule_name)
+            job.schedule_frequency.append(_decode_schedule_frequency(freq_type, freq_interval))
+
+        cur = self.connection.cursor()
+        cur.execute(QUERY_AGENT_JOB_NEXT_RUN)
+        for job_id, next_run_date, next_run_time in cur.fetchall():
+            job = jobs.get(id_to_name.get(job_id))
+            if job is None:
+                continue
+            date_part = _decode_int_date(next_run_date)
+            if date_part:
+                job.next_scheduled_run = f"{date_part}T{_decode_int_time(next_run_time) or '00:00:00'}"
+
+    def _attach_agent_job_last_run(self, jobs: dict, job_ids_by_name: dict) -> None:
+        id_to_name = {v: k for k, v in job_ids_by_name.items()}
+
+        cur = self.connection.cursor()
+        cur.execute(QUERY_AGENT_JOB_LAST_RUN)
+        for job_id, run_date, run_time, run_status in cur.fetchall():
+            job = jobs.get(id_to_name.get(job_id))
+            if job is None:
+                continue
+            job.last_run_date = _decode_int_date(run_date)
+            job.last_run_time = _decode_int_time(run_time)
+            status_text = _JOB_RUN_STATUS.get(run_status)
+            job.last_run_status = status_text
+            job.last_outcome = status_text  # existing field, previously never populated
 
     def list_views(self, database: str) -> list[ViewEntity]:
         self._use_database(database)
@@ -514,17 +772,70 @@ class LiveSqlServerSource:
 
     def list_indexes(self, database: str) -> list[IndexEntity]:
         self._use_database(database)
+
+        cur = self.connection.cursor()
+        cur.execute(QUERY_DATABASES)
+        size_row = cur.fetchone()
+        total_database_size_mb = float(size_row[1]) if size_row else 0.0
+
+        cur = self.connection.cursor()
+        cur.execute(QUERY_TABLE_SIZES_BY_OBJECT)
+        table_size_by_object_id = {object_id: float(size_mb or 0) for object_id, size_mb in cur.fetchall()}
+
+        storage_by_index: dict = {}
+        try:
+            cur = self.connection.cursor()
+            cur.execute(QUERY_INDEX_STORAGE)
+            for object_id, index_id, filegroup_name, partition_count, allocation_unit_type in cur.fetchall():
+                storage_by_index[(object_id, index_id)] = (filegroup_name, partition_count, allocation_unit_type)
+        except Exception:
+            pass  # storage breakdown unavailable -- filegroup/partition_count/allocation_unit_type stay None
+
+        physical_by_index: dict = {}
+        try:
+            cur = self.connection.cursor()
+            cur.execute(QUERY_INDEX_PHYSICAL_STATS)
+            for object_id, index_id, frag_pct, page_count, avg_page_space_used_pct, record_count in cur.fetchall():
+                physical_by_index[(object_id, index_id)] = (frag_pct, page_count, avg_page_space_used_pct, record_count)
+        except Exception:
+            pass  # dm_db_index_physical_stats unavailable (permissions/engine edition) -- operational stats stay None
+
+        usage_by_index: dict = {}
+        try:
+            cur = self.connection.cursor()
+            cur.execute(QUERY_INDEX_USAGE_STATS)
+            for object_id, index_id, seeks, scans, lookups, updates in cur.fetchall():
+                usage_by_index[(object_id, index_id)] = (seeks, scans, lookups, updates)
+        except Exception:
+            pass  # usage stats unavailable -- user_seeks/scans/lookups/updates stay None
+
         cur = self.connection.cursor()
         cur.execute(QUERY_INDEXES)
         rows = cur.fetchall()
         out = []
-        for schema_name, table_name, index_name, type_desc, is_unique, has_filter, is_disabled, fill_factor, _, _, object_id, index_id in rows:
+        for (schema_name, table_name, index_name, type_desc, is_unique, has_filter, is_disabled, fill_factor,
+             _, filter_definition, object_id, index_id, is_primary_key) in rows:
             col_cur = self.connection.cursor()
             col_cur.execute(QUERY_INDEX_COLUMNS, object_id, index_id)
             key_columns = []
+            key_column_sort = []
             included_columns = []
-            for col_name, is_included in col_cur.fetchall():
-                (included_columns if is_included else key_columns).append(col_name)
+            for col_name, is_included, is_descending in col_cur.fetchall():
+                if is_included:
+                    included_columns.append(col_name)
+                else:
+                    key_columns.append(col_name)
+                    key_column_sort.append("DESC" if is_descending else "ASC")
+
+            filegroup_name, partition_count, allocation_unit_type = storage_by_index.get((object_id, index_id), (None, None, None))
+            frag_pct, page_count, avg_page_space_used_pct, record_count = physical_by_index.get((object_id, index_id), (None, None, None, None))
+            seeks, scans, lookups, updates = usage_by_index.get((object_id, index_id), (None, None, None, None))
+
+            index_size_mb = round(float(page_count) * 8.0 / 1024, 2) if page_count is not None else None
+            table_size_mb = table_size_by_object_id.get(object_id)
+            percent_of_table = round(index_size_mb / table_size_mb * 100.0, 2) if index_size_mb and table_size_mb else None
+            percent_of_database = round(index_size_mb / total_database_size_mb * 100.0, 2) if index_size_mb and total_database_size_mb else None
+
             out.append(
                 IndexEntity(
                     database=database,
@@ -538,8 +849,27 @@ class LiveSqlServerSource:
                     is_disabled=bool(is_disabled),
                     fill_factor=fill_factor,
                     compression=None,
+                    fragmentation_pct=round(float(frag_pct), 2) if frag_pct is not None else None,
+                    page_count=int(page_count) if page_count is not None else None,
+                    index_size_mb=index_size_mb,
                     key_columns=key_columns,
                     included_columns=included_columns,
+                    index_type=type_desc,
+                    is_primary_key=bool(is_primary_key),
+                    filter_definition=filter_definition,
+                    key_column_sort=key_column_sort,
+                    is_partitioned=bool(partition_count and partition_count > 1),
+                    partition_count=partition_count,
+                    filegroup=filegroup_name,
+                    allocation_unit_type=allocation_unit_type,
+                    user_seeks=int(seeks) if seeks is not None else None,
+                    user_scans=int(scans) if scans is not None else None,
+                    user_lookups=int(lookups) if lookups is not None else None,
+                    user_updates=int(updates) if updates is not None else None,
+                    avg_page_space_used_pct=round(float(avg_page_space_used_pct), 2) if avg_page_space_used_pct is not None else None,
+                    record_count=int(record_count) if record_count is not None else None,
+                    percent_of_table=percent_of_table,
+                    percent_of_database=percent_of_database,
                 )
             )
         return out
@@ -648,6 +978,64 @@ class LiveSqlServerSource:
                 database_size_mb=database_size_mb,
             )
         ]
+
+    def list_constraints(self, database: str) -> list[ConstraintEntity]:
+        self._use_database(database)
+        constraints: list[ConstraintEntity] = []
+
+        cur = self.connection.cursor()
+        cur.execute(QUERY_PK_UNIQUE_CONSTRAINTS)
+        pk_unique: dict[tuple, ConstraintEntity] = {}
+        for schema_name, table_name, constraint_name, kc_type, is_system_named, column_name, _ in cur.fetchall():
+            key = (schema_name, table_name, constraint_name)
+            entity = pk_unique.setdefault(key, ConstraintEntity(
+                database=database, schema=schema_name, table=table_name, name=constraint_name,
+                constraint_type="PRIMARY_KEY" if kc_type == "PK" else "UNIQUE",
+                is_system_named=bool(is_system_named),
+            ))
+            entity.columns.append(column_name)
+        constraints.extend(pk_unique.values())
+
+        cur = self.connection.cursor()
+        cur.execute(QUERY_FOREIGN_KEY_CONSTRAINTS)
+        fks: dict[tuple, ConstraintEntity] = {}
+        for (parent_schema, parent_table, constraint_name, ref_schema, ref_table, parent_column, ref_column,
+             _, delete_action, update_action, is_not_trusted, is_disabled, is_system_named) in cur.fetchall():
+            key = (parent_schema, parent_table, constraint_name)
+            entity = fks.setdefault(key, ConstraintEntity(
+                database=database, schema=parent_schema, table=parent_table, name=constraint_name,
+                constraint_type="FOREIGN_KEY",
+                referenced_table=f"{ref_schema}.{ref_table}",
+                delete_action=delete_action, update_action=update_action,
+                is_trusted=not bool(is_not_trusted), is_disabled=bool(is_disabled),
+                is_system_named=bool(is_system_named),
+            ))
+            entity.columns.append(parent_column)
+            entity.referenced_columns.append(ref_column)
+        constraints.extend(fks.values())
+
+        cur = self.connection.cursor()
+        cur.execute(QUERY_CHECK_CONSTRAINTS)
+        for schema_name, table_name, constraint_name, definition, is_disabled, is_not_trusted, is_system_named, column_name in cur.fetchall():
+            constraints.append(ConstraintEntity(
+                database=database, schema=schema_name, table=table_name, name=constraint_name,
+                constraint_type="CHECK",
+                columns=[column_name] if column_name else [],
+                is_trusted=not bool(is_not_trusted), is_disabled=bool(is_disabled),
+                is_system_named=bool(is_system_named), definition=definition,
+            ))
+
+        cur = self.connection.cursor()
+        cur.execute(QUERY_DEFAULT_CONSTRAINTS)
+        for schema_name, table_name, constraint_name, definition, is_system_named, column_name in cur.fetchall():
+            constraints.append(ConstraintEntity(
+                database=database, schema=schema_name, table=table_name, name=constraint_name,
+                constraint_type="DEFAULT",
+                columns=[column_name] if column_name else [],
+                is_system_named=bool(is_system_named), definition=definition,
+            ))
+
+        return constraints
 
 
 @dataclass
@@ -785,7 +1173,17 @@ class FixtureMetadataSource:
 
     def list_indexes(self, database: str) -> list[IndexEntity]:
         return [
-            IndexEntity(database=database, schema="dbo", table="Orders", name="IX_Orders_CustomerId", is_clustered=False, is_nonclustered=True, is_unique=False, is_filtered=False, is_disabled=False, fill_factor=90, compression="NONE")
+            IndexEntity(
+                database=database, schema="dbo", table="Orders", name="IX_Orders_CustomerId",
+                is_clustered=False, is_nonclustered=True, is_unique=False, is_filtered=False, is_disabled=False,
+                fill_factor=90, compression="NONE", fragmentation_pct=2.5, page_count=12, index_size_mb=0.09,
+                key_columns=["CustomerId"], key_column_sort=["ASC"], included_columns=["OrderDate"],
+                index_type="NONCLUSTERED", is_primary_key=False, is_partitioned=False, partition_count=1,
+                filegroup="PRIMARY", allocation_unit_type="IN_ROW_DATA",
+                user_seeks=120, user_scans=4, user_lookups=0, user_updates=15,
+                avg_page_space_used_pct=78.4, record_count=1000,
+                percent_of_table=1.2, percent_of_database=0.03,
+            )
         ]
 
     def list_functions(self, database: str) -> list[FunctionEntity]:
@@ -816,6 +1214,41 @@ class FixtureMetadataSource:
 
     def list_database_summary(self, database: str) -> list[DatabaseSummaryEntity]:
         return [DatabaseSummaryEntity(database=database, total_tables=len(self.catalog.tables), total_views=len(self.catalog.views), total_stored_procedures=len(self.catalog.procedures), total_functions=1, total_triggers=len(self.catalog.triggers), total_users=1, total_roles=1, total_schemas=1, total_indexes=1, total_foreign_keys=len(self.catalog.foreign_keys), total_synonyms=1, total_sequences=1, total_partitions=1, total_row_count=sum(self.catalog.row_count(t.schema, t.name) for t in self.catalog.tables.values()), total_reserved_space_mb=256.0, total_used_space_mb=192.0, largest_table=max(self.catalog.tables.keys(), key=lambda key: self.catalog.size_mb(*key.split('.', 1))), largest_index="IX_Orders_CustomerId", largest_schema="dbo", last_backup="2024-06-15T00:00:00", last_restore="2024-06-16T00:00:00", recovery_model="FULL", compatibility_level="SQL Server 2022", database_size_mb=self.catalog.database_size_mb(), log_size_mb=self.catalog.log_file_size_mb(), free_space_mb=max(self.catalog.database_size_mb() - self.catalog.data_file_size_mb(), 0))]
+
+    def list_constraints(self, database: str) -> list[ConstraintEntity]:
+        c = self.catalog
+        constraints: list[ConstraintEntity] = []
+        for key, t in c.tables.items():
+            pk_column = t.columns[0].name if t.columns else None
+            if pk_column:
+                constraints.append(ConstraintEntity(
+                    database=database, schema=t.schema, table=t.name,
+                    name=f"PK_{t.name}", constraint_type="PRIMARY_KEY",
+                    columns=[pk_column], is_trusted=True, is_disabled=False, is_system_named=False,
+                ))
+        for from_key, to_key in c.foreign_keys:
+            from_schema, from_table = from_key.split(".", 1)
+            to_schema, to_table = to_key.split(".", 1)
+            ref_column = f"{to_table[:-1] if to_table.endswith('s') else to_table}Id"
+            constraints.append(ConstraintEntity(
+                database=database, schema=from_schema, table=from_table,
+                name=f"FK_{from_table}_{to_table}", constraint_type="FOREIGN_KEY",
+                columns=[ref_column], referenced_table=f"{to_schema}.{to_table}",
+                referenced_columns=[ref_column],
+                delete_action="NO_ACTION", update_action="NO_ACTION",
+                is_trusted=True, is_disabled=False, is_system_named=False,
+            ))
+        constraints.append(ConstraintEntity(
+            database=database, schema="dbo", table="Orders", name="CK_Orders_TotalDue",
+            constraint_type="CHECK", columns=["TotalDue"],
+            definition="([TotalDue]>=(0))", is_trusted=True, is_disabled=False, is_system_named=False,
+        ))
+        constraints.append(ConstraintEntity(
+            database=database, schema="dbo", table="Orders", name="DF_Orders_ModifiedDate",
+            constraint_type="DEFAULT", columns=["ModifiedDate"],
+            definition="(sysutcdatetime())", is_system_named=False,
+        ))
+        return constraints
 
 
 def extract_database_metadata(source: MetadataSource, database: str):
@@ -895,6 +1328,10 @@ def extract_database_metadata(source: MetadataSource, database: str):
     def _database_summary(name):
         return source.list_database_summary(database), "direct_metadata"
 
+    @log_object_result("constraint")
+    def _constraints(name):
+        return source.list_constraints(database), "direct_metadata"
+
     log_entries = []
     databases, e = _databases(database); log_entries.append(e)
     tables, e = _tables(database); log_entries.append(e)
@@ -914,6 +1351,7 @@ def extract_database_metadata(source: MetadataSource, database: str):
     security_principals, e = _security_principals(database); log_entries.append(e)
     permissions, e = _permissions(database); log_entries.append(e)
     database_summary, e = _database_summary(database); log_entries.append(e)
+    constraints, e = _constraints(database); log_entries.append(e)
 
     for db_entity in databases or []:
         if db_entity.name == database:
@@ -941,6 +1379,11 @@ def extract_database_metadata(source: MetadataSource, database: str):
             if tables:
                 largest = max(tables, key=lambda t: t.size_mb)
                 summary.largest_table = f"{largest.schema}.{largest.name}"
+            summary.total_constraints = len(constraints or [])
+            summary.total_primary_key_constraints = sum(1 for c in constraints or [] if c.constraint_type == "PRIMARY_KEY")
+            summary.total_unique_constraints = sum(1 for c in constraints or [] if c.constraint_type == "UNIQUE")
+            summary.total_check_constraints = sum(1 for c in constraints or [] if c.constraint_type == "CHECK")
+            summary.total_default_constraints = sum(1 for c in constraints or [] if c.constraint_type == "DEFAULT")
 
     return {
         "databases": databases or [],
@@ -961,4 +1404,5 @@ def extract_database_metadata(source: MetadataSource, database: str):
         "security_principals": security_principals or [],
         "permissions": permissions or [],
         "database_summary": database_summary or [],
+        "constraints": constraints or [],
     }, log_entries

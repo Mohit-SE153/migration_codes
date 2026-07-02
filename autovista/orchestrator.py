@@ -33,6 +33,7 @@ import uuid
 from datetime import datetime, timezone
 
 from autovista.config import AutovistaConfig, load_config
+from autovista.data_quality_analyzer import build_data_quality_summary
 from autovista.dependency_graph_builder import build_dependency_graph
 from autovista.dtsx_xml_parser import parse_dtsx_file
 from autovista.llm_fallback_extractor import build_llm_client, extract_with_llm_fallback
@@ -141,6 +142,7 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
         manifest.security_principals = db_result.get("security_principals", [])
         manifest.permissions = db_result.get("permissions", [])
         manifest.database_summary = db_result.get("database_summary", [])
+        manifest.constraints = db_result.get("constraints", [])
 
         # --- Tables: direct_metadata, resumable via row/size fingerprint ---
         for table in db_result["tables"]:
@@ -154,6 +156,11 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
                 logger.info("SKIP table        %-45s unchanged since last run", object_id)
                 counters["skipped_unchanged"] += 1
                 manifest.tables.append(table)  # still included in output; just not re-logged as newly scanned
+
+        # --- Data Quality Summary: metadata-only, computed from tables/indexes/constraints above ---
+        manifest.data_quality_summary = [
+            build_data_quality_summary(database_name, manifest.tables, manifest.indexes, manifest.constraints)
+        ]
 
         # --- Stored procedures: enrich with sqlglot lineage, resumable via definition hash ---
         llm_client = build_llm_client(config.llm)

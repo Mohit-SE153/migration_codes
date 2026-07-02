@@ -69,7 +69,11 @@ def test_list_procedures_reads_is_encrypted_and_execute_as_from_correct_columns(
 def test_list_agent_jobs_reads_retry_settings_from_sysjobsteps_not_sysjobs():
     source = _source([
         ("FROM msdb.dbo.sysjobs j", [
-            ("NightlyLoad", 1, "EXEC dbo.usp_Load", b"\x01", "2024-01-01", "2024-06-01", 3, 5, "Nightly ETL job"),
+            (
+                101, "NightlyLoad", 1, "EXEC dbo.usp_Load", b"\x01", "2024-01-01", "2024-06-01", 3, 5,
+                "Nightly ETL job", "Data Collector", "DBA_Team", 2,
+                1, "Run Load", "TSQL", "SalesDW", 3, 2,
+            ),
         ]),
     ])
     jobs = source.list_agent_jobs()
@@ -77,6 +81,13 @@ def test_list_agent_jobs_reads_retry_settings_from_sysjobsteps_not_sysjobs():
     job = jobs[0]
     assert job.retry_attempts == 3
     assert job.retry_interval == 5
+    assert job.category == "Data Collector"
+    assert job.notification_operator == "DBA_Team"
+    assert job.notification_method == "On Failure"
+    assert job.step_count == 1
+    assert job.step_details[0].subsystem == "TSQL"
+    assert job.step_details[0].on_success_action == "Go To Next Step"
+    assert job.step_details[0].on_fail_action == "Quit With Failure"
 
 
 def test_list_functions_resolves_return_type_via_parameters_join():
@@ -130,11 +141,11 @@ def test_list_assemblies_uses_owner_default_schema_not_schema_id_join():
 def test_list_indexes_splits_key_and_included_columns():
     source = _source([
         ("FROM sys.indexes i", [
-            ("dbo", "Orders", "IX_Orders_CustomerId", "NONCLUSTERED", False, False, False, 90, 1, None, 111, 2),
+            ("dbo", "Orders", "IX_Orders_CustomerId", "NONCLUSTERED", False, False, False, 90, 1, None, 111, 2, False),
         ]),
         ("FROM sys.index_columns ic", [
-            ("CustomerId", False),
-            ("OrderDate", True),
+            ("CustomerId", False, True),
+            ("OrderDate", True, False),
         ]),
     ])
     indexes = source.list_indexes("SalesDW")
@@ -142,6 +153,125 @@ def test_list_indexes_splits_key_and_included_columns():
     idx = indexes[0]
     assert idx.key_columns == ["CustomerId"]
     assert idx.included_columns == ["OrderDate"]
+    assert idx.key_column_sort == ["DESC"]
+    assert idx.is_primary_key is False
+
+
+def test_list_indexes_merges_storage_usage_and_physical_stats():
+    source = _source([
+        ("JOIN sys.master_files mf", [("SalesDW", 1000.0)]),
+        ("FROM sys.dm_db_partition_stats ps", [(111, 200.0)]),
+        # QUERY_INDEX_STORAGE's FROM clause is also "sys.indexes i" like the
+        # main index query -- match on a substring unique to it instead.
+        ("COUNT(DISTINCT p.partition_number)", [(111, 2, "PRIMARY", 1, "IN_ROW_DATA")]),
+        ("FROM sys.dm_db_index_physical_stats", [(111, 2, 12.5, 25, 80.0, 5000)]),
+        ("FROM sys.dm_db_index_usage_stats", [(111, 2, 100, 10, 2, 7)]),
+        ("FROM sys.indexes i", [
+            ("dbo", "Orders", "IX_Orders_CustomerId", "NONCLUSTERED", False, False, False, 90, 1, None, 111, 2, False),
+        ]),
+        ("FROM sys.index_columns ic", [("CustomerId", False, False)]),
+    ])
+    indexes = source.list_indexes("SalesDW")
+    assert len(indexes) == 1
+    idx = indexes[0]
+    assert idx.filegroup == "PRIMARY"
+    assert idx.allocation_unit_type == "IN_ROW_DATA"
+    assert idx.fragmentation_pct == 12.5
+    assert idx.page_count == 25
+    assert idx.avg_page_space_used_pct == 80.0
+    assert idx.record_count == 5000
+    assert idx.user_seeks == 100
+    assert idx.user_scans == 10
+    assert idx.user_lookups == 2
+    assert idx.user_updates == 7
+    assert idx.index_size_mb == round(25 * 8.0 / 1024, 2)
+    assert idx.percent_of_table == round(idx.index_size_mb / 200.0 * 100.0, 2)
+    assert idx.percent_of_database == round(idx.index_size_mb / 1000.0 * 100.0, 2)
+
+
+def test_list_indexes_tolerates_dmv_permission_errors():
+    class ExplodingDmvConnection(FakeConnection):
+        def cursor(self):
+            cursor = super().cursor()
+            original_execute = cursor.execute
+
+            def execute(sql, *params):
+                if "dm_db_index_physical_stats" in sql or "dm_db_index_usage_stats" in sql:
+                    raise RuntimeError("permission denied")
+                return original_execute(sql, *params)
+
+            cursor.execute = execute
+            return cursor
+
+    source = LiveSqlServerSource(connection=ExplodingDmvConnection([
+        ("JOIN sys.master_files mf", [("SalesDW", 1000.0)]),
+        ("FROM sys.indexes i", [
+            ("dbo", "Orders", "IX_Orders_CustomerId", "NONCLUSTERED", False, False, False, 90, 1, None, 111, 2, False),
+        ]),
+        ("FROM sys.index_columns ic", [("CustomerId", False, False)]),
+    ]))
+    indexes = source.list_indexes("SalesDW")
+    assert len(indexes) == 1
+    assert indexes[0].fragmentation_pct is None
+    assert indexes[0].user_seeks is None
+
+
+def test_list_agent_jobs_attaches_schedules_and_last_run_history():
+    source = _source([
+        ("FROM msdb.dbo.sysjobs j", [
+            (
+                101, "NightlyLoad", 1, "EXEC dbo.usp_Load", b"\x01", "2024-01-01", "2024-06-01", 3, 5,
+                "Nightly ETL job", "Data Collector", "DBA_Team", 2,
+                1, "Run Load", "TSQL", "SalesDW", 3, 2,
+            ),
+        ]),
+        ("FROM msdb.dbo.sysjobschedules js\nJOIN", [(101, "Nightly 2AM", 4, 1)]),
+        ("FROM msdb.dbo.sysjobschedules js\nWHERE", [(101, 20240616, 20000)]),
+        ("FROM msdb.dbo.sysjobhistory h", [(101, 20240615, 20000, 1)]),
+    ])
+    jobs = source.list_agent_jobs()
+    assert len(jobs) == 1
+    job = jobs[0]
+    assert job.schedule_names == ["Nightly 2AM"]
+    assert job.schedule_frequency == ["Daily (interval=1)"]
+    assert job.next_scheduled_run == "2024-06-16T02:00:00"
+    assert job.last_run_date == "2024-06-15"
+    assert job.last_run_time == "02:00:00"
+    assert job.last_run_status == "Succeeded"
+    assert job.last_outcome == "Succeeded"
+
+
+def test_list_agent_jobs_tolerates_missing_history_and_schedule_tables():
+    class ExplodingMsdbConnection(FakeConnection):
+        def cursor(self):
+            cursor = super().cursor()
+            original_execute = cursor.execute
+
+            def execute(sql, *params):
+                if "sysjobschedules" in sql or "sysjobhistory" in sql:
+                    raise RuntimeError("permission denied on msdb")
+                return original_execute(sql, *params)
+
+            cursor.execute = execute
+            return cursor
+
+    source = LiveSqlServerSource(connection=ExplodingMsdbConnection([
+        ("FROM msdb.dbo.sysjobs j", [
+            (
+                101, "NightlyLoad", 1, "EXEC dbo.usp_Load", b"\x01", "2024-01-01", "2024-06-01", 3, 5,
+                "Nightly ETL job", "Data Collector", "DBA_Team", 2,
+                1, "Run Load", "TSQL", "SalesDW", 3, 2,
+            ),
+        ]),
+    ]))
+    jobs = source.list_agent_jobs()
+    assert len(jobs) == 1
+    job = jobs[0]
+    assert job.schedule_names == []
+    assert job.last_run_status is None
+    # Original (pre-enhancement) fields are unaffected by the failure.
+    assert job.retry_attempts == 3
+    assert job.retry_interval == 5
 
 
 def test_list_tables_computes_percent_of_database_and_sorts_largest_first():

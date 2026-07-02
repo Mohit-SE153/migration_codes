@@ -73,6 +73,11 @@ class ColumnEntity:
     is_sparse: bool | None = None
     is_nullable: bool | None = None
 
+    # --- additive fields: used by Data Quality Summary (Enhancement 4) ---
+    is_filestream: bool | None = None
+    is_clr_type: bool | None = None
+    max_length: int | None = None  # sys.columns.max_length; -1 means MAX (varchar(max)/nvarchar(max)/varbinary(max))
+
     def __post_init__(self) -> None:
         if self.is_nullable is None:
             self.is_nullable = self.nullable
@@ -161,6 +166,19 @@ class TriggerEntity:
 
 
 @dataclass
+class AgentJobStepEntity:
+    step_id: int | None = None
+    name: str | None = None
+    subsystem: str | None = None  # step type, e.g. TSQL / CmdExec / PowerShell
+    database_name: str | None = None
+    command: str | None = None
+    on_success_action: str | None = None
+    on_fail_action: str | None = None
+    retry_attempts: int | None = None
+    retry_interval: int | None = None
+
+
+@dataclass
 class AgentJobEntity:
     name: str
     enabled: bool
@@ -174,6 +192,24 @@ class AgentJobEntity:
     retry_attempts: int | None = None
     retry_interval: int | None = None
     parse_status: ParseStatus = "direct_metadata"
+
+    # --- additive fields: richer SQL Agent metadata ---
+    category: str | None = None
+    description: str | None = None
+    date_created: str | None = None
+    date_modified: str | None = None
+    last_run_date: str | None = None
+    last_run_time: str | None = None
+    last_run_status: str | None = None
+    next_scheduled_run: str | None = None
+    step_count: int = 0
+    # Parallel arrays: schedule_names[i] pairs with schedule_frequency[i] --
+    # one job can have multiple schedules attached.
+    schedule_names: list[str] = field(default_factory=list)
+    schedule_frequency: list[str] = field(default_factory=list)
+    notification_operator: str | None = None
+    notification_method: str | None = None
+    step_details: list[AgentJobStepEntity] = field(default_factory=list)
 
 
 @dataclass
@@ -214,6 +250,44 @@ class IndexEntity:
     index_size_mb: float | None = None
     included_columns: list[str] = field(default_factory=list)
     key_columns: list[str] = field(default_factory=list)
+    parse_status: ParseStatus = "direct_metadata"
+
+    # --- additive fields: richer index metadata ---
+    index_type: str | None = None  # sys.indexes.type_desc verbatim (CLUSTERED/NONCLUSTERED/HEAP/...)
+    is_primary_key: bool | None = None
+    filter_definition: str | None = None
+    # Parallel to key_columns -- key_column_sort[i] is the sort direction of key_columns[i].
+    key_column_sort: list[str] = field(default_factory=list)
+    is_partitioned: bool | None = None
+    partition_count: int | None = None
+    filegroup: str | None = None
+    allocation_unit_type: str | None = None
+    user_seeks: int | None = None
+    user_scans: int | None = None
+    user_lookups: int | None = None
+    user_updates: int | None = None
+    avg_page_space_used_pct: float | None = None
+    record_count: int | None = None
+    percent_of_table: float | None = None
+    percent_of_database: float | None = None
+
+
+@dataclass
+class ConstraintEntity:
+    database: str
+    schema: str
+    table: str
+    name: str
+    constraint_type: str  # "PRIMARY_KEY" | "FOREIGN_KEY" | "UNIQUE" | "CHECK" | "DEFAULT"
+    columns: list[str] = field(default_factory=list)
+    referenced_table: str | None = None  # FOREIGN_KEY only
+    referenced_columns: list[str] = field(default_factory=list)  # FOREIGN_KEY only
+    delete_action: str | None = None  # FOREIGN_KEY only
+    update_action: str | None = None  # FOREIGN_KEY only
+    is_trusted: bool | None = None  # FOREIGN_KEY / CHECK only (NOT FOR REPLICATION-trusted)
+    is_disabled: bool | None = None  # CHECK / FOREIGN_KEY only
+    is_system_named: bool | None = None
+    definition: str | None = None  # CHECK / DEFAULT only
     parse_status: ParseStatus = "direct_metadata"
 
 
@@ -336,6 +410,60 @@ class DatabaseSummaryEntity:
     log_size_mb: float = 0.0
     free_space_mb: float = 0.0
 
+    # --- additive fields: constraint totals (Enhancement 2) ---
+    total_constraints: int = 0
+    total_primary_key_constraints: int = 0
+    total_unique_constraints: int = 0
+    total_check_constraints: int = 0
+    total_default_constraints: int = 0
+
+
+@dataclass
+class DataQualitySummaryEntity:
+    """Metadata-driven migration-readiness indicators. Deliberately built
+    only from data already collected by other extractors (tables, columns,
+    indexes) -- no additional full-table scans. Estimated NULL percentages
+    per column are intentionally NOT included here: a reliable estimate
+    needs either a full scan or column statistics histograms
+    (sys.dm_db_stats_histogram / DBCC SHOW_STATISTICS), which is more than
+    "metadata-only" and is left for a future, opt-in pass rather than
+    guessed at here."""
+
+    database: str
+
+    total_tables: int = 0
+    empty_tables: int = 0
+    tables_without_primary_key: int = 0
+    tables_without_clustered_index: int = 0
+    tables_without_foreign_key: int = 0
+    heap_tables: int = 0
+    tables_with_triggers: int = 0
+    tables_with_identity_columns: int = 0
+    tables_with_computed_columns: int = 0
+    tables_with_sparse_columns: int = 0
+    tables_with_xml_columns: int = 0
+    tables_with_spatial_columns: int = 0  # geography / geometry
+    tables_with_clr_types: int = 0
+    tables_with_lob_columns: int = 0
+    tables_with_cdc_enabled: int = 0
+    tables_with_change_tracking_enabled: int = 0
+    tables_with_temporal_tables: int = 0
+    tables_with_filestream: int = 0
+
+    nullable_columns: int = 0
+    non_nullable_columns: int = 0
+    duplicate_column_names: int = 0
+    deprecated_data_type_columns: int = 0
+    sql_variant_columns: int = 0
+    text_ntext_image_columns: int = 0
+    large_max_columns: int = 0  # varchar(max) / nvarchar(max) / varbinary(max)
+
+    average_row_length_bytes: float | None = None
+    largest_tables: list[str] = field(default_factory=list)
+    wide_schema_tables: list[str] = field(default_factory=list)
+    excessive_index_tables: list[str] = field(default_factory=list)
+    parse_status: ParseStatus = "direct_metadata"
+
 
 @dataclass
 class EmbeddedSqlEntity:
@@ -424,6 +552,8 @@ class DiscoveryManifest:
     security_principals: list[SecurityPrincipalEntity] = field(default_factory=list)
     permissions: list[PermissionEntity] = field(default_factory=list)
     database_summary: list[DatabaseSummaryEntity] = field(default_factory=list)
+    constraints: list[ConstraintEntity] = field(default_factory=list)
+    data_quality_summary: list[DataQualitySummaryEntity] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return asdict(self)
