@@ -1,0 +1,5 @@
+# Normalize line endings in the repo to LF regardless of the checkout OS.
+* text=auto eol=lf
+
+# Fixture XML should stay byte-stable for its content-hash fingerprint tests.
+*.dtsx text eol=lf

@@ -1,0 +1,12 @@
+# Core (required for `fixture` run mode and all extractor modules)
+sqlglot>=25.0.0
+
+# Required only for `live` run mode against a real SQL Server instance.
+# Also requires a system ODBC driver (e.g. "ODBC Driver 18 for SQL Server").
+pyodbc>=5.0.0
+
+# Optional: only needed if AUTOVISTA_LLM_FALLBACK_ENABLED=true
+# anthropic>=0.40.0
+
+# Dev/test
+pytest>=8.0.0

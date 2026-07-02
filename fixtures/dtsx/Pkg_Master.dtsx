@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!--
+  Complexity: ORCHESTRATOR. No data flow of its own; three Execute
+  Package Task nodes chaining the other packages, with a failure branch.
+  This is the primary fixture for exercising package -> package edges
+  in dependency_graph_builder.
+-->
+<DTS:Executable
+    xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+    xmlns:ExecutePackageTask="www.microsoft.com/SqlServer/Dts/Tasks/ExecutePackageTask"
+    DTS:ExecutableType="Microsoft.Package">
+  <DTS:Property DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Property DTS:Name="ObjectName">Pkg_Master</DTS:Property>
+  <DTS:Property DTS:Name="VersionGUID">{11111111-0000-0000-0000-000000000005}</DTS:Property>
+
+  <DTS:ConnectionManagers />
+
+  <DTS:Variables>
+    <DTS:Variable DTS:ObjectName="RunId" DTS:Namespace="User">
+      <DTS:VariableValue DTS:DataType="3">0</DTS:VariableValue>
+    </DTS:Variable>
+  </DTS:Variables>
+
+  <DTS:Executables>
+
+    <DTS:Executable DTS:ExecutableType="Microsoft.ExecutePackageTask" DTS:refId="Package\Run Load Customers">
+      <DTS:Property DTS:Name="ObjectName">Run Load Customers</DTS:Property>
+      <DTS:ObjectData>
+        <ExecutePackageTask:ExecutePackageTaskData
+            ExecutePackageTask:PackageName="Pkg_LoadCustomers.dtsx"
+            ExecutePackageTask:LocationType="SSISDB" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <DTS:Executable DTS:ExecutableType="Microsoft.ExecutePackageTask" DTS:refId="Package\Run Load Orders">
+      <DTS:Property DTS:Name="ObjectName">Run Load Orders</DTS:Property>
+      <DTS:ObjectData>
+        <ExecutePackageTask:ExecutePackageTaskData
+            ExecutePackageTask:PackageName="Pkg_LoadOrders.dtsx"
+            ExecutePackageTask:LocationType="SSISDB" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <DTS:Executable DTS:ExecutableType="Microsoft.ExecutePackageTask" DTS:refId="Package\Run Load Order Details">
+      <DTS:Property DTS:Name="ObjectName">Run Load Order Details</DTS:Property>
+      <DTS:ObjectData>
+        <ExecutePackageTask:ExecutePackageTaskData
+            ExecutePackageTask:PackageName="Pkg_LoadOrderDetails.dtsx"
+            ExecutePackageTask:LocationType="SSISDB" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <DTS:Executable DTS:ExecutableType="Microsoft.ExecutePackageTask" DTS:refId="Package\Run Archive Old Data">
+      <DTS:Property DTS:Name="ObjectName">Run Archive Old Data</DTS:Property>
+      <DTS:ObjectData>
+        <ExecutePackageTask:ExecutePackageTaskData
+            ExecutePackageTask:PackageName="Pkg_ArchiveOldData.dtsx"
+            ExecutePackageTask:LocationType="SSISDB" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+  </DTS:Executables>
+
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+        DTS:refId="Package.PrecedenceConstraints[Customers To Orders]"
+        DTS:From="Package\Run Load Customers"
+        DTS:To="Package\Run Load Orders"
+        DTS:Value="Success" />
+    <DTS:PrecedenceConstraint
+        DTS:refId="Package.PrecedenceConstraints[Orders To OrderDetails]"
+        DTS:From="Package\Run Load Orders"
+        DTS:To="Package\Run Load Order Details"
+        DTS:Value="Success" />
+    <DTS:PrecedenceConstraint
+        DTS:refId="Package.PrecedenceConstraints[OrderDetails To Archive]"
+        DTS:From="Package\Run Load Order Details"
+        DTS:To="Package\Run Archive Old Data"
+        DTS:Value="Completion" />
+  </DTS:PrecedenceConstraints>
+
+</DTS:Executable>

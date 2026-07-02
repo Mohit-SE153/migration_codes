@@ -1,0 +1,192 @@
+{
+  "sqlglot_spike": {
+    "total_procedures": 11,
+    "resolved_via_sqlglot": 10,
+    "correctly_flagged_unresolved": 1,
+    "total_views": 3,
+    "views_resolved": 3,
+    "proc_detail": {
+      "dbo.usp_LoadCustomersFromStaging": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [
+          "dbo.Customers",
+          "staging.stg_Customers"
+        ],
+        "referenced_procs": [],
+        "unresolved_reason": null
+      },
+      "dbo.usp_LoadOrdersFromStaging": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [
+          "dbo.OrderDetails",
+          "dbo.Orders",
+          "staging.stg_OrderDetails",
+          "staging.stg_Orders"
+        ],
+        "referenced_procs": [],
+        "unresolved_reason": null
+      },
+      "dbo.usp_UpdateInventoryFromStaging": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [
+          "dbo.Inventory",
+          "staging.stg_Inventory"
+        ],
+        "referenced_procs": [],
+        "unresolved_reason": null
+      },
+      "dbo.usp_ArchiveOldOrders": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [
+          "dbo.ArchiveOrders",
+          "dbo.OrderDetails",
+          "dbo.Orders"
+        ],
+        "referenced_procs": [],
+        "unresolved_reason": null
+      },
+      "dbo.usp_CalculateSalesReasonStats": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [
+          "dbo.Orders",
+          "dbo.SalesReasons"
+        ],
+        "referenced_procs": [],
+        "unresolved_reason": null
+      },
+      "dbo.usp_MergeProducts": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [
+          "dbo.Products",
+          "staging.stg_Products"
+        ],
+        "referenced_procs": [],
+        "unresolved_reason": null
+      },
+      "dbo.usp_SyncSuppliersFromStaging": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [
+          "dbo.Suppliers",
+          "staging.stg_Suppliers"
+        ],
+        "referenced_procs": [],
+        "unresolved_reason": null
+      },
+      "dbo.usp_ValidateOrderTotals": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [
+          "dbo.OrderDetails",
+          "dbo.Orders"
+        ],
+        "referenced_procs": [],
+        "unresolved_reason": null
+      },
+      "dbo.usp_PurgeStagingTables": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [
+          "staging.stg_Customers",
+          "staging.stg_Inventory",
+          "staging.stg_OrderDetails",
+          "staging.stg_Orders",
+          "staging.stg_Products",
+          "staging.stg_Suppliers"
+        ],
+        "referenced_procs": [],
+        "unresolved_reason": null
+      },
+      "dbo.usp_RebuildIndexes": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [],
+        "referenced_procs": [],
+        "unresolved_reason": null
+      },
+      "dbo.usp_DynamicReportBuilder": {
+        "parse_status": "unresolved",
+        "referenced_tables": [],
+        "referenced_procs": [],
+        "unresolved_reason": "dynamic SQL (sp_executesql / EXEC(@var)) -- table names not statically resolvable"
+      }
+    },
+    "view_detail": {
+      "dbo.vw_CustomerOrderSummary": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [
+          "dbo.Customers",
+          "dbo.Orders"
+        ]
+      },
+      "dbo.vw_ActiveProducts": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [
+          "dbo.ProductCategory",
+          "dbo.Products"
+        ]
+      },
+      "dbo.vw_InventoryStatus": {
+        "parse_status": "sqlglot",
+        "referenced_tables": [
+          "dbo.Inventory",
+          "dbo.Products",
+          "dbo.Suppliers"
+        ]
+      }
+    }
+  },
+  "xml_parser_spike": {
+    "total_packages": 5,
+    "total_script_tasks_flagged": 1,
+    "total_execute_package_edges": 4,
+    "package_detail": {
+      "Pkg_ArchiveOldData": {
+        "task_count": 2,
+        "connection_managers": 2,
+        "variables": 1,
+        "precedence_constraints": 1,
+        "embedded_sql_extracted": 1,
+        "script_tasks_flagged_unparseable": 0,
+        "package_to_package_edges": []
+      },
+      "Pkg_LoadCustomers": {
+        "task_count": 2,
+        "connection_managers": 1,
+        "variables": 1,
+        "precedence_constraints": 1,
+        "embedded_sql_extracted": 2,
+        "script_tasks_flagged_unparseable": 0,
+        "package_to_package_edges": []
+      },
+      "Pkg_LoadOrderDetails": {
+        "task_count": 4,
+        "connection_managers": 1,
+        "variables": 2,
+        "precedence_constraints": 2,
+        "embedded_sql_extracted": 2,
+        "script_tasks_flagged_unparseable": 1,
+        "package_to_package_edges": []
+      },
+      "Pkg_LoadOrders": {
+        "task_count": 3,
+        "connection_managers": 1,
+        "variables": 1,
+        "precedence_constraints": 1,
+        "embedded_sql_extracted": 3,
+        "script_tasks_flagged_unparseable": 0,
+        "package_to_package_edges": []
+      },
+      "Pkg_Master": {
+        "task_count": 4,
+        "connection_managers": 0,
+        "variables": 1,
+        "precedence_constraints": 3,
+        "embedded_sql_extracted": 0,
+        "script_tasks_flagged_unparseable": 0,
+        "package_to_package_edges": [
+          "Pkg_LoadCustomers",
+          "Pkg_LoadOrders",
+          "Pkg_LoadOrderDetails",
+          "Pkg_ArchiveOldData"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--
+  Complexity: MEDIUM. Sequence container, a data flow with a Lookup
+  component (adds a package -> table READ dependency beyond the main
+  source), and an OLE DB Source driven by a multi-table join query
+  (exercises sql_lineage_parser on embedded SQL).
+-->
+<DTS:Executable
+    xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+    xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+    DTS:ExecutableType="Microsoft.Package">
+  <DTS:Property DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Property DTS:Name="ObjectName">Pkg_LoadOrders</DTS:Property>
+  <DTS:Property DTS:Name="VersionGUID">{11111111-0000-0000-0000-000000000002}</DTS:Property>
+
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager DTS:refId="Package.ConnectionManagers[SalesDW]" DTS:CreationName="OLEDB" DTS:ObjectName="SalesDW">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager ConnectionString="Data Source=SQLPRD01;Initial Catalog=SalesDW;Provider=SQLNCLI11.1;Integrated Security=SSPI;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+
+  <DTS:Variables>
+    <DTS:Variable DTS:ObjectName="RunDate" DTS:Namespace="User">
+      <DTS:VariableValue DTS:DataType="7">2026-07-01T00:00:00</DTS:VariableValue>
+    </DTS:Variable>
+  </DTS:Variables>
+
+  <DTS:Executables>
+
+    <DTS:Executable DTS:ExecutableType="STOCK:SEQUENCE" DTS:refId="Package\Load Orders Sequence">
+      <DTS:Property DTS:Name="ObjectName">Load Orders Sequence</DTS:Property>
+      <DTS:Executables>
+
+        <DTS:Executable DTS:ExecutableType="STOCK:PipelineTask" DTS:refId="Package\Load Orders Sequence\Load Orders Flow">
+          <DTS:Property DTS:Name="ObjectName">Load Orders Flow</DTS:Property>
+          <DTS:ObjectData>
+            <pipeline version="1">
+              <components>
+                <component name="OLE DB Source - Orders Join" componentClassID="Microsoft.OLEDBSource" connectionRef="SalesDW">
+                  <properties>
+                    <property name="AccessMode">2</property>
+                    <property name="SqlCommand">SELECT o.OrderId, o.CustomerId, o.OrderDate, o.TotalDue FROM dbo.Orders o INNER JOIN dbo.Customers c ON c.CustomerId = o.CustomerId WHERE o.ModifiedDate &gt; ?</property>
+                  </properties>
+                </component>
+                <component name="Lookup - Ship Method" componentClassID="Microsoft.Lookup" connectionRef="SalesDW">
+                  <properties>
+                    <property name="SqlCommand">SELECT ShipMethodId, MethodName FROM dbo.ShipMethods</property>
+                  </properties>
+                </component>
+                <component name="OLE DB Destination - stg_Orders" componentClassID="Microsoft.OLEDBDestination" connectionRef="SalesDW">
+                  <properties>
+                    <property name="AccessMode">3</property>
+                    <property name="OpenRowset">[staging].[stg_Orders]</property>
+                  </properties>
+                </component>
+              </components>
+              <paths>
+                <path startId="OLE DB Source - Orders Join" endId="Lookup - Ship Method" />
+                <path startId="Lookup - Ship Method" endId="OLE DB Destination - stg_Orders" />
+              </paths>
+            </pipeline>
+          </DTS:ObjectData>
+        </DTS:Executable>
+
+        <DTS:Executable DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:refId="Package\Load Orders Sequence\Exec usp_LoadOrdersFromStaging">
+          <DTS:Property DTS:Name="ObjectName">Exec usp_LoadOrdersFromStaging</DTS:Property>
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+                SQLTask:Connection="SalesDW"
+                SQLTask:SqlStatementSource="EXEC dbo.usp_LoadOrdersFromStaging;" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+
+      </DTS:Executables>
+    </DTS:Executable>
+
+  </DTS:Executables>
+
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+        DTS:refId="Package\Load Orders Sequence.PrecedenceConstraints[Flow To Proc]"
+        DTS:From="Package\Load Orders Sequence\Load Orders Flow"
+        DTS:To="Package\Load Orders Sequence\Exec usp_LoadOrdersFromStaging"
+        DTS:Value="Success" />
+  </DTS:PrecedenceConstraints>
+
+</DTS:Executable>
