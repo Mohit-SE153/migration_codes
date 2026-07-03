@@ -1,16 +1,82 @@
 """
 Assembles the cross-object dependency graph from everything the other
 extractors already resolved. This module does no parsing of its own --
-it only combines already-typed results into DependencyEntity edges. Edge
-types produced:
+it only combines already-typed results into DependencyEntity edges.
 
-  package -> package        (Execute Package Task)          discovery_method=xml_parsed
-  package -> table/view     (read/write via embedded SQL)    discovery_method=sqlglot | llm_inferred | unresolved
-  proc    -> table          (via sql_lineage_parser)         discovery_method=sqlglot | llm_inferred | unresolved
-  proc    -> proc           (EXEC inside a proc body)        discovery_method=sqlglot
-  package -> proc           (Execute SQL Task calling EXEC)  discovery_method=sqlglot
-  table   -> table          (foreign key)                    discovery_method=direct_metadata
-  view    -> table          (view definition)                discovery_method=sqlglot
+Edge types produced:
+
+  package     -> package        (Execute Package Task)          discovery_method=xml_parsed
+  package     -> table/view     (read/write via embedded SQL)    discovery_method=sqlglot | llm_inferred | unresolved
+  package     -> proc           (Execute SQL Task calling EXEC)  discovery_method=sqlglot
+  proc        -> table/view     (via sql_lineage_parser)         discovery_method=sqlglot | llm_inferred | unresolved
+  proc        -> proc           (EXEC inside a proc body)        discovery_method=sqlglot
+  proc        -> function       (inline function call)           discovery_method=sqlglot
+  view        -> table/view     (view definition)                discovery_method=sqlglot
+  view        -> function       (inline function call)           discovery_method=sqlglot
+  function    -> table/view     (function body)                  discovery_method=sqlglot
+  function    -> function       (nested function call)           discovery_method=sqlglot
+  trigger     -> table          (fires_on: the table it's defined ON) discovery_method=direct_metadata
+  trigger     -> table/view     (referenced elsewhere in its body) discovery_method=sqlglot
+  trigger     -> proc           (EXEC inside a trigger body)      discovery_method=sqlglot
+  trigger     -> function       (inline function call)           discovery_method=sqlglot
+  table       -> table          (foreign key)                    discovery_method=direct_metadata
+  constraint  -> table/view     (CHECK/DEFAULT expression)        discovery_method=sqlglot
+  constraint  -> function       (CHECK/DEFAULT expression)        discovery_method=sqlglot
+  synonym     -> table/view/proc/function (base object)          discovery_method=direct_metadata
+  proc/view/function/trigger/constraint/package -> sequence
+                                 (NEXT VALUE FOR)                 discovery_method=sqlglot
+  table       -> user_defined_type (column typed as a UDT alias)  discovery_method=direct_metadata
+  table       -> xml_schema_collection (XML column binding)       discovery_method=direct_metadata
+  table       -> function       (computed column calls a UDF)     discovery_method=sqlglot
+  <object>    -> table/view/proc/function
+                (metadata backfill for objects whose own sqlglot
+                 parse degraded/failed -- see build_dependency_graph's
+                 expression_dependencies param)                   discovery_method=direct_metadata
+
+Table vs. view target classification: sqlglot's AST can't tell a table
+reference from a view reference apart (both are just a schema-qualified
+name to a text parser) -- this module resolves that by cross-checking
+each referenced name against the known views list Discovery already
+built, so e.g. a proc selecting from a view now gets target_type="view"
+rather than a blanket "table" (this refines target_type on some
+proc/view/package edges that already existed; relationship_type and
+discovery_method for those edges are unchanged). A name that isn't a
+known view defaults to "table", matching pre-existing behavior for
+anything this distinction doesn't apply to (including names Discovery
+never saw at all).
+
+Deduplication: the same edge can legitimately surface from more than one
+source (e.g. a trigger's own parent-table "fires_on" edge and a body
+reference to that same table both point at the same target) -- the final
+list is deduplicated on (source_object, source_type, target_object,
+target_type, relationship_type) before being returned.
+
+Not built here, and why:
+  - Package -> Function: SSIS embedded-SQL lineage (enrich_embedded_sql)
+    isn't extended with function-call detection in this pass -- out of
+    scope for a change scoped to SQLGlot dependency discovery on the
+    direct-metadata (proc/view/function/trigger/constraint) side; SSIS
+    parsing is untouched.
+  - Function -> Procedure: not a real SQL Server dependency (T-SQL
+    functions can't execute a stored procedure -- no side effects allowed).
+  - Procedure/Function parameter -> UserDefinedType (table-valued
+    parameters): StoredProcedureEntity.parameters/FunctionEntity.parameters
+    are not currently populated by sql_metadata_extractor.py (no
+    sys.parameters query exists yet) -- building this needs new parameter
+    extraction from scratch, out of scope for a dependency-graph-only change.
+  - CLR routine (assembly-backed proc/function) -> Assembly: CLR procs/
+    functions are already filtered out of Discovery's object inventory
+    entirely (no sys.sql_modules row to join against) -- surfacing this
+    needs a new object category, not just a new edge.
+
+Metadata backfill (expression_dependencies param): sys.sql_expression_dependencies
+is SQL Server's own dependency catalog, covering the same proc/view/
+function/trigger/CHECK-constraint scope sqlglot parses. It is used here
+ONLY to fill in referenced_tables/procs/functions for objects whose own
+sqlglot parse degraded (Command-node fallback) or failed outright
+(unresolved_reason is set) -- never to override or second-guess an object
+sqlglot parsed cleanly. Ambiguous rows (is_ambiguous) and non-object
+references (types, XML namespaces) are excluded -- never guessed.
 
 This graph is a required output (not optional metadata) -- the
 Assessment phase uses it for complexity/blast-radius scoring, so every
@@ -22,18 +88,55 @@ just not silently dropped, so blast-radius scoring can't undercount).
 from __future__ import annotations
 
 from autovista.schema import (
+    ConstraintEntity,
     DependencyEntity,
+    FunctionEntity,
     PackageEntity,
     StoredProcedureEntity,
+    SynonymEntity,
+    TableEntity,
+    TriggerEntity,
+    UserDefinedTypeEntity,
     ViewEntity,
 )
 
+# SQL Server's magic trigger-context virtual tables -- not real objects,
+# so a metadata-backfill row pointing at them would be misleading. Mirrors
+# sql_lineage_parser.py's _TRIGGER_PSEUDO_TABLES (kept as a separate
+# constant here to avoid this module importing from the parser module for
+# a two-item set).
+_PSEUDO_TABLES = {"inserted", "deleted"}
 
-def _table_edges(source_object: str, source_type: str, referenced_tables: list[str], discovery_method: str, relationship_type: str = "reads") -> list[DependencyEntity]:
+# sys.sql_expression_dependencies referencing_type values this module knows
+# how to map to a source_type. USER_TABLE (computed-column expressions,
+# whose referencing_id is the table's own object_id) is deliberately
+# excluded -- that category is already covered by direct sqlglot parsing
+# of computed_expression (see _type_usage_edges), which never degrades the
+# way a full CREATE PROCEDURE/TRIGGER body can, so there is no gap to
+# backfill there.
+_BACKFILL_SOURCE_TYPES = {
+    "SQL_STORED_PROCEDURE": "stored_procedure",
+    "VIEW": "view",
+    "SQL_TRIGGER": "trigger",
+    "CHECK_CONSTRAINT": "constraint",
+    "SQL_SCALAR_FUNCTION": "function",
+    "SQL_TABLE_VALUED_FUNCTION": "function",
+    "SQL_INLINE_TABLE_VALUED_FUNCTION": "function",
+}
+
+
+def _normalize_key(name: str) -> str:
+    return name.strip().strip("[]").lower()
+
+
+def _table_edges(
+    source_object: str, source_type: str, referenced_tables: list[str], discovery_method: str,
+    resolve_target_type, relationship_type: str = "reads",
+) -> list[DependencyEntity]:
     return [
         DependencyEntity(
             source_object=source_object, source_type=source_type,
-            target_object=table, target_type="table",
+            target_object=table, target_type=resolve_target_type(table),
             relationship_type=relationship_type, discovery_method=discovery_method,
         )
         for table in referenced_tables
@@ -51,22 +154,245 @@ def _proc_edges(source_object: str, source_type: str, referenced_procs: list[str
     ]
 
 
+def _function_edges(source_object: str, source_type: str, referenced_functions: list[str], discovery_method: str) -> list[DependencyEntity]:
+    return [
+        DependencyEntity(
+            source_object=source_object, source_type=source_type,
+            target_object=func, target_type="function",
+            relationship_type="calls", discovery_method=discovery_method,
+        )
+        for func in referenced_functions
+    ]
+
+
+def _sequence_edges(source_object: str, source_type: str, referenced_sequences: list[str], discovery_method: str) -> list[DependencyEntity]:
+    return [
+        DependencyEntity(
+            source_object=source_object, source_type=source_type,
+            target_object=seq, target_type="sequence",
+            relationship_type="uses_sequence", discovery_method=discovery_method,
+        )
+        for seq in referenced_sequences
+    ]
+
+
+def _dedupe(dependencies: list[DependencyEntity]) -> list[DependencyEntity]:
+    """Keeps the first edge seen for a given (source, target, relationship)
+    combination -- e.g. a trigger's fires_on edge and a body reference to
+    that same table would otherwise both be emitted."""
+    seen: dict[tuple, DependencyEntity] = {}
+    for dep in dependencies:
+        key = (dep.source_object, dep.source_type, dep.target_object, dep.target_type, dep.relationship_type)
+        if key not in seen:
+            seen[key] = dep
+    return list(seen.values())
+
+
+def _type_usage_edges(
+    tables: list[TableEntity], user_defined_types: list[UserDefinedTypeEntity],
+) -> list[DependencyEntity]:
+    """table -> user_defined_type / xml_schema_collection / function edges
+    derived from already-collected column metadata -- no new parsing pass
+    beyond what sql_metadata_extractor.py and the computed-column lineage
+    pass (wired in orchestrator.py) already produce.
+
+    UDT matching is by bare type name only (ColumnEntity.data_type is the
+    type's own name with no schema prefix, e.g. "PhoneNumber" -- the same
+    "call site never carries a schema" limitation _extract_function_calls
+    in sql_lineage_parser.py already documents for function calls), cross-
+    referenced against known UDT names so built-in system types (varchar,
+    int, ...) are never misreported as a dependency."""
+    udt_by_bare_name: dict[str, str] = {}
+    for udt in user_defined_types:
+        udt_by_bare_name[udt.name.lower()] = f"{udt.schema}.{udt.name}"
+
+    edges: list[DependencyEntity] = []
+    for table in tables:
+        table_id = f"{table.schema}.{table.name}"
+        for column in table.columns:
+            udt_target = udt_by_bare_name.get(column.data_type.lower())
+            if udt_target:
+                edges.append(
+                    DependencyEntity(
+                        source_object=table_id, source_type="table",
+                        target_object=udt_target, target_type="user_defined_type",
+                        relationship_type="uses_type", discovery_method="direct_metadata",
+                    )
+                )
+            if column.xml_schema_collection:
+                edges.append(
+                    DependencyEntity(
+                        source_object=table_id, source_type="table",
+                        target_object=column.xml_schema_collection, target_type="xml_schema_collection",
+                        relationship_type="uses_type", discovery_method="direct_metadata",
+                    )
+                )
+        edges.extend(_function_edges(
+            table_id, "table",
+            [f for column in table.columns for f in column.referenced_functions],
+            "sqlglot",
+        ))
+    return edges
+
+
+def _build_metadata_backfill_edges(
+    expression_dependencies: list[tuple[str, str, str, str, str]],
+    stored_procedures: list[StoredProcedureEntity],
+    views: list[ViewEntity],
+    functions: list[FunctionEntity],
+    triggers: list[TriggerEntity],
+    constraints: list[ConstraintEntity],
+    resolve_target_type,
+) -> list[DependencyEntity]:
+    """Fills gaps for objects whose own sqlglot parse degraded or failed,
+    using SQL Server's own sys.sql_expression_dependencies catalog (see
+    module docstring). Only ever ADDS edges for objects already flagged
+    parse_status=='unresolved' or with a non-null unresolved_reason -- an
+    object sqlglot parsed cleanly is never touched here, so this can only
+    improve coverage, never override an existing result."""
+    needs_backfill: set[tuple[str, str, str]] = set()
+    # Constraints are identified elsewhere in this module by the 3-part
+    # "schema.table.name" (see the constraints loop in build_dependency_graph)
+    # even though sys.sql_expression_dependencies only resolves a
+    # constraint's own (schema, name) -- a constraint's name is unique
+    # within its schema, so this map recovers the matching 3-part id.
+    constraint_source_id: dict[tuple[str, str], str] = {
+        (_normalize_key(c.schema), _normalize_key(c.name)): f"{c.schema}.{c.table}.{c.name}"
+        for c in constraints
+    }
+    for source_type, entities in (
+        ("stored_procedure", stored_procedures),
+        ("view", views),
+        ("function", functions),
+        ("trigger", triggers),
+        ("constraint", constraints),
+    ):
+        for entity in entities:
+            if entity.parse_status == "unresolved" or entity.unresolved_reason is not None:
+                needs_backfill.add((source_type, _normalize_key(entity.schema), _normalize_key(entity.name)))
+
+    edges: list[DependencyEntity] = []
+    for (ref_schema, ref_name, ref_type, target_schema, target_name) in expression_dependencies:
+        source_type = _BACKFILL_SOURCE_TYPES.get(ref_type)
+        if source_type is None:
+            continue
+        norm_schema, norm_name = _normalize_key(ref_schema), _normalize_key(ref_name)
+        key = (source_type, norm_schema, norm_name)
+        if key not in needs_backfill:
+            continue
+        if _normalize_key(target_name) in _PSEUDO_TABLES:
+            continue
+        source_object = (
+            constraint_source_id.get((norm_schema, norm_name), f"{ref_schema}.{ref_name}")
+            if source_type == "constraint" else f"{ref_schema}.{ref_name}"
+        )
+        target_object = f"{target_schema}.{target_name}" if target_schema else target_name
+        target_type = resolve_target_type(target_object)
+        relationship_type = "calls" if target_type in ("stored_procedure", "function") else "reads"
+        edges.append(
+            DependencyEntity(
+                source_object=source_object, source_type=source_type,
+                target_object=target_object, target_type=target_type,
+                relationship_type=relationship_type, discovery_method="direct_metadata",
+            )
+        )
+    return edges
+
+
 def build_dependency_graph(
     stored_procedures: list[StoredProcedureEntity],
     views: list[ViewEntity],
     packages: list[PackageEntity],
     foreign_keys: list[tuple[str, str]],
+    functions: list[FunctionEntity] | None = None,
+    triggers: list[TriggerEntity] | None = None,
+    constraints: list[ConstraintEntity] | None = None,
+    synonyms: list[SynonymEntity] | None = None,
+    tables: list[TableEntity] | None = None,
+    user_defined_types: list[UserDefinedTypeEntity] | None = None,
+    expression_dependencies: list[tuple[str, str, str, str, str]] | None = None,
 ) -> list[DependencyEntity]:
+    functions = functions or []
+    triggers = triggers or []
+    constraints = constraints or []
+    synonyms = synonyms or []
+    tables = tables or []
+    user_defined_types = user_defined_types or []
+    expression_dependencies = expression_dependencies or []
+
+    known_views = {_normalize_key(f"{v.schema}.{v.name}") for v in views}
+    known_synonyms = {_normalize_key(f"{s.schema}.{s.name}") for s in synonyms}
+    known_procs = {_normalize_key(f"{p.schema}.{p.name}") for p in stored_procedures}
+    known_functions = {_normalize_key(f"{f.schema}.{f.name}") for f in functions}
+
+    def resolve_target_type(name: str) -> str:
+        key = _normalize_key(name)
+        if key in known_views:
+            return "view"
+        if key in known_synonyms:
+            return "synonym"
+        if key in known_procs:
+            return "stored_procedure"
+        if key in known_functions:
+            return "function"
+        return "table"
+
     dependencies: list[DependencyEntity] = []
 
     for proc in stored_procedures:
         proc_id = f"{proc.schema}.{proc.name}"
-        dependencies.extend(_table_edges(proc_id, "stored_procedure", proc.referenced_tables, proc.parse_status))
+        dependencies.extend(_table_edges(proc_id, "stored_procedure", proc.referenced_tables, proc.parse_status, resolve_target_type))
         dependencies.extend(_proc_edges(proc_id, "stored_procedure", proc.referenced_procs, proc.parse_status))
+        dependencies.extend(_function_edges(proc_id, "stored_procedure", proc.referenced_functions, proc.parse_status))
+        dependencies.extend(_sequence_edges(proc_id, "stored_procedure", proc.referenced_sequences, proc.parse_status))
 
     for view in views:
         view_id = f"{view.schema}.{view.name}"
-        dependencies.extend(_table_edges(view_id, "view", view.referenced_tables, view.parse_status))
+        dependencies.extend(_table_edges(view_id, "view", view.referenced_tables, view.parse_status, resolve_target_type))
+        dependencies.extend(_function_edges(view_id, "view", view.referenced_functions, view.parse_status))
+        dependencies.extend(_sequence_edges(view_id, "view", view.referenced_sequences, view.parse_status))
+
+    for func in functions:
+        func_id = f"{func.schema}.{func.name}"
+        dependencies.extend(_table_edges(func_id, "function", func.referenced_tables, func.parse_status, resolve_target_type))
+        dependencies.extend(_function_edges(func_id, "function", func.referenced_functions, func.parse_status))
+        dependencies.extend(_sequence_edges(func_id, "function", func.referenced_sequences, func.parse_status))
+
+    for trigger in triggers:
+        trigger_id = f"{trigger.schema}.{trigger.name}"
+        # The table it's defined ON -- always known (direct_metadata, from
+        # sys.triggers), regardless of whether the body itself parsed.
+        if trigger.table:
+            dependencies.append(
+                DependencyEntity(
+                    source_object=trigger_id, source_type="trigger",
+                    target_object=trigger.table, target_type=resolve_target_type(trigger.table),
+                    relationship_type="fires_on", discovery_method="direct_metadata",
+                )
+            )
+        dependencies.extend(_table_edges(trigger_id, "trigger", trigger.referenced_tables, trigger.parse_status, resolve_target_type))
+        dependencies.extend(_proc_edges(trigger_id, "trigger", trigger.referenced_procs, trigger.parse_status))
+        dependencies.extend(_function_edges(trigger_id, "trigger", trigger.referenced_functions, trigger.parse_status))
+        dependencies.extend(_sequence_edges(trigger_id, "trigger", trigger.referenced_sequences, trigger.parse_status))
+
+    for constraint in constraints:
+        if not constraint.definition:
+            continue  # PRIMARY_KEY/UNIQUE/FOREIGN_KEY -- no expression text to have parsed
+        constraint_id = f"{constraint.schema}.{constraint.table}.{constraint.name}"
+        dependencies.extend(_table_edges(constraint_id, "constraint", constraint.referenced_tables, constraint.parse_status, resolve_target_type))
+        dependencies.extend(_function_edges(constraint_id, "constraint", constraint.referenced_functions, constraint.parse_status))
+        dependencies.extend(_sequence_edges(constraint_id, "constraint", constraint.referenced_sequences, constraint.parse_status))
+
+    for synonym in synonyms:
+        if synonym.base_object:
+            synonym_id = f"{synonym.schema}.{synonym.name}"
+            dependencies.append(
+                DependencyEntity(
+                    source_object=synonym_id, source_type="synonym",
+                    target_object=synonym.base_object, target_type=resolve_target_type(synonym.base_object),
+                    relationship_type="references", discovery_method="direct_metadata",
+                )
+            )
 
     for from_table, to_table in foreign_keys:
         dependencies.append(
@@ -90,10 +416,18 @@ def build_dependency_graph(
 
         for embedded in package.embedded_sql:
             dependencies.extend(
-                _table_edges(package.name, "package", embedded.referenced_tables, embedded.parse_status)
+                _table_edges(package.name, "package", embedded.referenced_tables, embedded.parse_status, resolve_target_type)
             )
             dependencies.extend(
                 _proc_edges(package.name, "package", embedded.referenced_procs, embedded.parse_status)
             )
+            dependencies.extend(
+                _sequence_edges(package.name, "package", embedded.referenced_sequences, embedded.parse_status)
+            )
 
-    return dependencies
+    dependencies.extend(_type_usage_edges(tables, user_defined_types))
+    dependencies.extend(_build_metadata_backfill_edges(
+        expression_dependencies, stored_procedures, views, functions, triggers, constraints, resolve_target_type,
+    ))
+
+    return _dedupe(dependencies)

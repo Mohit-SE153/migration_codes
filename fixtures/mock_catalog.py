@@ -62,6 +62,7 @@ class MockTrigger:
     name: str
     table: str
     event: str
+    definition: str = ""
 
 
 def _synthetic_metric(seed: str, low: int, high: int) -> int:
@@ -171,6 +172,7 @@ class MockCatalog:
                     name=trig_name,
                     table=f"{tbl_schema or 'dbo'}.{tbl_name}",
                     event=event.upper(),
+                    definition=raw_batch,
                 )
             )
 

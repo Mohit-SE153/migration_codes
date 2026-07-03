@@ -93,12 +93,14 @@ def test_list_agent_jobs_reads_retry_settings_from_sysjobsteps_not_sysjobs():
 def test_list_functions_resolves_return_type_via_parameters_join():
     source = _source([
         ("FROM sys.objects f", [
-            ("dbo", "ufn_GetOrderStatus", "SQL_SCALAR_FUNCTION", "nvarchar", 456),
+            ("dbo", "ufn_GetOrderStatus", "SQL_SCALAR_FUNCTION", "nvarchar", 456, "CREATE FUNCTION dbo.ufn_GetOrderStatus() RETURNS NVARCHAR(20) AS BEGIN RETURN 'x' END"),
         ]),
     ])
     functions = source.list_functions("SalesDW")
     assert len(functions) == 1
-    assert functions[0].return_type == "nvarchar"
+    entity, definition = functions[0]
+    assert entity.return_type == "nvarchar"
+    assert "ufn_GetOrderStatus" in definition
 
 
 def test_list_sequences_maps_minimum_and_maximum_value():

@@ -154,12 +154,14 @@ SELECT c.name, ty.name AS data_type, c.is_nullable, c.column_id,
        c.collation_name,
        COLUMNPROPERTY(c.object_id, c.name, 'IsRowGUIDCol') AS is_rowguid,
        c.is_sparse,
-       c.is_filestream, ty.is_assembly_type, c.max_length
+       c.is_filestream, ty.is_assembly_type, c.max_length,
+       xc.name AS xml_schema_collection_name, SCHEMA_NAME(xc.schema_id) AS xml_schema_collection_schema
 FROM sys.columns c
 JOIN sys.types ty ON ty.user_type_id = c.user_type_id
 LEFT JOIN sys.default_constraints dc ON dc.object_id = c.default_object_id
 LEFT JOIN sys.check_constraints cc ON cc.object_id = c.default_object_id
 LEFT JOIN sys.computed_columns cmp ON cmp.object_id = c.object_id AND cmp.column_id = c.column_id
+LEFT JOIN sys.xml_schema_collections xc ON xc.xml_collection_id = c.xml_collection_id
 WHERE c.object_id = OBJECT_ID(?)
 ORDER BY c.column_id
 """
@@ -174,10 +176,11 @@ JOIN sys.sql_modules m ON m.object_id = p.object_id
 
 QUERY_TRIGGERS = """
 SELECT s.name AS schema_name, tr.name AS trigger_name, OBJECT_NAME(tr.parent_id) AS table_name,
-       te.type_desc AS event
+       te.type_desc AS event, m.definition
 FROM sys.triggers tr
 JOIN sys.tables t ON t.object_id = tr.parent_id
 JOIN sys.schemas s ON s.schema_id = t.schema_id
+JOIN sys.sql_modules m ON m.object_id = tr.object_id
 CROSS APPLY sys.trigger_events te WHERE te.object_id = tr.object_id
 """
 
@@ -292,12 +295,18 @@ FROM sys.dm_db_partition_stats ps
 GROUP BY ps.object_id
 """
 
+# LEFT JOIN sys.sql_modules -- CLR functions (type 'FS'/'FT', not selected
+# here anyway since this query is scoped to T-SQL FN/IF/TF) have no module
+# row; for the T-SQL function types this query does select, the join
+# always matches, but LEFT keeps this defensive rather than assuming it.
 QUERY_FUNCTIONS = """
-SELECT s.name AS schema_name, f.name AS function_name, f.type_desc, ty.name AS return_type, f.object_id
+SELECT s.name AS schema_name, f.name AS function_name, f.type_desc, ty.name AS return_type, f.object_id,
+       m.definition
 FROM sys.objects f
 JOIN sys.schemas s ON s.schema_id = f.schema_id
 LEFT JOIN sys.parameters p ON p.object_id = f.object_id AND p.parameter_id = 0
 LEFT JOIN sys.types ty ON ty.user_type_id = p.user_type_id
+LEFT JOIN sys.sql_modules m ON m.object_id = f.object_id
 WHERE f.type IN ('FN','IF','TF')
 """
 
@@ -412,18 +421,39 @@ LEFT JOIN sys.columns col ON col.object_id = dc.parent_object_id AND col.column_
 ORDER BY s.name, t.name, dc.name
 """
 
+# --- Dependency-discovery metadata backfill (sys.sql_expression_dependencies) ---
+# One query for the whole database -- this catalog view is SQL Server's own
+# dependency tracker for expression-based references (procs/views/
+# functions/triggers/CHECK constraints/computed columns). Used only to fill
+# in referenced_tables/procs/functions for objects whose own sqlglot parse
+# degraded or failed (see dependency_graph_builder.py's
+# _build_metadata_backfill_edges). is_ambiguous rows are excluded by the
+# caller, never guessed at here.
+QUERY_EXPRESSION_DEPENDENCIES = """
+SELECT
+    OBJECT_SCHEMA_NAME(sed.referencing_id) AS referencing_schema,
+    OBJECT_NAME(sed.referencing_id) AS referencing_name,
+    o.type_desc AS referencing_type,
+    sed.referenced_schema_name,
+    sed.referenced_entity_name,
+    sed.referenced_class_desc,
+    sed.is_ambiguous
+FROM sys.sql_expression_dependencies sed
+JOIN sys.objects o ON o.object_id = sed.referencing_id
+"""
+
 
 class MetadataSource(Protocol):
     def list_databases(self) -> list[DatabaseEntity]: ...
     def list_tables(self, database: str) -> list[TableEntity]: ...
     def list_procedures(self, database: str) -> list[tuple[StoredProcedureEntity, str]]: ...  # (entity, definition text)
-    def list_triggers(self, database: str) -> list[TriggerEntity]: ...
+    def list_triggers(self, database: str) -> list[tuple[TriggerEntity, str]]: ...  # (entity, definition text)
     def list_agent_jobs(self) -> list[AgentJobEntity]: ...
     def list_views(self, database: str) -> list[ViewEntity]: ...
     def list_foreign_keys(self, database: str) -> list[tuple[str, str]]: ...  # (from "schema.table", to "schema.table")
     def list_database_files(self, database: str) -> list[FileEntity]: ...
     def list_indexes(self, database: str) -> list[IndexEntity]: ...
-    def list_functions(self, database: str) -> list[FunctionEntity]: ...
+    def list_functions(self, database: str) -> list[tuple[FunctionEntity, str]]: ...  # (entity, definition text)
     def list_synonyms(self, database: str) -> list[SynonymEntity]: ...
     def list_sequences(self, database: str) -> list[SequenceEntity]: ...
     def list_user_defined_types(self, database: str) -> list[UserDefinedTypeEntity]: ...
@@ -433,6 +463,8 @@ class MetadataSource(Protocol):
     def list_permissions(self, database: str) -> list[PermissionEntity]: ...
     def list_database_summary(self, database: str) -> list[DatabaseSummaryEntity]: ...
     def list_constraints(self, database: str) -> list[ConstraintEntity]: ...
+    def list_expression_dependencies(self, database: str) -> list[tuple[str, str, str, str, str]]: ...
+    # (referencing_schema, referencing_name, referencing_type, referenced_schema, referenced_name)
 
 
 @dataclass
@@ -581,6 +613,9 @@ class LiveSqlServerSource:
                         is_filestream=bool(c[14]) if c[14] is not None else None,
                         is_clr_type=bool(c[15]) if c[15] is not None else None,
                         max_length=int(c[16]) if c[16] is not None else None,
+                        xml_schema_collection=(
+                            f"{c[18]}.{c[17]}" if c[17] is not None and c[18] is not None else None
+                        ),
                     )
                 )
             tables.append(
@@ -641,13 +676,13 @@ class LiveSqlServerSource:
             for schema_name, proc_name, definition, create_date, modify_date, is_encrypted, execute_as_principal_id, _ in cur.fetchall()
         ]
 
-    def list_triggers(self, database: str) -> list[TriggerEntity]:
+    def list_triggers(self, database: str) -> list[tuple[TriggerEntity, str]]:
         self._use_database(database)
         cur = self.connection.cursor()
         cur.execute(QUERY_TRIGGERS)
         return [
-            TriggerEntity(database=database, schema=s, name=n, table=t, event=e)
-            for s, n, t, e in cur.fetchall()
+            (TriggerEntity(database=database, schema=s, name=n, table=t, event=e), definition)
+            for s, n, t, e, definition in cur.fetchall()
         ]
 
     def list_agent_jobs(self) -> list[AgentJobEntity]:
@@ -874,13 +909,16 @@ class LiveSqlServerSource:
             )
         return out
 
-    def list_functions(self, database: str) -> list[FunctionEntity]:
+    def list_functions(self, database: str) -> list[tuple[FunctionEntity, str]]:
         self._use_database(database)
         cur = self.connection.cursor()
         cur.execute(QUERY_FUNCTIONS)
         return [
-            FunctionEntity(database=database, schema=schema_name, name=function_name, function_type=function_type or 'SCALAR', return_type=return_type)
-            for schema_name, function_name, function_type, return_type, _ in cur.fetchall()
+            (
+                FunctionEntity(database=database, schema=schema_name, name=function_name, function_type=function_type or 'SCALAR', return_type=return_type),
+                definition or "",
+            )
+            for schema_name, function_name, function_type, return_type, _, definition in cur.fetchall()
         ]
 
     def list_synonyms(self, database: str) -> list[SynonymEntity]:
@@ -1037,6 +1075,25 @@ class LiveSqlServerSource:
 
         return constraints
 
+    def list_expression_dependencies(self, database: str) -> list[tuple[str, str, str, str, str]]:
+        """sys.sql_expression_dependencies, whole-database in one query --
+        see QUERY_EXPRESSION_DEPENDENCIES. is_ambiguous rows and non-object
+        references (referenced_class_desc != 'OBJECT_OR_COLUMN', e.g. TYPE/
+        XML_NAMESPACE) are filtered out here rather than left for the
+        caller, since neither is safely usable as a dependency target --
+        the caller (dependency_graph_builder.py) still separately decides
+        WHICH of these rows apply, by only matching against objects whose
+        own sqlglot parse degraded or failed."""
+        self._use_database(database)
+        cur = self.connection.cursor()
+        cur.execute(QUERY_EXPRESSION_DEPENDENCIES)
+        rows = []
+        for (ref_schema, ref_name, ref_type, target_schema, target_name, target_class, is_ambiguous) in cur.fetchall():
+            if is_ambiguous or target_class != "OBJECT_OR_COLUMN" or not ref_schema or not ref_name or not target_name:
+                continue
+            rows.append((ref_schema, ref_name, ref_type, target_schema, target_name))
+        return rows
+
 
 @dataclass
 class FixtureMetadataSource:
@@ -1152,10 +1209,13 @@ class FixtureMetadataSource:
             for p in c.procedures.values()
         ]
 
-    def list_triggers(self, database: str) -> list[TriggerEntity]:
+    def list_triggers(self, database: str) -> list[tuple[TriggerEntity, str]]:
         c = self.catalog
         return [
-            TriggerEntity(database=database, schema=t.schema, name=t.name, table=t.table, event=t.event)
+            (
+                TriggerEntity(database=database, schema=t.schema, name=t.name, table=t.table, event=t.event),
+                t.definition,
+            )
             for t in c.triggers
         ]
 
@@ -1186,9 +1246,21 @@ class FixtureMetadataSource:
             )
         ]
 
-    def list_functions(self, database: str) -> list[FunctionEntity]:
+    def list_functions(self, database: str) -> list[tuple[FunctionEntity, str]]:
+        # Two functions, one calling the other and reading a table, so
+        # fixture mode demonstrates Function->Table and Function->Function
+        # detection without needing real live SQL Server metadata.
         return [
-            FunctionEntity(database=database, schema="dbo", name="ufn_GetOrderStatus", function_type="SCALAR")
+            (
+                FunctionEntity(database=database, schema="dbo", name="ufn_GetOrderStatus", function_type="SCALAR"),
+                "CREATE FUNCTION dbo.ufn_GetOrderStatus(@OrderId INT) RETURNS NVARCHAR(20) AS "
+                "BEGIN RETURN (SELECT dbo.ufn_GetOrderStatusLabel(o.OrderId) FROM dbo.Orders o WHERE o.OrderId = @OrderId) END",
+            ),
+            (
+                FunctionEntity(database=database, schema="dbo", name="ufn_GetOrderStatusLabel", function_type="SCALAR"),
+                "CREATE FUNCTION dbo.ufn_GetOrderStatusLabel(@OrderId INT) RETURNS NVARCHAR(20) AS "
+                "BEGIN RETURN 'Open' END",
+            ),
         ]
 
     def list_synonyms(self, database: str) -> list[SynonymEntity]:
@@ -1249,6 +1321,13 @@ class FixtureMetadataSource:
             definition="(sysutcdatetime())", is_system_named=False,
         ))
         return constraints
+
+    def list_expression_dependencies(self, database: str) -> list[tuple[str, str, str, str, str]]:
+        """No live catalog exists in fixture mode -- the curated fixture
+        DDL/procs already parse cleanly with sqlglot (no Command-node
+        degradation), so there is nothing real to backfill and inventing
+        rows here would violate the "never guess" principle."""
+        return []
 
 
 def extract_database_metadata(source: MetadataSource, database: str):
