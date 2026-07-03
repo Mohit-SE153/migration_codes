@@ -1,0 +1,82 @@
+[
+  {
+    "object_type": "trigger",
+    "name": "HumanResources.dEmployee",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "LOW",
+    "notes": null
+  },
+  {
+    "object_type": "trigger",
+    "name": "Person.iuPerson",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "MEDIUM",
+    "notes": null
+  },
+  {
+    "object_type": "trigger",
+    "name": "Production.iWorkOrder",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "MEDIUM",
+    "notes": null
+  },
+  {
+    "object_type": "trigger",
+    "name": "Production.uWorkOrder",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "MEDIUM",
+    "notes": null
+  },
+  {
+    "object_type": "trigger",
+    "name": "Purchasing.dVendor",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "MEDIUM",
+    "notes": null
+  },
+  {
+    "object_type": "trigger",
+    "name": "Purchasing.iPurchaseOrderDetail",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "MEDIUM",
+    "notes": null
+  },
+  {
+    "object_type": "trigger",
+    "name": "Purchasing.uPurchaseOrderDetail",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "MEDIUM",
+    "notes": null
+  },
+  {
+    "object_type": "trigger",
+    "name": "Purchasing.uPurchaseOrderHeader",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "MEDIUM",
+    "notes": null
+  },
+  {
+    "object_type": "trigger",
+    "name": "Sales.iduSalesOrderDetail",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "MEDIUM",
+    "notes": null
+  },
+  {
+    "object_type": "trigger",
+    "name": "Sales.uSalesOrderHeader",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "MEDIUM",
+    "notes": null
+  }
+]

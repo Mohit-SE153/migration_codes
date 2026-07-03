@@ -1,0 +1,4 @@
+stage,object_type,object_name,status,error,duration_ms
+source_export,source_export,output_lakebridge/_source_export,success,,113.36
+analyze,analyze_invocation,MS SQL Server,success,,5870.0
+analyze,analyze_invocation,SSIS,success,"no exported source files for source-tech=SSIS, skipping analyze",0

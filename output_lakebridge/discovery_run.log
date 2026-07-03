@@ -1,0 +1,9 @@
+2026-07-03T14:35:45 INFO [LAKEBRIDGE] === Lakebridge Discovery run 3931c1ed-20e7-48ec-b4e2-396a8e177cbc started (mode=live) ===
+2026-07-03T14:35:45 INFO [LAKEBRIDGE] SSISDB not installed -- no SSIS packages to export for Lakebridge.
+2026-07-03T14:35:45 INFO [LAKEBRIDGE] OK   source_export sql_files=51 table_ddl=71 ssis_files=0 errors=0 (113.4ms)
+2026-07-03T14:35:51 INFO [LAKEBRIDGE] OK   analyze source_tech=MS SQL Server exit=0 (5.9s) report=output_lakebridge/reports/lakebridge_report_MS_SQL_Server.xlsx
+2026-07-03T14:35:51 INFO [LAKEBRIDGE] SKIP analyze source_tech=SSIS reason=no exported source files for source-tech=SSIS, skipping analyze
+2026-07-03T14:35:51 INFO [LAKEBRIDGE] Parsed JSON report output_lakebridge/reports/lakebridge_report_MS_SQL_Server.json: 122 rows classified into inventory categories
+2026-07-03T14:35:51 INFO [LAKEBRIDGE] === Lakebridge Discovery run 3931c1ed-20e7-48ec-b4e2-396a8e177cbc finished: status=success duration=5.99s objects=122 dependencies=0 errors=0 warnings=0 ===
+2026-07-03T14:35:51 INFO [LAKEBRIDGE] Wrote 10 per-category output files to output_lakebridge
+2026-07-03T14:35:51 INFO [LAKEBRIDGE] Wrote manifest=output_lakebridge/lakebridge_manifest.json rollup=output_lakebridge/lakebridge_rollup.csv log_summary=output_lakebridge/lakebridge_log_summary.csv

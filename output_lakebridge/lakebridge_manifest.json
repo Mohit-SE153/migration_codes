@@ -1,0 +1,1063 @@
+{
+  "run_id": "3931c1ed-20e7-48ec-b4e2-396a8e177cbc",
+  "started_at": "2026-07-03T09:05:45.882557+00:00",
+  "finished_at": "2026-07-03T09:05:51.868310+00:00",
+  "duration_seconds": 5.99,
+  "status": "success",
+  "run_mode": "live",
+  "export_summary": {
+    "sql_definition_files": 51,
+    "table_ddl_files": 71,
+    "ssis_package_files": 0,
+    "export_errors": [],
+    "export_dir": "output_lakebridge/_source_export"
+  },
+  "analyze_invocations": [
+    {
+      "source_tech": "MS SQL Server",
+      "command": [
+        "databricks",
+        "labs",
+        "lakebridge",
+        "analyze",
+        "--source-directory",
+        "output_lakebridge/_source_export/sql",
+        "--report-file",
+        "output_lakebridge/reports/lakebridge_report_MS_SQL_Server.xlsx",
+        "--source-tech",
+        "MS SQL Server",
+        "--generate-json",
+        "true"
+      ],
+      "status": "success",
+      "exit_code": 0,
+      "duration_seconds": 5.87,
+      "report_json_path": "output_lakebridge/reports/lakebridge_report_MS_SQL_Server.json",
+      "report_excel_path": "output_lakebridge/reports/lakebridge_report_MS_SQL_Server.xlsx",
+      "error": null,
+      "stderr_tail": "\u001b[90m14:35:49\u001b[0m \u001b[1m\u001b[32m    INFO\u001b[0m \u001b[1m[d.l.bladespector.analyzer] Analyzer JSON output validated successfully against analyzer-sql-schema.json: /home/milind-joshi/mig_dbx/migration_codes/output_lakebridge/reports/lakebridge_report_MS_SQL_Server.json\u001b[0m\n\u001b[90m14:35:49\u001b[0m \u001b[1m\u001b[32m    INFO\u001b[0m \u001b[1m[d.l.l.analyzer.lakebridge_analyzer] Analyzed MS SQL Server files in /home/milind-joshi/mig_dbx/migration_codes/output_lakebridge/_source_export/sql; report saved to: /home/milind-joshi/mig_dbx/migration_codes/output_lakebridge/reports/lakebridge_report_MS_SQL_Server.xlsx\u001b[0m\n"
+    },
+    {
+      "source_tech": "SSIS",
+      "command": [
+        "databricks",
+        "labs",
+        "lakebridge",
+        "analyze",
+        "--source-directory",
+        "output_lakebridge/_source_export/ssis",
+        "--report-file",
+        "output_lakebridge/reports/lakebridge_report_SSIS.xlsx",
+        "--source-tech",
+        "SSIS",
+        "--generate-json",
+        "true"
+      ],
+      "status": "skipped",
+      "exit_code": null,
+      "duration_seconds": null,
+      "report_json_path": null,
+      "report_excel_path": null,
+      "error": "no exported source files for source-tech=SSIS, skipping analyze",
+      "stderr_tail": null
+    }
+  ],
+  "tables": [
+    {
+      "object_type": "table",
+      "name": "HumanResources.Department",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "HumanResources.Employee",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "HumanResources.EmployeeDepartmentHistory",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "HumanResources.EmployeePayHistory",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "HumanResources.JobCandidate",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "HumanResources.Shift",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.Address",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.AddressType",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.BusinessEntity",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.BusinessEntityAddress",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.BusinessEntityContact",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.ContactType",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.CountryRegion",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.EmailAddress",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.Password",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.Person",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.PersonPhone",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.PhoneNumberType",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Person.StateProvince",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.BillOfMaterials",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.Culture",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.Document",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.Illustration",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.Location",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.Product",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductCategory",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductCostHistory",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductDescription",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductDocument",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductInventory",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductListPriceHistory",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductModel",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductModelIllustration",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductModelProductDescriptionCulture",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductPhoto",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductProductPhoto",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductReview",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ProductSubcategory",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.ScrapReason",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.TransactionHistory",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.TransactionHistoryArchive",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.UnitMeasure",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.WorkOrder",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Production.WorkOrderRouting",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Purchasing.ProductVendor",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Purchasing.PurchaseOrderDetail",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Purchasing.PurchaseOrderHeader",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Purchasing.ShipMethod",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Purchasing.Vendor",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.CountryRegionCurrency",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.CreditCard",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.Currency",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.CurrencyRate",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.Customer",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.PersonCreditCard",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.SalesOrderDetail",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.SalesOrderHeader",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.SalesOrderHeaderSalesReason",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.SalesPerson",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.SalesPersonQuotaHistory",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.SalesReason",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.SalesTaxRate",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.SalesTerritory",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.SalesTerritoryHistory",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.ShoppingCartItem",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.SpecialOffer",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.SpecialOfferProduct",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "Sales.Store",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "dbo.AWBuildVersion",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "dbo.DatabaseLog",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "table",
+      "name": "dbo.ErrorLog",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    }
+  ],
+  "views": [
+    {
+      "object_type": "view",
+      "name": "HumanResources.vEmployee",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "HumanResources.vEmployeeDepartment",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "HumanResources.vEmployeeDepartmentHistory",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "HumanResources.vJobCandidate",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "HumanResources.vJobCandidateEducation",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "HumanResources.vJobCandidateEmployment",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Person.vAdditionalContactInfo",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Person.vStateProvinceCountryRegion",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Production.vProductAndDescription",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Production.vProductModelCatalogDescription",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Production.vProductModelInstructions",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Purchasing.vVendorWithAddresses",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Purchasing.vVendorWithContacts",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Sales.vIndividualCustomer",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Sales.vPersonDemographics",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Sales.vSalesPerson",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Sales.vSalesPersonSalesByFiscalYears",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Sales.vStoreWithAddresses",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Sales.vStoreWithContacts",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "view",
+      "name": "Sales.vStoreWithDemographics",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    }
+  ],
+  "stored_procedures": [
+    {
+      "object_type": "stored_procedure",
+      "name": "HumanResources.uspUpdateEmployeeHireInfo",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "stored_procedure",
+      "name": "HumanResources.uspUpdateEmployeeLogin",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "stored_procedure",
+      "name": "HumanResources.uspUpdateEmployeePersonalInfo",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "stored_procedure",
+      "name": "dbo.uspGetBillOfMaterials",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "stored_procedure",
+      "name": "dbo.uspGetEmployeeManagers",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "stored_procedure",
+      "name": "dbo.uspGetManagerEmployees",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "stored_procedure",
+      "name": "dbo.uspGetWhereUsedProductID",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "stored_procedure",
+      "name": "dbo.uspLogError",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "stored_procedure",
+      "name": "dbo.uspPrintError",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "stored_procedure",
+      "name": "dbo.uspSearchCandidateResumes",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    }
+  ],
+  "functions": [
+    {
+      "object_type": "function",
+      "name": "dbo.ufnGetAccountingEndDate",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "function",
+      "name": "dbo.ufnGetAccountingStartDate",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "function",
+      "name": "dbo.ufnGetDocumentStatusText",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "function",
+      "name": "dbo.ufnGetProductDealerPrice",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "function",
+      "name": "dbo.ufnGetProductListPrice",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "function",
+      "name": "dbo.ufnGetProductStandardCost",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "function",
+      "name": "dbo.ufnGetPurchaseOrderStatusText",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "function",
+      "name": "dbo.ufnGetSalesOrderStatusText",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "function",
+      "name": "dbo.ufnGetStock",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "function",
+      "name": "dbo.ufnLeadingZeros",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "function",
+      "name": "dbo.ufnGetContactInformation",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    }
+  ],
+  "triggers": [
+    {
+      "object_type": "trigger",
+      "name": "HumanResources.dEmployee",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "LOW",
+      "notes": null
+    },
+    {
+      "object_type": "trigger",
+      "name": "Person.iuPerson",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "trigger",
+      "name": "Production.iWorkOrder",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "trigger",
+      "name": "Production.uWorkOrder",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "trigger",
+      "name": "Purchasing.dVendor",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "trigger",
+      "name": "Purchasing.iPurchaseOrderDetail",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "trigger",
+      "name": "Purchasing.uPurchaseOrderDetail",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "trigger",
+      "name": "Purchasing.uPurchaseOrderHeader",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "trigger",
+      "name": "Sales.iduSalesOrderDetail",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    },
+    {
+      "object_type": "trigger",
+      "name": "Sales.uSalesOrderHeader",
+      "source_tech": "MS SQL Server",
+      "raw_category": "name",
+      "complexity": "MEDIUM",
+      "notes": null
+    }
+  ],
+  "synonyms": [],
+  "schemas": [],
+  "packages": [],
+  "unsupported_objects": [],
+  "dependencies": [],
+  "warnings": [],
+  "errors": [],
+  "raw_report_paths": [
+    "output_lakebridge/reports/lakebridge_report_MS_SQL_Server.json"
+  ],
+  "mapping_verified": false,
+  "mapping_notes": "Lakebridge Analyzer's report schema is not publicly documented at the field level. This result is mapped defensively (tolerates missing/renamed fields) and has not been verified against a real Databricks workspace run. Re-validate this mapping against your first real report and update report_parser.py's key lookups if names differ."
+}

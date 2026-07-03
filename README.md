@@ -207,3 +207,193 @@ This phase does **not** do complexity/effort scoring, PySpark or any other
 migration code generation, or reconciliation/validation. Constructs this
 pipeline can't confidently parse are flagged (`llm_inferred` / `unresolved`)
 for human review, never guessed at.
+
+---
+
+# Multi-engine Discovery: SQLGlot vs. Lakebridge
+
+Everything above this line describes the original SQLGlot Discovery
+pipeline (`autovista/`), **unchanged**. This section documents a second,
+completely independent Discovery engine — **Lakebridge Discovery**
+(`lakebridge_discovery/`) — added purely to compare Discovery capability
+against SQLGlot Discovery, plus the **Discovery Comparison** module
+(`discovery_comparison/`) that reads both engines' already-written output
+and reports the differences.
+
+This is still Discovery-phase only. Neither engine does SQL-to-SQL
+conversion, transpilation, or generates migrated code — Lakebridge's
+`analyze` (Analyzer/Assessment) subcommand is the only Lakebridge feature
+used here; its `transpile`/`reconcile` subcommands are never invoked.
+
+## Architecture
+
+```
+Source Database
+    ├──► SQLGlot Discovery      (autovista/)              → ./output/
+    └──► Lakebridge Discovery   (lakebridge_discovery/)    → ./output_lakebridge/
+
+           (both outputs, read-only, after both finish or fail)
+                          │
+                          ▼
+                Discovery Comparison (discovery_comparison/) → ./output_comparison/
+```
+
+- **SQLGlot Discovery and Lakebridge Discovery never import each other**,
+  never read each other's output, and never call each other. The only
+  thing they share is which source database to point at (same
+  `AUTOVISTA_SQL_*` / `AUTOVISTA_RUN_MODE` env vars) and, in `fixture`
+  mode, the same `fixtures/` sample DDL/`.dtsx` files as raw input.
+- A failure in one engine does not stop the other, and does not stop the
+  comparison step — see `run_all_discovery.py`.
+- **Output folders are completely separate.** `./output/` (SQLGlot) is
+  untouched by this work. `./output_lakebridge/` and `./output_comparison/`
+  are new and neither engine writes into the other's folder.
+
+## Why Lakebridge Discovery needs a source-export step
+
+Unlike SQLGlot Discovery (which queries SQL Server live via `pyodbc`),
+the Lakebridge Analyzer (`databricks labs lakebridge analyze`) only
+accepts a **directory of source files** as input — it has no live-database
+connection mode. So in `live` run mode, `lakebridge_discovery/source_exporter.py`
+first stages the source database into files:
+
+- Table DDL is best-effort reconstructed from `INFORMATION_SCHEMA.COLUMNS`
+  (SQL Server doesn't store table DDL as text the way it does for views/
+  procs/functions/triggers, so this is columns-and-types only — not a
+  byte-perfect `CREATE TABLE`, no constraints/indexes/defaults).
+- Views, stored procedures, functions, and trigger bodies are exported
+  verbatim from `sys.sql_modules.definition`.
+- SSIS packages are exported from the same place SQLGlot Discovery would
+  read them from (file-deployed `.dtsx` directory, or the SSISDB catalog).
+
+This export uses its **own independent SQL Server connection code** (not
+`autovista/sql_metadata_extractor.py`) — it's a raw text/XML dump, not a
+parsed discovery result, so staging it doesn't make Lakebridge depend on
+SQLGlot's output. In `fixture` mode, no export is needed: it points the
+Analyzer directly at `fixtures/sql/ddl_sample.sql` and `fixtures/dtsx/*.dtsx`.
+
+The Analyzer is then invoked once per `--source-tech` (`mssql` for the
+exported SQL, `ssis` for the exported packages), since the CLI takes one
+source-tech per run.
+
+## Installing Lakebridge
+
+Lakebridge is a separate Databricks Labs tool, not a Python library this
+project imports — `lakebridge_discovery/lakebridge_runner.py` shells out to
+it. Prerequisites (per [Lakebridge's install docs](https://databrickslabs.github.io/lakebridge/docs/installation/)):
+
+1. **A Databricks workspace** (any type, including a free trial) and the
+   **Databricks CLI**, authenticated (`databricks configure`, PAT or
+   service principal).
+2. **Java 21+** (`java -version`) — required by Lakebridge's Morpheus
+   transpiler component even though Discovery here never invokes
+   transpilation.
+3. **Python 3.10–3.14**.
+4. Network access to GitHub, Maven Central, and PyPI (the install pulls
+   dependencies from all three).
+
+Install:
+
+```bash
+databricks labs install lakebridge
+```
+
+No further `install-transpile` / `configure-reconcile` step is needed —
+those set up Lakebridge's conversion/reconciliation features, which this
+integration deliberately never uses.
+
+**This sandbox does not currently have the Databricks CLI, a workspace, or
+Java 21 available (Java 11 is installed)** — `lakebridge_discovery` is
+built to call the real CLI, and will log a clean, isolated failure for the
+`analyze` step here (per the error-isolation design) until those
+prerequisites are provisioned. SQLGlot Discovery is completely unaffected
+either way.
+
+**Lakebridge's Analyzer report schema (JSON/Excel) is not publicly
+documented at the field level.** `lakebridge_discovery/report_parser.py`
+maps it defensively (tolerates missing/renamed fields, never crashes on an
+unrecognized shape) and every `LakebridgeDiscoveryResult` carries
+`mapping_verified=False` with a note to that effect until someone runs
+this against a real workspace and the field mapping in `report_parser.py`
+is confirmed/corrected against real output — same "validate before
+trusting" principle as `spike/step0_report.md`.
+
+## Running SQLGlot Discovery
+
+Unchanged — see "Running discovery" above:
+
+```bash
+python3 -m autovista.orchestrator
+```
+
+## Running Lakebridge Discovery
+
+```bash
+pip install -r requirements.txt   # now also installs openpyxl
+python3 -m lakebridge_discovery.orchestrator
+```
+
+Writes to `./output_lakebridge/` (`LAKEBRIDGE_OUTPUT_DIR`):
+
+- `lakebridge_manifest.json` — full result (export summary, analyze
+  invocations, inventory, dependencies, warnings/errors, `mapping_verified`)
+- `tables.json`, `views.json`, `stored_procedures.json`, `functions.json`,
+  `triggers.json`, `synonyms.json`, `schemas.json`, `packages.json`,
+  `unsupported_objects.json`, `dependencies.json` — per-category files
+- `lakebridge_rollup.csv` — flat counts
+- `lakebridge_log_summary.csv`, `discovery_run.log`
+- `reports/lakebridge_report_<source-tech>.xlsx` / `.json` — the raw
+  Lakebridge Analyzer report(s), kept for manual inspection
+
+Set `LAKEBRIDGE_ENABLED=false` to skip this engine entirely (e.g. before
+the Databricks CLI/workspace prerequisites are set up).
+
+## Running both engines together + generating the comparison
+
+```bash
+python3 run_all_discovery.py
+```
+
+Runs SQLGlot Discovery, then Lakebridge Discovery, then the comparison —
+each step isolated from the others' failures. Equivalent to running the
+three commands below in sequence, which also works if you want to inspect
+each engine's output before moving to the next step:
+
+```bash
+python3 -m autovista.orchestrator
+python3 -m lakebridge_discovery.orchestrator
+python3 -m discovery_comparison.orchestrator
+```
+
+## Discovery Comparison report
+
+`discovery_comparison/` reads `./output/` and `./output_lakebridge/`
+**read-only** (it does not modify either) and writes to
+`./output_comparison/` (`COMPARISON_OUTPUT_DIR`):
+
+- `comparison_report.json` — full structured comparison
+- `comparison_report.csv` — one row per object category (tables, views,
+  stored procedures, functions, triggers, synonyms, SSIS packages,
+  dependencies, unsupported objects) with both engines' counts and the
+  difference
+- `comparison_report.md` — human-readable report: engine run status
+  (success/partial/failed/not_run, duration, error/warning counts), the
+  same category table, and a best-effort sample of object names found by
+  one engine but not the other
+
+Safe to run even if one or both engines haven't run yet or failed —
+missing output is reported as `not_run`/`failed` rather than raising.
+Name-based "found by one engine but not the other" matching is
+best-effort (see `discovery_comparison/comparator.py`'s docstring) —
+**counts are the reliable signal**, name-level matching is a bonus, not a
+guaranteed-precise join.
+
+## Adding a third Discovery engine later
+
+Each engine is a self-contained package with the same shape (`config.py`,
+`logging_setup.py`, `schema.py`, an `orchestrator.py` exposing
+`run_discovery()`, and its own output directory). To add another engine:
+write a new package following that shape, add it as a third independent
+step in `run_all_discovery.py` (wrapped in its own try/except, same as the
+other two), and extend `discovery_comparison/comparator.py`'s category
+loop to also read its output directory. No existing engine's code changes.

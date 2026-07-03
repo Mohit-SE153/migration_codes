@@ -10,3 +10,12 @@ pyodbc>=5.0.0
 
 # Dev/test
 pytest>=8.0.0
+
+# --- Lakebridge Discovery (independent second Discovery engine) ---
+# openpyxl is only needed if lakebridge_discovery/report_parser.py has to
+# fall back to reading the Analyzer's .xlsx report (no --generate-json).
+# The Lakebridge Analyzer itself is NOT a pip package this project imports --
+# it's the separate `databricks labs lakebridge analyze` CLI, installed via
+# the Databricks CLI. See README.md "Installing Lakebridge" for the full
+# (non-pip) install path.
+openpyxl>=3.1.0

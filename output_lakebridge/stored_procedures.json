@@ -1,0 +1,82 @@
+[
+  {
+    "object_type": "stored_procedure",
+    "name": "HumanResources.uspUpdateEmployeeHireInfo",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "LOW",
+    "notes": null
+  },
+  {
+    "object_type": "stored_procedure",
+    "name": "HumanResources.uspUpdateEmployeeLogin",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "LOW",
+    "notes": null
+  },
+  {
+    "object_type": "stored_procedure",
+    "name": "HumanResources.uspUpdateEmployeePersonalInfo",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "LOW",
+    "notes": null
+  },
+  {
+    "object_type": "stored_procedure",
+    "name": "dbo.uspGetBillOfMaterials",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "LOW",
+    "notes": null
+  },
+  {
+    "object_type": "stored_procedure",
+    "name": "dbo.uspGetEmployeeManagers",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "LOW",
+    "notes": null
+  },
+  {
+    "object_type": "stored_procedure",
+    "name": "dbo.uspGetManagerEmployees",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "LOW",
+    "notes": null
+  },
+  {
+    "object_type": "stored_procedure",
+    "name": "dbo.uspGetWhereUsedProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "LOW",
+    "notes": null
+  },
+  {
+    "object_type": "stored_procedure",
+    "name": "dbo.uspLogError",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "MEDIUM",
+    "notes": null
+  },
+  {
+    "object_type": "stored_procedure",
+    "name": "dbo.uspPrintError",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "LOW",
+    "notes": null
+  },
+  {
+    "object_type": "stored_procedure",
+    "name": "dbo.uspSearchCandidateResumes",
+    "source_tech": "MS SQL Server",
+    "raw_category": "name",
+    "complexity": "MEDIUM",
+    "notes": null
+  }
+]
