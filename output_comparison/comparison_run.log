@@ -1,0 +1,4 @@
+2026-07-03T15:29:06 INFO [COMPARISON] === Discovery Comparison started (sqlglot=./output, lakebridge=./output_lakebridge) ===
+2026-07-03T15:29:06 INFO [COMPARISON] Built comparison: sqlglot_status=success lakebridge_status=success categories=9
+2026-07-03T15:29:06 INFO [COMPARISON] Wrote comparison reports: output_comparison/comparison_report.json, output_comparison/comparison_report.csv, output_comparison/comparison_report.md
+2026-07-03T15:29:06 INFO [COMPARISON] === Discovery Comparison finished: sqlglot=success lakebridge=success reports=output_comparison/comparison_report.json, output_comparison/comparison_report.csv, output_comparison/comparison_report.md ===
