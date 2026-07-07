@@ -2,6 +2,10 @@
    "inventory" : [
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "CONVERT" : 1,
+            "DATEADD" : 1
+         },
          "lineCount" : 7,
          "name" : "sql_scalar_function__dbo.ufnGetAccountingEndDate.sql",
          "procAndFunctionCount" : 1,
@@ -15,6 +19,9 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "CONVERT" : 1
+         },
          "lineCount" : 7,
          "name" : "sql_scalar_function__dbo.ufnGetAccountingStartDate.sql",
          "procAndFunctionCount" : 1,
@@ -43,8 +50,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "COALESCE" : 1,
+            "CONVERT" : 1
+         },
          "lineCount" : 21,
          "name" : "sql_scalar_function__dbo.ufnGetProductDealerPrice.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[ProductListPriceHistory]"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "PROGRAM_DECLARATION",
@@ -60,8 +78,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "COALESCE" : 1,
+            "CONVERT" : 1
+         },
          "lineCount" : 18,
          "name" : "sql_scalar_function__dbo.ufnGetProductListPrice.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[ProductListPriceHistory]"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "PROGRAM_DECLARATION",
@@ -76,8 +105,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "COALESCE" : 1,
+            "CONVERT" : 1
+         },
          "lineCount" : 19,
          "name" : "sql_scalar_function__dbo.ufnGetProductStandardCost.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[ProductCostHistory]"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "PROGRAM_DECLARATION",
@@ -122,8 +162,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "SUM" : 1
+         },
          "lineCount" : 22,
          "name" : "sql_scalar_function__dbo.ufnGetStock.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[ProductInventory]"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "IF_START",
@@ -138,6 +188,11 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "CONVERT" : 1,
+            "DATALENGTH" : 1,
+            "REPLICATE" : 1
+         },
          "lineCount" : 15,
          "name" : "sql_scalar_function__dbo.ufnLeadingZeros.sql",
          "procAndFunctionCount" : 1,
@@ -156,6 +211,18 @@
          "complexityLevel" : "LOW",
          "lineCount" : 44,
          "name" : "sql_stored_procedure__HumanResources.uspUpdateEmployeeHireInfo.sql",
+         "objectRel" : [
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[HumanResources].[EmployeePayHistory]"
+            },
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[HumanResources].[Employee]"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "CREATE_PROCEDURE",
@@ -173,6 +240,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 29,
          "name" : "sql_stored_procedure__HumanResources.uspUpdateEmployeeLogin.sql",
+         "objectRel" : [
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[HumanResources].[Employee]"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "CREATE_PROCEDURE",
@@ -188,6 +262,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 27,
          "name" : "sql_stored_procedure__HumanResources.uspUpdateEmployeePersonalInfo.sql",
+         "objectRel" : [
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[HumanResources].[Employee]"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "CREATE_PROCEDURE",
@@ -201,8 +282,30 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "ISNULL" : 2,
+            "OPTION" : 1,
+            "SUM" : 1
+         },
          "lineCount" : 36,
          "name" : "sql_stored_procedure__dbo.uspGetBillOfMaterials.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[BOM_cte]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[BillOfMaterials]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[Product]"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "CREATE_PROCEDURE",
@@ -214,8 +317,28 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "OPTION" : 1
+         },
          "lineCount" : 33,
          "name" : "sql_stored_procedure__dbo.uspGetEmployeeManagers.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[EMP_cte]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[HumanResources].[Employee]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Person]"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "CREATE_PROCEDURE",
@@ -227,8 +350,28 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "OPTION" : 1
+         },
          "lineCount" : 33,
          "name" : "sql_stored_procedure__dbo.uspGetManagerEmployees.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[EMP_cte]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[HumanResources].[Employee]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Person]"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "CREATE_PROCEDURE",
@@ -240,8 +383,30 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "ISNULL" : 2,
+            "OPTION" : 1,
+            "SUM" : 1
+         },
          "lineCount" : 34,
          "name" : "sql_stored_procedure__dbo.uspGetWhereUsedProductID.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[BOM_cte]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[BillOfMaterials]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[Product]"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "CREATE_PROCEDURE",
@@ -253,6 +418,16 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "CONVERT" : 1,
+            "ERROR_LINE" : 1,
+            "ERROR_MESSAGE" : 1,
+            "ERROR_NUMBER" : 2,
+            "ERROR_PROCEDURE" : 1,
+            "ERROR_SEVERITY" : 1,
+            "ERROR_STATE" : 1,
+            "XACT_STATE" : 1
+         },
          "lineCount" : 67,
          "name" : "sql_stored_procedure__dbo.uspLogError.sql",
          "procAndFunctionCount" : 1,
@@ -271,6 +446,16 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "CONVERT" : 4,
+            "ERROR_LINE" : 1,
+            "ERROR_MESSAGE" : 1,
+            "ERROR_NUMBER" : 1,
+            "ERROR_PROCEDURE" : 1,
+            "ERROR_SEVERITY" : 1,
+            "ERROR_STATE" : 1,
+            "ISNULL" : 1
+         },
          "lineCount" : 19,
          "name" : "sql_stored_procedure__dbo.uspPrintError.sql",
          "procAndFunctionCount" : 1,
@@ -284,8 +469,27 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "CONTAINSTABLE" : 3,
+            "CONVERT" : 1,
+            "FREETEXTTABLE" : 1,
+            "NVARCHAR" : 1,
+            "SERVERPROPERTY" : 1
+         },
          "lineCount" : 65,
          "name" : "sql_stored_procedure__dbo.uspSearchCandidateResumes.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 3,
+               "object" : "CONTAINSTABLE"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "FREETEXTTABLE"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "CREATE_PROCEDURE",
@@ -303,6 +507,48 @@
          "complexityLevel" : "LOW",
          "lineCount" : 73,
          "name" : "sql_table_valued_function__dbo.ufnGetContactInformation.sql",
+         "objectRel" : [
+            {
+               "action" : "write",
+               "count" : 4,
+               "object" : "@retContactInformation"
+            },
+            {
+               "action" : "read",
+               "count" : 2,
+               "object" : "[HumanResources].[Employee]"
+            },
+            {
+               "action" : "read",
+               "count" : 2,
+               "object" : "[Person].ContactType"
+            },
+            {
+               "action" : "read",
+               "count" : 4,
+               "object" : "[Person].[BusinessEntityContact]"
+            },
+            {
+               "action" : "read",
+               "count" : 5,
+               "object" : "[Person].[Person]"
+            },
+            {
+               "action" : "read",
+               "count" : 2,
+               "object" : "[Purchasing].[Vendor]"
+            },
+            {
+               "action" : "read",
+               "count" : 2,
+               "object" : "[Sales].[Customer]"
+            },
+            {
+               "action" : "read",
+               "count" : 2,
+               "object" : "[Sales].[Store]"
+            }
+         ],
          "procAndFunctionCount" : 1,
          "scriptCategories" : [
             "IF_START",
@@ -316,6 +562,9 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "RAISERROR" : 1
+         },
          "lineCount" : 28,
          "name" : "sql_trigger__HumanResources.dEmployee.sql",
          "procAndFunctionCount" : 0,
@@ -335,8 +584,24 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "INTO" : 1,
+            "UPDATE" : 2
+         },
          "lineCount" : 41,
          "name" : "sql_trigger__Person.iuPerson.sql",
+         "objectRel" : [
+            {
+               "action" : "write",
+               "count" : 2,
+               "object" : "[Person].[Person]"
+            },
+            {
+               "action" : "read",
+               "count" : 2,
+               "object" : "inserted"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "FOR",
@@ -355,8 +620,23 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "GETDATE" : 1
+         },
          "lineCount" : 47,
          "name" : "sql_trigger__Production.iWorkOrder.sql",
+         "objectRel" : [
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Production].[TransactionHistory]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "inserted"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "DYNAMIC_SQL",
@@ -375,8 +655,24 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "GETDATE" : 1,
+            "UPDATE" : 2
+         },
          "lineCount" : 51,
          "name" : "sql_trigger__Production.uWorkOrder.sql",
+         "objectRel" : [
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Production].[TransactionHistory]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "inserted"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "DYNAMIC_SQL",
@@ -395,8 +691,19 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "COUNT" : 1,
+            "RAISERROR" : 1
+         },
          "lineCount" : 51,
          "name" : "sql_trigger__Purchasing.dVendor.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "deleted"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "DELETE",
@@ -416,8 +723,34 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "GETDATE" : 1,
+            "SUM" : 1
+         },
          "lineCount" : 61,
          "name" : "sql_trigger__Purchasing.iPurchaseOrderDetail.sql",
+         "objectRel" : [
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Production].[TransactionHistory]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Purchasing].[PurchaseOrderDetail]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Purchasing].[PurchaseOrderHeader]"
+            },
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Purchasing].[PurchaseOrderHeader]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "DYNAMIC_SQL",
@@ -437,8 +770,40 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "GETDATE" : 2,
+            "SUM" : 1,
+            "UPDATE" : 3
+         },
          "lineCount" : 76,
          "name" : "sql_trigger__Purchasing.uPurchaseOrderDetail.sql",
+         "objectRel" : [
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Production].[TransactionHistory]"
+            },
+            {
+               "action" : "read",
+               "count" : 2,
+               "object" : "[Purchasing].[PurchaseOrderDetail]"
+            },
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Purchasing].[PurchaseOrderDetail]"
+            },
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Purchasing].[PurchaseOrderHeader]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "inserted"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "DYNAMIC_SQL",
@@ -457,8 +822,18 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "UPDATE" : 1
+         },
          "lineCount" : 43,
          "name" : "sql_trigger__Purchasing.uPurchaseOrderHeader.sql",
+         "objectRel" : [
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Purchasing].[PurchaseOrderHeader]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "DYNAMIC_SQL",
@@ -476,8 +851,47 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "GETDATE" : 1,
+            "OF" : 2,
+            "SQL:COLUMN" : 2,
+            "SUM" : 1,
+            "UPDATE" : 4
+         },
          "lineCount" : 97,
          "name" : "sql_trigger__Sales.iduSalesOrderDetail.sql",
+         "objectRel" : [
+            {
+               "action" : "write",
+               "count" : 2,
+               "object" : "[Person].[Person]"
+            },
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Production].[TransactionHistory]"
+            },
+            {
+               "action" : "read",
+               "count" : 2,
+               "object" : "[Sales].[Customer]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Sales].[SalesOrderDetail]"
+            },
+            {
+               "action" : "read",
+               "count" : 3,
+               "object" : "[Sales].[SalesOrderHeader]"
+            },
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Sales].[SalesOrderHeader]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "DELETE",
@@ -497,8 +911,39 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "SUM" : 2,
+            "UPDATE" : 2
+         },
          "lineCount" : 81,
          "name" : "sql_trigger__Sales.uSalesOrderHeader.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 2,
+               "object" : "[Sales].[SalesOrderHeader]"
+            },
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Sales].[SalesOrderHeader]"
+            },
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Sales].[SalesPerson]"
+            },
+            {
+               "action" : "write",
+               "count" : 1,
+               "object" : "[Sales].[SalesTerritory]"
+            },
+            {
+               "action" : "read",
+               "count" : 2,
+               "object" : "inserted"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "DYNAMIC_SQL",
@@ -517,8 +962,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 2
+         },
          "lineCount" : 6,
          "name" : "table__HumanResources.Department.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[HumanResources].[Department]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -529,8 +984,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 2,
+            "NVARCHAR" : 3
+         },
          "lineCount" : 18,
          "name" : "table__HumanResources.Employee.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[HumanResources].[Employee]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -543,6 +1009,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 8,
          "name" : "table__HumanResources.EmployeeDepartmentHistory.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[HumanResources].[EmployeeDepartmentHistory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -555,6 +1028,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 7,
          "name" : "table__HumanResources.EmployeePayHistory.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[HumanResources].[EmployeePayHistory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -567,6 +1047,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 6,
          "name" : "table__HumanResources.JobCandidate.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[HumanResources].[JobCandidate]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -577,8 +1064,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 7,
          "name" : "table__HumanResources.Shift.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[HumanResources].[Shift]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -589,8 +1086,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 4
+         },
          "lineCount" : 11,
          "name" : "table__Person.Address.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[Address]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -601,8 +1108,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 6,
          "name" : "table__Person.AddressType.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[AddressType]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -615,6 +1132,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 5,
          "name" : "table__Person.BusinessEntity.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[BusinessEntity]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -627,6 +1151,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 7,
          "name" : "table__Person.BusinessEntityAddress.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[BusinessEntityAddress]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -639,6 +1170,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 7,
          "name" : "table__Person.BusinessEntityContact.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[BusinessEntityContact]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -649,8 +1187,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 5,
          "name" : "table__Person.ContactType.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[ContactType]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -661,8 +1209,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 2
+         },
          "lineCount" : 5,
          "name" : "table__Person.CountryRegion.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[CountryRegion]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -673,8 +1231,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 7,
          "name" : "table__Person.EmailAddress.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[EmailAddress]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -687,6 +1255,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 7,
          "name" : "table__Person.Password.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[Password]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -697,8 +1272,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 1,
+            "NVARCHAR" : 5
+         },
          "lineCount" : 15,
          "name" : "table__Person.Person.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[Person]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -709,8 +1295,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 6,
          "name" : "table__Person.PersonPhone.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[PersonPhone]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -721,8 +1317,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 5,
          "name" : "table__Person.PhoneNumberType.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[PhoneNumberType]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -733,8 +1339,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 1,
+            "NVARCHAR" : 2
+         },
          "lineCount" : 10,
          "name" : "table__Person.StateProvince.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Person].[StateProvince]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -745,8 +1362,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 1
+         },
          "lineCount" : 11,
          "name" : "table__Production.BillOfMaterials.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[BillOfMaterials]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -757,8 +1384,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 1,
+            "NVARCHAR" : 1
+         },
          "lineCount" : 5,
          "name" : "table__Production.Culture.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[Culture]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -769,8 +1407,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 1,
+            "NVARCHAR" : 4
+         },
          "lineCount" : 16,
          "name" : "table__Production.Document.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[Document]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -783,6 +1432,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 5,
          "name" : "table__Production.Illustration.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[Illustration]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -793,8 +1449,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 7,
          "name" : "table__Production.Location.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[Location]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -805,8 +1471,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 5,
+            "NVARCHAR" : 4
+         },
          "lineCount" : 27,
          "name" : "table__Production.Product.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[Product]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -817,8 +1494,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 6,
          "name" : "table__Production.ProductCategory.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductCategory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -831,6 +1518,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 7,
          "name" : "table__Production.ProductCostHistory.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductCostHistory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -841,8 +1535,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 6,
          "name" : "table__Production.ProductDescription.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductDescription]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -855,6 +1559,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 5,
          "name" : "table__Production.ProductDocument.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductDocument]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -865,8 +1576,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 9,
          "name" : "table__Production.ProductInventory.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductInventory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -879,6 +1600,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 7,
          "name" : "table__Production.ProductListPriceHistory.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductListPriceHistory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -889,8 +1617,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 8,
          "name" : "table__Production.ProductModel.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductModel]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -903,6 +1641,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 5,
          "name" : "table__Production.ProductModelIllustration.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductModelIllustration]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -913,8 +1658,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 1
+         },
          "lineCount" : 6,
          "name" : "table__Production.ProductModelProductDescriptionCulture.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductModelProductDescriptionCulture]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -925,8 +1680,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 2
+         },
          "lineCount" : 8,
          "name" : "table__Production.ProductPhoto.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductPhoto]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -939,6 +1704,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 6,
          "name" : "table__Production.ProductProductPhoto.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductProductPhoto]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -949,8 +1721,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 3
+         },
          "lineCount" : 10,
          "name" : "table__Production.ProductReview.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductReview]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -961,8 +1743,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 7,
          "name" : "table__Production.ProductSubcategory.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ProductSubcategory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -973,8 +1765,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 5,
          "name" : "table__Production.ScrapReason.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[ScrapReason]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -985,8 +1787,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 1
+         },
          "lineCount" : 11,
          "name" : "table__Production.TransactionHistory.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[TransactionHistory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -997,8 +1809,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 1
+         },
          "lineCount" : 11,
          "name" : "table__Production.TransactionHistoryArchive.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[TransactionHistoryArchive]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1009,8 +1831,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 1,
+            "NVARCHAR" : 1
+         },
          "lineCount" : 5,
          "name" : "table__Production.UnitMeasure.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[UnitMeasure]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1023,6 +1856,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 12,
          "name" : "table__Production.WorkOrder.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[WorkOrder]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1035,6 +1875,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 14,
          "name" : "table__Production.WorkOrderRouting.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Production].[WorkOrderRouting]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1045,8 +1892,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 1
+         },
          "lineCount" : 13,
          "name" : "table__Purchasing.ProductVendor.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Purchasing].[ProductVendor]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1059,6 +1916,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 13,
          "name" : "table__Purchasing.PurchaseOrderDetail.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Purchasing].[PurchaseOrderDetail]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1071,6 +1935,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 15,
          "name" : "table__Purchasing.PurchaseOrderHeader.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Purchasing].[PurchaseOrderHeader]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1081,8 +1952,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 8,
          "name" : "table__Purchasing.ShipMethod.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Purchasing].[ShipMethod]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1093,8 +1974,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 3
+         },
          "lineCount" : 10,
          "name" : "table__Purchasing.Vendor.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Purchasing].[Vendor]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1105,8 +1996,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 1,
+            "NVARCHAR" : 1
+         },
          "lineCount" : 5,
          "name" : "table__Sales.CountryRegionCurrency.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[CountryRegionCurrency]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1117,8 +2019,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 2
+         },
          "lineCount" : 8,
          "name" : "table__Sales.CreditCard.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[CreditCard]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1129,8 +2041,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 1,
+            "NVARCHAR" : 1
+         },
          "lineCount" : 5,
          "name" : "table__Sales.Currency.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[Currency]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1141,8 +2064,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NCHAR" : 2
+         },
          "lineCount" : 9,
          "name" : "table__Sales.CurrencyRate.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[CurrencyRate]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1155,6 +2088,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 9,
          "name" : "table__Sales.Customer.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[Customer]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1167,6 +2107,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 5,
          "name" : "table__Sales.PersonCreditCard.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[PersonCreditCard]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1177,8 +2124,19 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NUMERIC" : 1,
+            "NVARCHAR" : 1
+         },
          "lineCount" : 13,
          "name" : "table__Sales.SalesOrderDetail.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[SalesOrderDetail]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1189,8 +2147,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 4
+         },
          "lineCount" : 28,
          "name" : "table__Sales.SalesOrderHeader.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[SalesOrderHeader]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1203,6 +2171,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 5,
          "name" : "table__Sales.SalesOrderHeaderSalesReason.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[SalesOrderHeaderSalesReason]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1215,6 +2190,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 11,
          "name" : "table__Sales.SalesPerson.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[SalesPerson]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1227,6 +2209,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 7,
          "name" : "table__Sales.SalesPersonQuotaHistory.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[SalesPersonQuotaHistory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1237,8 +2226,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 2
+         },
          "lineCount" : 6,
          "name" : "table__Sales.SalesReason.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[SalesReason]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1249,8 +2248,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 9,
          "name" : "table__Sales.SalesTaxRate.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[SalesTaxRate]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1261,8 +2270,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 3
+         },
          "lineCount" : 12,
          "name" : "table__Sales.SalesTerritory.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[SalesTerritory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1275,6 +2294,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 8,
          "name" : "table__Sales.SalesTerritoryHistory.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[SalesTerritoryHistory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1285,8 +2311,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 8,
          "name" : "table__Sales.ShoppingCartItem.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[ShoppingCartItem]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1297,8 +2333,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 3
+         },
          "lineCount" : 13,
          "name" : "table__Sales.SpecialOffer.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[SpecialOffer]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1311,6 +2357,13 @@
          "complexityLevel" : "LOW",
          "lineCount" : 6,
          "name" : "table__Sales.SpecialOfferProduct.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[SpecialOfferProduct]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1321,8 +2374,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 8,
          "name" : "table__Sales.Store.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[Sales].[Store]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1333,8 +2396,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 1
+         },
          "lineCount" : 7,
          "name" : "table__dbo.AWBuildVersion.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[dbo].[AWBuildVersion]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1345,8 +2418,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 5
+         },
          "lineCount" : 11,
          "name" : "table__dbo.DatabaseLog.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[dbo].[DatabaseLog]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1357,8 +2440,18 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 3
+         },
          "lineCount" : 12,
          "name" : "table__dbo.ErrorLog.sql",
+         "objectRel" : [
+            {
+               "action" : "create",
+               "count" : 1,
+               "object" : "[dbo].[ErrorLog]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "TABLE_DDL"
@@ -1371,6 +2464,53 @@
          "complexityLevel" : "LOW",
          "lineCount" : 39,
          "name" : "view__HumanResources.vEmployee.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[HumanResources].[Employee]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Address]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[BusinessEntityAddress]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[CountryRegion]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[EmailAddress]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[PersonPhone]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Person]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[PhoneNumberType]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[StateProvince]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW"
@@ -1383,6 +2523,28 @@
          "complexityLevel" : "LOW",
          "lineCount" : 22,
          "name" : "view__HumanResources.vEmployeeDepartment.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[HumanResources].[Department]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[HumanResources].[EmployeeDepartmentHistory]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[HumanResources].[Employee]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Person]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW"
@@ -1395,6 +2557,33 @@
          "complexityLevel" : "LOW",
          "lineCount" : 24,
          "name" : "view__HumanResources.vEmployeeDepartmentHistory.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[HumanResources].[Department]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[HumanResources].[EmployeeDepartmentHistory]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[HumanResources].[Employee]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[HumanResources].[Shift]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Person]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW"
@@ -1405,6 +2594,9 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "NVARCHAR" : 13
+         },
          "lineCount" : 36,
          "name" : "view__HumanResources.vJobCandidate.sql",
          "procAndFunctionCount" : 0,
@@ -1419,6 +2611,9 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "NVARCHAR" : 12
+         },
          "lineCount" : 32,
          "name" : "view__HumanResources.vJobCandidateEducation.sql",
          "procAndFunctionCount" : 0,
@@ -1433,6 +2628,11 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "CONVERT" : 1,
+            "NVARCHAR" : 10,
+            "REPLACE" : 1
+         },
          "lineCount" : 28,
          "name" : "view__HumanResources.vJobCandidateEmployment.sql",
          "procAndFunctionCount" : 0,
@@ -1447,6 +2647,10 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "NVARCHAR" : 11,
+            "TEXT" : 3
+         },
          "lineCount" : 48,
          "name" : "view__Person.vAdditionalContactInfo.sql",
          "procAndFunctionCount" : 0,
@@ -1463,6 +2667,18 @@
          "complexityLevel" : "LOW",
          "lineCount" : 15,
          "name" : "view__Person.vStateProvinceCountryRegion.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[CountryRegion]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[StateProvince]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW"
@@ -1475,6 +2691,28 @@
          "complexityLevel" : "LOW",
          "lineCount" : 18,
          "name" : "view__Production.vProductAndDescription.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[ProductDescription]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[ProductModelProductDescriptionCulture]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[ProductModel]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[Product]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW"
@@ -1485,8 +2723,18 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "NVARCHAR" : 21
+         },
          "lineCount" : 62,
          "name" : "view__Production.vProductModelCatalogDescription.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Production].[ProductModel]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW",
@@ -1499,6 +2747,11 @@
       },
       {
          "complexityLevel" : "LOW",
+         "functionCall" : {
+            "NVARCHAR" : 2,
+            "STRING" : 1,
+            "TEXT" : 1
+         },
          "lineCount" : 21,
          "name" : "view__Production.vProductModelInstructions.sql",
          "procAndFunctionCount" : 0,
@@ -1515,6 +2768,38 @@
          "complexityLevel" : "LOW",
          "lineCount" : 23,
          "name" : "view__Purchasing.vVendorWithAddresses.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[AddressType]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Address]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[BusinessEntityAddress]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[CountryRegion]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[StateProvince]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Purchasing].[Vendor]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW"
@@ -1527,6 +2812,43 @@
          "complexityLevel" : "LOW",
          "lineCount" : 28,
          "name" : "view__Purchasing.vVendorWithContacts.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].ContactType"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[BusinessEntityContact]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[EmailAddress]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[PersonPhone]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Person]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[PhoneNumberType]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Purchasing].[Vendor]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW"
@@ -1539,6 +2861,58 @@
          "complexityLevel" : "LOW",
          "lineCount" : 42,
          "name" : "view__Sales.vIndividualCustomer.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[AddressType]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Address]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[BusinessEntityAddress]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[CountryRegion]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[EmailAddress]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[PersonPhone]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Person]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[PhoneNumberType]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[StateProvince]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Sales].[Customer]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW"
@@ -1549,6 +2923,9 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "NVARCHAR" : 7
+         },
          "lineCount" : 33,
          "name" : "view__Sales.vPersonDemographics.sql",
          "procAndFunctionCount" : 0,
@@ -1565,6 +2942,63 @@
          "complexityLevel" : "LOW",
          "lineCount" : 47,
          "name" : "view__Sales.vSalesPerson.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[HumanResources].[Employee]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Address]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[BusinessEntityAddress]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[CountryRegion]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[EmailAddress]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[PersonPhone]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Person]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[PhoneNumberType]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[StateProvince]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Sales].[SalesPerson]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Sales].[SalesTerritory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW"
@@ -1575,8 +3009,42 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "COALESCE" : 1,
+            "DATEADD" : 1,
+            "PIVOT" : 1,
+            "SUM" : 1,
+            "YEAR" : 1
+         },
          "lineCount" : 34,
          "name" : "view__Sales.vSalesPersonSalesByFiscalYears.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[HumanResources].[Employee]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Person]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Sales].[SalesOrderHeader]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Sales].[SalesPerson]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Sales].[SalesTerritory]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW"
@@ -1589,6 +3057,38 @@
          "complexityLevel" : "LOW",
          "lineCount" : 23,
          "name" : "view__Sales.vStoreWithAddresses.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[AddressType]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Address]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[BusinessEntityAddress]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[CountryRegion]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[StateProvince]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Sales].[Store]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW"
@@ -1601,6 +3101,43 @@
          "complexityLevel" : "LOW",
          "lineCount" : 28,
          "name" : "view__Sales.vStoreWithContacts.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[BusinessEntityContact]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[ContactType]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[EmailAddress]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[PersonPhone]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[Person]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Person].[PhoneNumberType]"
+            },
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Sales].[Store]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW"
@@ -1611,8 +3148,18 @@
       },
       {
          "complexityLevel" : "MEDIUM",
+         "functionCall" : {
+            "NVARCHAR" : 5
+         },
          "lineCount" : 26,
          "name" : "view__Sales.vStoreWithDemographics.sql",
+         "objectRel" : [
+            {
+               "action" : "read",
+               "count" : 1,
+               "object" : "[Sales].[Store]"
+            }
+         ],
          "procAndFunctionCount" : 0,
          "scriptCategories" : [
             "CREATE_VIEW",
@@ -1698,9 +3245,9 @@
          "target" : "[Production].[TransactionHistory]",
          "writes" : [
             {
-               "file" : "sql_trigger__Production.iWorkOrder.sql",
+               "file" : "sql_trigger__Sales.iduSalesOrderDetail.sql",
                "sources" : [
-                  "inserted"
+                  "[Sales].[SalesOrderHeader]"
                ]
             },
             {
@@ -1716,15 +3263,15 @@
                ]
             },
             {
-               "file" : "sql_trigger__Purchasing.uPurchaseOrderDetail.sql",
+               "file" : "sql_trigger__Production.iWorkOrder.sql",
                "sources" : [
-                  "[Purchasing].[PurchaseOrderDetail]"
+                  "inserted"
                ]
             },
             {
-               "file" : "sql_trigger__Sales.iduSalesOrderDetail.sql",
+               "file" : "sql_trigger__Purchasing.uPurchaseOrderDetail.sql",
                "sources" : [
-                  "[Sales].[SalesOrderHeader]"
+                  "[Purchasing].[PurchaseOrderDetail]"
                ]
             }
          ]
@@ -1839,10 +3386,10 @@
       }
    ],
    "runInfo" : {
-      "inputFolder" : "D:/autovista/output_lakebridge/_source_export/sql",
-      "reportName" : "D:\\autovista\\output_lakebridge\\reports\\lakebridge_report_MS_SQL_Server.xlsx",
-      "runDurationSeconds" : 4,
+      "inputFolder" : "/home/milind-joshi/mig_dbx/migration_codes/output_lakebridge/_source_export/sql",
+      "reportName" : "/home/milind-joshi/mig_dbx/migration_codes/output_lakebridge/reports/lakebridge_report_MS_SQL_Server.xlsx",
+      "runDurationSeconds" : 1,
       "sourceTechnology" : "SQL",
-      "startTime" : "2026-07-06T15:18:37Z"
+      "startTime" : "2026-07-07T05:46:22Z"
    }
 }

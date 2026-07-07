@@ -1,8 +1,8 @@
 {
-  "run_id": "3931c1ed-20e7-48ec-b4e2-396a8e177cbc",
-  "started_at": "2026-07-03T09:05:45.882557+00:00",
-  "finished_at": "2026-07-03T09:05:51.868310+00:00",
-  "duration_seconds": 5.99,
+  "run_id": "d9158902-fbeb-4f76-b92b-dd45e53be1fe",
+  "started_at": "2026-07-07T05:46:16.397418+00:00",
+  "finished_at": "2026-07-07T05:46:27.257974+00:00",
+  "duration_seconds": 10.86,
   "status": "success",
   "run_mode": "live",
   "export_summary": {
@@ -31,11 +31,11 @@
       ],
       "status": "success",
       "exit_code": 0,
-      "duration_seconds": 5.87,
+      "duration_seconds": 9.95,
       "report_json_path": "output_lakebridge/reports/lakebridge_report_MS_SQL_Server.json",
       "report_excel_path": "output_lakebridge/reports/lakebridge_report_MS_SQL_Server.xlsx",
       "error": null,
-      "stderr_tail": "\u001b[90m14:35:49\u001b[0m \u001b[1m\u001b[32m    INFO\u001b[0m \u001b[1m[d.l.bladespector.analyzer] Analyzer JSON output validated successfully against analyzer-sql-schema.json: /home/milind-joshi/mig_dbx/migration_codes/output_lakebridge/reports/lakebridge_report_MS_SQL_Server.json\u001b[0m\n\u001b[90m14:35:49\u001b[0m \u001b[1m\u001b[32m    INFO\u001b[0m \u001b[1m[d.l.l.analyzer.lakebridge_analyzer] Analyzed MS SQL Server files in /home/milind-joshi/mig_dbx/migration_codes/output_lakebridge/_source_export/sql; report saved to: /home/milind-joshi/mig_dbx/migration_codes/output_lakebridge/reports/lakebridge_report_MS_SQL_Server.xlsx\u001b[0m\n"
+      "stderr_tail": "\u001b[90m11:16:23\u001b[0m \u001b[1m\u001b[32m    INFO\u001b[0m \u001b[1m[d.l.bladespector.analyzer] Analyzer JSON output validated successfully against analyzer-sql-schema.json: /home/milind-joshi/mig_dbx/migration_codes/output_lakebridge/reports/lakebridge_report_MS_SQL_Server.json\u001b[0m\n\u001b[90m11:16:23\u001b[0m \u001b[1m\u001b[32m    INFO\u001b[0m \u001b[1m[d.l.l.analyzer.lakebridge_analyzer] Analyzed MS SQL Server files in /home/milind-joshi/mig_dbx/migration_codes/output_lakebridge/_source_export/sql; report saved to: /home/milind-joshi/mig_dbx/migration_codes/output_lakebridge/reports/lakebridge_report_MS_SQL_Server.xlsx\u001b[0m\n"
     },
     {
       "source_tech": "SSIS",
@@ -1052,7 +1052,1754 @@
   "schemas": [],
   "packages": [],
   "unsupported_objects": [],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "source_object": "dbo.ufnGetContactInformation",
+      "target_object": "humanresources.employee",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetContactInformation",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetContactInformation",
+      "target_object": "person.contacttype",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetContactInformation",
+      "target_object": "person.businessentitycontact",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetContactInformation",
+      "target_object": "purchasing.vendor",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetContactInformation",
+      "target_object": "sales.store",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetContactInformation",
+      "target_object": "sales.customer",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Person.iuPerson",
+      "target_object": "person.person",
+      "relationship_type": "writes",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.iduSalesOrderDetail",
+      "target_object": "production.transactionhistory",
+      "relationship_type": "writes",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.iduSalesOrderDetail",
+      "target_object": "sales.salesorderheader",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.uWorkOrder",
+      "target_object": "production.transactionhistory",
+      "relationship_type": "writes",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.iPurchaseOrderDetail",
+      "target_object": "production.transactionhistory",
+      "relationship_type": "writes",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.iPurchaseOrderDetail",
+      "target_object": "purchasing.purchaseorderheader",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.iWorkOrder",
+      "target_object": "production.transactionhistory",
+      "relationship_type": "writes",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.uPurchaseOrderDetail",
+      "target_object": "production.transactionhistory",
+      "relationship_type": "writes",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.uPurchaseOrderDetail",
+      "target_object": "purchasing.purchaseorderdetail",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.iPurchaseOrderDetail",
+      "target_object": "purchasing.purchaseorderdetail",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.uPurchaseOrderDetail",
+      "target_object": "purchasing.purchaseorderdetail",
+      "relationship_type": "writes",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.iPurchaseOrderDetail",
+      "target_object": "purchasing.purchaseorderheader",
+      "relationship_type": "writes",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.uPurchaseOrderDetail",
+      "target_object": "purchasing.purchaseorderheader",
+      "relationship_type": "writes",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.iduSalesOrderDetail",
+      "target_object": "sales.salesorderdetail",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.uSalesOrderHeader",
+      "target_object": "sales.salesorderheader",
+      "relationship_type": "reads",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.iduSalesOrderDetail",
+      "target_object": "sales.salesorderheader",
+      "relationship_type": "writes",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.uSalesOrderHeader",
+      "target_object": "sales.salesperson",
+      "relationship_type": "writes",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.uSalesOrderHeader",
+      "target_object": "sales.salesterritory",
+      "relationship_type": "writes",
+      "raw_category": "object_lineage",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetProductDealerPrice",
+      "target_object": "production.productlistpricehistory",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetProductListPrice",
+      "target_object": "production.productlistpricehistory",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetProductStandardCost",
+      "target_object": "production.productcosthistory",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetStock",
+      "target_object": "production.productinventory",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.uspUpdateEmployeeHireInfo",
+      "target_object": "humanresources.employeepayhistory",
+      "relationship_type": "writes",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.uspUpdateEmployeeHireInfo",
+      "target_object": "humanresources.employee",
+      "relationship_type": "writes",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.uspUpdateEmployeeLogin",
+      "target_object": "humanresources.employee",
+      "relationship_type": "writes",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.uspUpdateEmployeePersonalInfo",
+      "target_object": "humanresources.employee",
+      "relationship_type": "writes",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.uspGetBillOfMaterials",
+      "target_object": "bom_cte",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "unknown",
+      "discovery_method": "lakebridge_report",
+      "resolved": false
+    },
+    {
+      "source_object": "dbo.uspGetBillOfMaterials",
+      "target_object": "production.billofmaterials",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.uspGetBillOfMaterials",
+      "target_object": "production.product",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.uspGetEmployeeManagers",
+      "target_object": "emp_cte",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "unknown",
+      "discovery_method": "lakebridge_report",
+      "resolved": false
+    },
+    {
+      "source_object": "dbo.uspGetEmployeeManagers",
+      "target_object": "humanresources.employee",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.uspGetEmployeeManagers",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.uspGetManagerEmployees",
+      "target_object": "emp_cte",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "unknown",
+      "discovery_method": "lakebridge_report",
+      "resolved": false
+    },
+    {
+      "source_object": "dbo.uspGetManagerEmployees",
+      "target_object": "humanresources.employee",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.uspGetManagerEmployees",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.uspGetWhereUsedProductID",
+      "target_object": "bom_cte",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "unknown",
+      "discovery_method": "lakebridge_report",
+      "resolved": false
+    },
+    {
+      "source_object": "dbo.uspGetWhereUsedProductID",
+      "target_object": "production.billofmaterials",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.uspGetWhereUsedProductID",
+      "target_object": "production.product",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.uspSearchCandidateResumes",
+      "target_object": "containstable",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "unknown",
+      "discovery_method": "lakebridge_report",
+      "resolved": false
+    },
+    {
+      "source_object": "dbo.uspSearchCandidateResumes",
+      "target_object": "freetexttable",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "stored_procedure",
+      "target_type": "unknown",
+      "discovery_method": "lakebridge_report",
+      "resolved": false
+    },
+    {
+      "source_object": "Purchasing.uPurchaseOrderHeader",
+      "target_object": "purchasing.purchaseorderheader",
+      "relationship_type": "writes",
+      "raw_category": "objectRel",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.iduSalesOrderDetail",
+      "target_object": "person.person",
+      "relationship_type": "writes",
+      "raw_category": "objectRel",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.iduSalesOrderDetail",
+      "target_object": "sales.customer",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.uSalesOrderHeader",
+      "target_object": "sales.salesorderheader",
+      "relationship_type": "writes",
+      "raw_category": "objectRel",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployee",
+      "target_object": "humanresources.employee",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployee",
+      "target_object": "person.address",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployee",
+      "target_object": "person.businessentityaddress",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployee",
+      "target_object": "person.countryregion",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployee",
+      "target_object": "person.emailaddress",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployee",
+      "target_object": "person.personphone",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployee",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployee",
+      "target_object": "person.phonenumbertype",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployee",
+      "target_object": "person.stateprovince",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployeeDepartment",
+      "target_object": "humanresources.department",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployeeDepartment",
+      "target_object": "humanresources.employeedepartmenthistory",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployeeDepartment",
+      "target_object": "humanresources.employee",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployeeDepartment",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployeeDepartmentHistory",
+      "target_object": "humanresources.department",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployeeDepartmentHistory",
+      "target_object": "humanresources.employeedepartmenthistory",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployeeDepartmentHistory",
+      "target_object": "humanresources.employee",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployeeDepartmentHistory",
+      "target_object": "humanresources.shift",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vEmployeeDepartmentHistory",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Person.vStateProvinceCountryRegion",
+      "target_object": "person.countryregion",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Person.vStateProvinceCountryRegion",
+      "target_object": "person.stateprovince",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.vProductAndDescription",
+      "target_object": "production.productdescription",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.vProductAndDescription",
+      "target_object": "production.productmodelproductdescriptionculture",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.vProductAndDescription",
+      "target_object": "production.productmodel",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.vProductAndDescription",
+      "target_object": "production.product",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.vProductModelCatalogDescription",
+      "target_object": "production.productmodel",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithAddresses",
+      "target_object": "person.addresstype",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithAddresses",
+      "target_object": "person.address",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithAddresses",
+      "target_object": "person.businessentityaddress",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithAddresses",
+      "target_object": "person.countryregion",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithAddresses",
+      "target_object": "person.stateprovince",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithAddresses",
+      "target_object": "purchasing.vendor",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithContacts",
+      "target_object": "person.contacttype",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithContacts",
+      "target_object": "person.businessentitycontact",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithContacts",
+      "target_object": "person.emailaddress",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithContacts",
+      "target_object": "person.personphone",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithContacts",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithContacts",
+      "target_object": "person.phonenumbertype",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.vVendorWithContacts",
+      "target_object": "purchasing.vendor",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vIndividualCustomer",
+      "target_object": "person.addresstype",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vIndividualCustomer",
+      "target_object": "person.address",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vIndividualCustomer",
+      "target_object": "person.businessentityaddress",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vIndividualCustomer",
+      "target_object": "person.countryregion",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vIndividualCustomer",
+      "target_object": "person.emailaddress",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vIndividualCustomer",
+      "target_object": "person.personphone",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vIndividualCustomer",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vIndividualCustomer",
+      "target_object": "person.phonenumbertype",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vIndividualCustomer",
+      "target_object": "person.stateprovince",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vIndividualCustomer",
+      "target_object": "sales.customer",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPerson",
+      "target_object": "humanresources.employee",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPerson",
+      "target_object": "person.address",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPerson",
+      "target_object": "person.businessentityaddress",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPerson",
+      "target_object": "person.countryregion",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPerson",
+      "target_object": "person.emailaddress",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPerson",
+      "target_object": "person.personphone",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPerson",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPerson",
+      "target_object": "person.phonenumbertype",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPerson",
+      "target_object": "person.stateprovince",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPerson",
+      "target_object": "sales.salesperson",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPerson",
+      "target_object": "sales.salesterritory",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPersonSalesByFiscalYears",
+      "target_object": "humanresources.employee",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPersonSalesByFiscalYears",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPersonSalesByFiscalYears",
+      "target_object": "sales.salesorderheader",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPersonSalesByFiscalYears",
+      "target_object": "sales.salesperson",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vSalesPersonSalesByFiscalYears",
+      "target_object": "sales.salesterritory",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithAddresses",
+      "target_object": "person.addresstype",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithAddresses",
+      "target_object": "person.address",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithAddresses",
+      "target_object": "person.businessentityaddress",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithAddresses",
+      "target_object": "person.countryregion",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithAddresses",
+      "target_object": "person.stateprovince",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithAddresses",
+      "target_object": "sales.store",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithContacts",
+      "target_object": "person.businessentitycontact",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithContacts",
+      "target_object": "person.contacttype",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithContacts",
+      "target_object": "person.emailaddress",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithContacts",
+      "target_object": "person.personphone",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithContacts",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithContacts",
+      "target_object": "person.phonenumbertype",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithContacts",
+      "target_object": "sales.store",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vStoreWithDemographics",
+      "target_object": "sales.store",
+      "relationship_type": "reads",
+      "raw_category": "objectRel",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge_report",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vJobCandidate",
+      "target_object": "humanresources.jobcandidate",
+      "relationship_type": "reads",
+      "raw_category": "text_scan",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vJobCandidateEducation",
+      "target_object": "humanresources.jobcandidate",
+      "relationship_type": "reads",
+      "raw_category": "text_scan",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.vJobCandidateEmployment",
+      "target_object": "humanresources.jobcandidate",
+      "relationship_type": "reads",
+      "raw_category": "text_scan",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Person.vAdditionalContactInfo",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "text_scan",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.vProductModelInstructions",
+      "target_object": "production.productmodel",
+      "relationship_type": "reads",
+      "raw_category": "text_scan",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.vPersonDemographics",
+      "target_object": "person.person",
+      "relationship_type": "reads",
+      "raw_category": "text_scan",
+      "source_type": "view",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.uspUpdateEmployeeHireInfo",
+      "target_object": "dbo.usplogerror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "stored_procedure",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.uspUpdateEmployeeLogin",
+      "target_object": "dbo.usplogerror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "stored_procedure",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.uspUpdateEmployeePersonalInfo",
+      "target_object": "dbo.usplogerror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "stored_procedure",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.uspLogError",
+      "target_object": "dbo.errorlog",
+      "relationship_type": "writes",
+      "raw_category": "text_scan",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.uspLogError",
+      "target_object": "dbo.uspprinterror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "stored_procedure",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.uspSearchCandidateResumes",
+      "target_object": "humanresources.jobcandidate",
+      "relationship_type": "reads",
+      "raw_category": "text_scan",
+      "source_type": "stored_procedure",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetProductDealerPrice",
+      "target_object": "production.product",
+      "relationship_type": "reads",
+      "raw_category": "text_scan",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetProductListPrice",
+      "target_object": "production.product",
+      "relationship_type": "reads",
+      "raw_category": "text_scan",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "dbo.ufnGetProductStandardCost",
+      "target_object": "production.product",
+      "relationship_type": "reads",
+      "raw_category": "text_scan",
+      "source_type": "function",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "HumanResources.dEmployee",
+      "target_object": "humanresources.employee",
+      "relationship_type": "fires_on",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Person.iuPerson",
+      "target_object": "person.person",
+      "relationship_type": "fires_on",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.iWorkOrder",
+      "target_object": "dbo.uspprinterror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.iWorkOrder",
+      "target_object": "dbo.usplogerror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.iWorkOrder",
+      "target_object": "production.workorder",
+      "relationship_type": "fires_on",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.uWorkOrder",
+      "target_object": "dbo.uspprinterror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.uWorkOrder",
+      "target_object": "dbo.usplogerror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Production.uWorkOrder",
+      "target_object": "production.workorder",
+      "relationship_type": "fires_on",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.dVendor",
+      "target_object": "dbo.uspprinterror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.dVendor",
+      "target_object": "dbo.usplogerror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.dVendor",
+      "target_object": "purchasing.vendor",
+      "relationship_type": "fires_on",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.iPurchaseOrderDetail",
+      "target_object": "dbo.uspprinterror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.iPurchaseOrderDetail",
+      "target_object": "dbo.usplogerror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.iPurchaseOrderDetail",
+      "target_object": "purchasing.purchaseorderdetail",
+      "relationship_type": "fires_on",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.uPurchaseOrderDetail",
+      "target_object": "dbo.uspprinterror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.uPurchaseOrderDetail",
+      "target_object": "dbo.usplogerror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.uPurchaseOrderDetail",
+      "target_object": "purchasing.purchaseorderdetail",
+      "relationship_type": "fires_on",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.uPurchaseOrderHeader",
+      "target_object": "dbo.uspprinterror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.uPurchaseOrderHeader",
+      "target_object": "dbo.usplogerror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Purchasing.uPurchaseOrderHeader",
+      "target_object": "purchasing.purchaseorderheader",
+      "relationship_type": "fires_on",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.iduSalesOrderDetail",
+      "target_object": "dbo.uspprinterror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.iduSalesOrderDetail",
+      "target_object": "dbo.usplogerror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.iduSalesOrderDetail",
+      "target_object": "sales.salesorderdetail",
+      "relationship_type": "fires_on",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.uSalesOrderHeader",
+      "target_object": "dbo.uspprinterror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.uSalesOrderHeader",
+      "target_object": "dbo.usplogerror",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "stored_procedure",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.uSalesOrderHeader",
+      "target_object": "sales.salesorderheader",
+      "relationship_type": "fires_on",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "table",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.uSalesOrderHeader",
+      "target_object": "dbo.ufngetaccountingstartdate",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "function",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    },
+    {
+      "source_object": "Sales.uSalesOrderHeader",
+      "target_object": "dbo.ufngetaccountingenddate",
+      "relationship_type": "calls",
+      "raw_category": "text_scan",
+      "source_type": "trigger",
+      "target_type": "function",
+      "discovery_method": "lakebridge",
+      "resolved": true
+    }
+  ],
+  "dependency_stats": {
+    "total_dependencies": 172,
+    "unique_relationships": 172,
+    "by_relationship_type": {
+      "reads": 120,
+      "writes": 20,
+      "calls": 22,
+      "fires_on": 10
+    },
+    "by_type_pair": {
+      "function->table": 14,
+      "stored_procedure->stored_procedure": 4,
+      "stored_procedure->table": 14,
+      "stored_procedure->unknown": 6,
+      "trigger->function": 2,
+      "trigger->stored_procedure": 16,
+      "trigger->table": 32,
+      "view->table": 84
+    },
+    "by_discovery_method": {
+      "lakebridge_report": 129,
+      "lakebridge": 43
+    },
+    "resolved": 166,
+    "unresolved": 6
+  },
   "warnings": [],
   "errors": [],
   "raw_report_paths": [

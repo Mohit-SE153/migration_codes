@@ -1,0 +1,26 @@
+{
+  "total_dependencies": 172,
+  "unique_relationships": 172,
+  "by_relationship_type": {
+    "reads": 120,
+    "writes": 20,
+    "calls": 22,
+    "fires_on": 10
+  },
+  "by_type_pair": {
+    "function->table": 14,
+    "stored_procedure->stored_procedure": 4,
+    "stored_procedure->table": 14,
+    "stored_procedure->unknown": 6,
+    "trigger->function": 2,
+    "trigger->stored_procedure": 16,
+    "trigger->table": 32,
+    "view->table": 84
+  },
+  "by_discovery_method": {
+    "lakebridge_report": 129,
+    "lakebridge": 43
+  },
+  "resolved": 166,
+  "unresolved": 6
+}

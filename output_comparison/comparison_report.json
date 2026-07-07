@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-07-03T09:59:06.090539Z",
+  "generated_at": "2026-07-07T05:46:27.268198Z",
   "sqlglot_run": {
     "engine": "sqlglot",
     "status": "success",
-    "duration_seconds": 3.0,
-    "started_at": "2026-07-03T15:28:52",
-    "finished_at": "2026-07-03T15:28:55",
+    "duration_seconds": 166.0,
+    "started_at": "2026-07-07T11:13:30",
+    "finished_at": "2026-07-07T11:16:16",
     "error_count": 0,
     "warning_count": 0,
     "notes": []
@@ -13,9 +13,9 @@
   "lakebridge_run": {
     "engine": "lakebridge",
     "status": "success",
-    "duration_seconds": 5.99,
-    "started_at": "2026-07-03T09:05:45.882557+00:00",
-    "finished_at": "2026-07-03T09:05:51.868310+00:00",
+    "duration_seconds": 10.86,
+    "started_at": "2026-07-07T05:46:16.397418+00:00",
+    "finished_at": "2026-07-07T05:46:27.257974+00:00",
     "error_count": 0,
     "warning_count": 0,
     "notes": [
@@ -95,9 +95,9 @@
     },
     {
       "category": "dependencies",
-      "sqlglot_count": 108,
-      "lakebridge_count": 0,
-      "difference": 108,
+      "sqlglot_count": 292,
+      "lakebridge_count": 172,
+      "difference": 120,
       "matched_count": 0,
       "sqlglot_only_sample": [],
       "lakebridge_only_sample": [],
@@ -114,7 +114,7 @@
       "match_basis": "count-only (sqlglot: unresolved/llm_inferred proc+embedded-sql count; lakebridge: Analyzer-flagged unsupported objects)"
     }
   ],
-  "sqlglot_dependency_count": 108,
-  "lakebridge_dependency_count": 0,
+  "sqlglot_dependency_count": 292,
+  "lakebridge_dependency_count": 172,
   "notes": []
 }
