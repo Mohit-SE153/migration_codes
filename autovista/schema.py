@@ -78,6 +78,18 @@ class ColumnEntity:
     is_clr_type: bool | None = None
     max_length: int | None = None  # sys.columns.max_length; -1 means MAX (varchar(max)/nvarchar(max)/varbinary(max))
 
+    # --- additive: dependency-discovery enhancement ---
+    # "schema.name" of the XML schema collection this column is bound to
+    # (sys.columns.xml_collection_id resolved via sys.xml_schema_collections),
+    # or None for non-XML columns / unbound XML columns.
+    xml_schema_collection: str | None = None
+    # Scalar UDF calls found inside computed_expression (e.g. a computed
+    # column defined as `AS (dbo.ufnCalc(Price, Qty))`); always empty for
+    # non-computed columns. Computed columns can only reference other
+    # columns in the same row, never other tables, so there is no
+    # referenced_tables here.
+    referenced_functions: list[str] = field(default_factory=list)
+
     def __post_init__(self) -> None:
         if self.is_nullable is None:
             self.is_nullable = self.nullable
@@ -154,6 +166,16 @@ class ViewEntity:
     referencing_objects: list[str] = field(default_factory=list)
     parse_status: ParseStatus = "direct_metadata"
 
+    # --- additive: dependency-discovery enhancement ---
+    # referenced_tables already distinguishes table vs. view targets at
+    # dependency_graph_builder.py's edge-building stage (a view reference
+    # looks identical to a table reference to sqlglot; only cross-checking
+    # against the known views list can tell them apart), so no separate
+    # referenced_views field is needed here.
+    referenced_functions: list[str] = field(default_factory=list)
+    referenced_sequences: list[str] = field(default_factory=list)
+    unresolved_reason: str | None = None
+
 
 @dataclass
 class TriggerEntity:
@@ -163,6 +185,13 @@ class TriggerEntity:
     table: str
     event: str
     parse_status: ParseStatus = "direct_metadata"
+
+    # --- additive: dependency-discovery enhancement ---
+    referenced_tables: list[str] = field(default_factory=list)
+    referenced_procs: list[str] = field(default_factory=list)
+    referenced_functions: list[str] = field(default_factory=list)
+    referenced_sequences: list[str] = field(default_factory=list)
+    unresolved_reason: str | None = None
 
 
 @dataclass
@@ -221,6 +250,7 @@ class StoredProcedureEntity:
     referenced_tables: list[str] = field(default_factory=list)
     referenced_procs: list[str] = field(default_factory=list)
     referenced_functions: list[str] = field(default_factory=list)
+    referenced_sequences: list[str] = field(default_factory=list)
     create_date: str | None = None
     modify_date: str | None = None
     is_encrypted: bool | None = None
@@ -290,6 +320,13 @@ class ConstraintEntity:
     definition: str | None = None  # CHECK / DEFAULT only
     parse_status: ParseStatus = "direct_metadata"
 
+    # --- additive: dependency-discovery enhancement (CHECK/DEFAULT only --
+    # PRIMARY_KEY/UNIQUE/FOREIGN_KEY have no `definition` text to parse) ---
+    referenced_tables: list[str] = field(default_factory=list)
+    referenced_functions: list[str] = field(default_factory=list)
+    referenced_sequences: list[str] = field(default_factory=list)
+    unresolved_reason: str | None = None
+
 
 @dataclass
 class FunctionEntity:
@@ -302,6 +339,12 @@ class FunctionEntity:
     parameter_count: int = 0
     referenced_objects: list[str] = field(default_factory=list)
     parse_status: ParseStatus = "direct_metadata"
+
+    # --- additive: dependency-discovery enhancement ---
+    referenced_tables: list[str] = field(default_factory=list)
+    referenced_functions: list[str] = field(default_factory=list)
+    referenced_sequences: list[str] = field(default_factory=list)
+    unresolved_reason: str | None = None
 
 
 @dataclass
@@ -472,6 +515,7 @@ class EmbeddedSqlEntity:
     sql_text: str
     referenced_tables: list[str] = field(default_factory=list)
     referenced_procs: list[str] = field(default_factory=list)
+    referenced_sequences: list[str] = field(default_factory=list)
     parse_status: ParseStatus = "xml_parsed"
     unresolved_reason: str | None = None
 

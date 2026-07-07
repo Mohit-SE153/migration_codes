@@ -17,10 +17,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from lakebridge_discovery.config import LakebridgeConfig, load_config
+from lakebridge_discovery.dependency_extractor import extract_dependencies
 from lakebridge_discovery.lakebridge_runner import run_analyze
 from lakebridge_discovery.logging_setup import configure_logging, logger
 from lakebridge_discovery.output_writer import (
     write_csv_rollup,
+    write_dependency_stats,
     write_entity_outputs,
     write_manifest_json,
     write_run_log_summary,
@@ -69,6 +71,8 @@ def run_discovery(config: LakebridgeConfig | None = None) -> LakebridgeDiscovery
         ))
         parse_invocation(invocation, result)
 
+    extract_dependencies(result, export_dir)
+
     statuses = [i.status for i in invocations]
     if any(s == "success" for s in statuses) and not any(s == "failed" for s in statuses):
         result.status = "success"
@@ -97,7 +101,11 @@ def _write_outputs(result: LakebridgeDiscoveryResult, log_entries: list[Lakebrid
     manifest_path = write_manifest_json(result, output_dir)
     csv_path = write_csv_rollup(result, output_dir)
     log_csv_path = write_run_log_summary(log_entries, output_dir)
-    logger.info("Wrote manifest=%s rollup=%s log_summary=%s", manifest_path, csv_path, log_csv_path)
+    stats_path = write_dependency_stats(result, output_dir)
+    logger.info(
+        "Wrote manifest=%s rollup=%s log_summary=%s dependency_stats=%s",
+        manifest_path, csv_path, log_csv_path, stats_path,
+    )
 
 
 if __name__ == "__main__":

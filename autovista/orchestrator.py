@@ -40,7 +40,15 @@ from autovista.llm_fallback_extractor import build_llm_client, extract_with_llm_
 from autovista.logging_setup import configure_logging, logger
 from autovista.output_writer import write_csv_rollup, write_manifest_json, write_run_log_summary
 from autovista.schema import DiscoveryManifest
-from autovista.sql_lineage_parser import build_view_entity, enrich_embedded_sql, enrich_stored_procedure
+from autovista.sql_lineage_parser import (
+    build_view_entity,
+    enrich_constraint,
+    enrich_embedded_sql,
+    enrich_function,
+    enrich_stored_procedure,
+    enrich_trigger,
+    parse_lineage,
+)
 from autovista.sql_metadata_extractor import FixtureMetadataSource, LiveSqlServerSource, extract_database_metadata
 from autovista.ssis_catalog_extractor import FileSystemDtsxSource, LiveSsisCatalogSource, extract_ssis_packages
 from autovista.state_store import StateStore
@@ -129,11 +137,9 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
         all_log_entries.extend(log_entries)
 
         manifest.databases = db_result["databases"]
-        manifest.triggers = db_result["triggers"]
         manifest.agent_jobs = db_result["agent_jobs"]
         manifest.database_files = db_result.get("database_files", [])
         manifest.indexes = db_result.get("indexes", [])
-        manifest.functions = db_result.get("functions", [])
         manifest.synonyms = db_result.get("synonyms", [])
         manifest.sequences = db_result.get("sequences", [])
         manifest.user_defined_types = db_result.get("user_defined_types", [])
@@ -143,6 +149,15 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
         manifest.permissions = db_result.get("permissions", [])
         manifest.database_summary = db_result.get("database_summary", [])
         manifest.constraints = db_result.get("constraints", [])
+
+        # Computed first (before tables below need it for computed-column
+        # function detection, and before procs/views/triggers/constraints
+        # need it for their own inline function-call detection) -- a call
+        # site only ever carries the bare function name, never its schema
+        # (see sql_lineage_parser.py).
+        known_function_names = frozenset(
+            f"{func_entity.schema}.{func_entity.name}" for func_entity, _ in db_result.get("functions", [])
+        )
 
         # --- Tables: direct_metadata, resumable via row/size fingerprint ---
         for table in db_result["tables"]:
@@ -157,10 +172,38 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
                 counters["skipped_unchanged"] += 1
                 manifest.tables.append(table)  # still included in output; just not re-logged as newly scanned
 
+        # --- Computed columns: detect scalar UDF calls inside the computed
+        # expression (e.g. `AS (dbo.ufnCalc(Price, Qty))`) -- a computed
+        # column can only reference other columns in the same row, never
+        # another table, so table-lineage parsing doesn't apply here. ---
+        for table in manifest.tables:
+            for column in table.columns:
+                if column.computed_expression:
+                    result = parse_lineage(column.computed_expression, known_function_names=known_function_names)
+                    column.referenced_functions = result.referenced_functions
+
         # --- Data Quality Summary: metadata-only, computed from tables/indexes/constraints above ---
         manifest.data_quality_summary = [
             build_data_quality_summary(database_name, manifest.tables, manifest.indexes, manifest.constraints)
         ]
+
+        # --- Functions: enrich with sqlglot lineage ---
+        for func_entity, definition in db_result.get("functions", []):
+            enrich_function(func_entity, definition, known_function_names=known_function_names)
+            manifest.functions.append(func_entity)
+            counters["scanned"] += 1
+
+        # --- Triggers: enrich with sqlglot lineage ---
+        for trigger_entity, definition in db_result.get("triggers", []):
+            enrich_trigger(trigger_entity, definition, known_function_names=known_function_names)
+            manifest.triggers.append(trigger_entity)
+            counters["scanned"] += 1
+
+        # --- Constraints: enrich CHECK/DEFAULT definitions with sqlglot
+        # lineage (enrich_constraint no-ops for PRIMARY_KEY/UNIQUE/FOREIGN_KEY,
+        # which have no expression text) ---
+        for constraint_entity in manifest.constraints:
+            enrich_constraint(constraint_entity, known_function_names=known_function_names)
 
         # --- Stored procedures: enrich with sqlglot lineage, resumable via definition hash ---
         llm_client = build_llm_client(config.llm)
@@ -169,13 +212,23 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
         for proc_entity, definition in db_result["stored_procedures"]:
             object_id = f"{proc_entity.database}.{proc_entity.schema}.{proc_entity.name}"
             fingerprint = _fingerprint(definition)
-            if not state.has_changed(object_id, fingerprint):
-                logger.info("SKIP proc         %-45s unchanged since last run", object_id)
-                counters["skipped_unchanged"] += 1
-                manifest.stored_procedures.append(proc_entity)
-                continue
+            # has_changed() is used only for the scanned/skipped_unchanged
+            # observability split below -- it must NEVER gate whether
+            # enrichment runs. The state store's object_fingerprints table
+            # records only a hash, not the previously-computed
+            # referenced_tables/procs/functions/sequences -- there is
+            # nothing to "resume" from, so skipping enrich_stored_procedure()
+            # here would silently and permanently drop that object's
+            # dependency data from this run's manifest whenever its
+            # definition happens to match a fingerprint from any earlier
+            # run (found via tools/validate_sqlglot_dependencies.py
+            # reporting Procedure -> Table/Procedure regressing to 0 on a
+            # second consecutive live run against an unchanged database).
+            is_unchanged = not state.has_changed(object_id, fingerprint)
+            if is_unchanged:
+                logger.info("SKIP proc         %-45s unchanged since last run (still re-enriched)", object_id)
 
-            enrich_stored_procedure(proc_entity, definition)
+            enrich_stored_procedure(proc_entity, definition, known_function_names=known_function_names)
             if proc_entity.parse_status == "unresolved":
                 llm_result = extract_with_llm_fallback(
                     llm_client, object_id, definition, llm_objects_attempted, config.llm
@@ -192,13 +245,16 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
 
             manifest.stored_procedures.append(proc_entity)
             state.record_fingerprint(object_id, "stored_procedure", fingerprint, run_id, now_iso)
-            counters["scanned"] += 1
+            counters["skipped_unchanged" if is_unchanged else "scanned"] += 1
 
         # --- Views: enrich with sqlglot lineage ---
         for view_entry in db_result["views"]:
-            if isinstance(view_entry, tuple) and len(view_entry) == 3:
-                schema_name, view_name, definition = view_entry
-                view_entity = build_view_entity(database=database_name, schema=schema_name, name=view_name, definition=definition)
+            if isinstance(view_entry, tuple) and len(view_entry) == 5:
+                schema_name, view_name, definition, create_date, modify_date = view_entry
+                view_entity = build_view_entity(
+                    database=database_name, schema=schema_name, name=view_name, definition=definition,
+                    known_function_names=known_function_names, create_date=create_date, modify_date=modify_date,
+                )
             else:
                 view_entity = view_entry
             manifest.views.append(view_entity)
@@ -211,12 +267,15 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
         for package in packages:
             object_id = f"{package.project}.{package.name}"
 
+            # Same reasoning as the stored-procedure loop above: has_changed()
+            # must only drive the scanned/skipped_unchanged split, never
+            # gate whether embedded_sql actually gets lineage-enriched --
+            # the state store has nowhere to persist a previous run's
+            # enrichment to "resume" from.
             fingerprint = _fingerprint(ssis_source.get_package_xml(package.folder, package.project, package.name))
-            if not state.has_changed(object_id, fingerprint):
-                logger.info("SKIP package      %-45s unchanged since last run", object_id)
-                counters["skipped_unchanged"] += 1
-                manifest.packages.append(package)
-                continue
+            is_unchanged = not state.has_changed(object_id, fingerprint)
+            if is_unchanged:
+                logger.info("SKIP package      %-45s unchanged since last run (still re-enriched)", object_id)
             state.record_fingerprint(object_id, "ssis_package", fingerprint, run_id, now_iso)
 
             for embedded in package.embedded_sql:
@@ -246,14 +305,25 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
                     )
 
             manifest.packages.append(package)
-            counters["scanned"] += len(package.tasks) + 1
+            counters["skipped_unchanged" if is_unchanged else "scanned"] += len(package.tasks) + 1
 
         # --- Dependency graph: required output, built from everything above ---
+        # expression_dependencies (sys.sql_expression_dependencies) is used
+        # only to backfill objects whose own sqlglot parse degraded/failed --
+        # see dependency_graph_builder.py's module docstring.
+        expression_dependencies = metadata_source.list_expression_dependencies(database_name)
         manifest.dependencies = build_dependency_graph(
             stored_procedures=manifest.stored_procedures,
             views=manifest.views,
             packages=manifest.packages,
             foreign_keys=db_result["foreign_keys"],
+            functions=manifest.functions,
+            triggers=manifest.triggers,
+            constraints=manifest.constraints,
+            synonyms=manifest.synonyms,
+            tables=manifest.tables,
+            user_defined_types=manifest.user_defined_types,
+            expression_dependencies=expression_dependencies,
         )
 
         counters["failed"] = sum(1 for e in all_log_entries if e.status == "failed")

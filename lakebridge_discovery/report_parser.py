@@ -2,13 +2,23 @@
 Defensive mapper: Lakebridge Analyzer report (JSON preferred, Excel
 fallback) -> lakebridge_discovery.schema.LakebridgeDiscoveryResult.
 
-The Analyzer's report schema is not publicly documented at the field
-level (see schema.py's module docstring), so this parser does keyword-based
-best-effort classification rather than assuming exact key/sheet names, and
-never raises on an unrecognized shape -- it logs a warning onto the result
-and moves on. Re-validate `_CATEGORY_KEYWORDS` and `_NAME_KEYS` below
-against a real report the first time this runs against an actual
-Databricks workspace, and tighten the mapping then.
+For JSON reports, the *object inventory and dependency* shape is in fact
+publicly known: Lakebridge's `analyze` command delegates to the
+`databricks-labs-bladespector` package, whose installed JSON schemas
+(databricks/labs/bladespector/schemas/analyzer-{sql,etl}-schema.json) define
+`inventory[].objectRel[]` (per-object {object, action, count} relationships),
+ETL's `inventory[].sqlStatements[].objectRel[]`, and ETL's top-level
+`subJobInfo[]` (parent/child job relationships) as the native dependency
+data -- see extract_native_report_dependencies() below, which is preferred
+over dependency_extractor.py's regex text-scan (that module only fills gaps
+for objects this function found zero edges for).
+
+Everything else here (_CATEGORY_KEYWORDS, _apply_rows, and Excel handling)
+remains keyword-based best-effort classification, since the Excel report's
+sheet layout and any *other* JSON shapes (older/newer Analyzer versions)
+aren't pinned down the same way -- never raises on an unrecognized shape,
+logs a warning and moves on. Re-validate against a real report the first
+time this runs against an actual Databricks workspace, and tighten further.
 """
 from __future__ import annotations
 
@@ -16,6 +26,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from lakebridge_discovery.dependency_extractor import _build_inventory, _normalize_ref, _resolve
 from lakebridge_discovery.logging_setup import logger
 from lakebridge_discovery.schema import (
     AnalyzeInvocationEntity,
@@ -23,6 +34,16 @@ from lakebridge_discovery.schema import (
     LakebridgeDiscoveryResult,
     LakebridgeObjectRef,
 )
+
+# Bladespector's objectRel "action" enum -> this engine's relationship_type
+# vocabulary. "create"/"drop" are DDL on the object itself (the script
+# defining/dropping its own object), not a cross-object edge -- intentionally
+# unmapped, so those actions are skipped rather than emitting a self-loop.
+_ACTION_TO_RELATIONSHIP = {
+    "read": "reads", "source": "reads", "lookup": "reads",
+    "write": "writes", "target": "writes",
+    "execute": "calls",
+}
 
 # Ordered so more specific keywords (e.g. "stored procedure") are checked
 # before generic ones. Matched against lower-cased sheet names / JSON key
@@ -81,11 +102,16 @@ def _row_to_object_ref(row: dict, category: str, source_tech: str, raw_category:
 
 
 def _row_to_dependency_ref(row: dict, raw_category: str) -> LakebridgeDependencyRef:
+    # Analyzer-report-derived rows carry no reliable object-type info, unlike
+    # dependency_extractor.py's own text-scan edges -- tagged distinctly and
+    # left unresolved rather than defaulting to a misleading resolved=True.
     return LakebridgeDependencyRef(
         source_object=_first_present(row, _SOURCE_KEYS) or "(unknown)",
         target_object=_first_present(row, _TARGET_KEYS) or "(unknown)",
         relationship_type=_first_present(row, _RELATIONSHIP_KEYS) or "unknown",
         raw_category=raw_category,
+        discovery_method="lakebridge_report",
+        resolved=False,
     )
 
 
@@ -144,6 +170,21 @@ _NON_INVENTORY_SHEETS = {
 }
 
 
+def _parse_program_name(program_name: str) -> tuple[str, str] | None:
+    """Decomposes source_exporter.py's `{kind}__{schema}.{name}.ext` file
+    naming convention into (object_type, "schema.name"). Returns None if the
+    name doesn't follow that convention, or classifies as dependency/
+    unsupported (not a real object category)."""
+    prefix, sep, rest = str(program_name).partition("__")
+    if not sep:
+        return None
+    category = _classify(prefix.replace("_", " "))
+    if category is None or category in ("dependency", "unsupported"):
+        return None
+    name = rest.rsplit(".", 1)[0] if "." in rest else rest
+    return category, name
+
+
 def _apply_program_inventory_rows(
     result: LakebridgeDiscoveryResult, rows: list[dict], source_tech: str, name_field: str, complexity_field: str
 ) -> int:
@@ -154,16 +195,13 @@ def _apply_program_inventory_rows(
         program_name = row.get(name_field)
         if not program_name:
             continue
-        prefix, sep, rest = str(program_name).partition("__")
-        if not sep:
+        parsed = _parse_program_name(program_name)
+        if parsed is None:
             continue
-        category = _classify(prefix.replace("_", " "))
-        if category is None or category in ("dependency", "unsupported"):
-            continue
+        category, name = parsed
         bucket = getattr(result, _PLURAL.get(category, category), None)
         if bucket is None:
             continue
-        name = rest.rsplit(".", 1)[0] if "." in rest else rest
         bucket.append(LakebridgeObjectRef(
             object_type=category,
             name=name,
@@ -173,6 +211,174 @@ def _apply_program_inventory_rows(
         ))
         count += 1
     return count
+
+
+# Names that show up as an "object"/"target"/lineage source but aren't real
+# catalog objects -- SQL Server's trigger-only virtual tables, and any
+# "@variable" (e.g. a table-valued function's own return-value variable, see
+# extract_native_report_dependencies' object_lineage handling below). An
+# edge naming one of these as an endpoint conveys nothing migration-relevant
+# (nearly every trigger "reads inserted"; a function trivially "writes" its
+# own return variable) so these are skipped rather than emitted as unresolved.
+_PSEUDO_OBJECT_NAMES = {"inserted", "deleted"}
+
+
+def _is_pseudo_object(name: str) -> bool:
+    return name.startswith("@") or name.strip().lower() in _PSEUDO_OBJECT_NAMES
+
+
+def _emit_dependency(
+    result: LakebridgeDiscoveryResult, qualified: dict[str, str], bare_index: dict[str, str], seen_edges: set[tuple],
+    source_object: str, source_type: str, own_schema: str | None,
+    target_raw: str | None, relationship_type: str | None, raw_category: str,
+) -> None:
+    if relationship_type is None or not target_raw or _is_pseudo_object(str(target_raw)):
+        return
+    bare_name, schema = _normalize_ref(str(target_raw))
+    if not bare_name:
+        return
+    matched_key, target_type = _resolve(bare_name, schema, own_schema, qualified, bare_index)
+    target_object = matched_key or (f"{schema}.{bare_name}" if schema else bare_name)
+    if target_object.lower() == source_object.lower():
+        return  # self-loop (e.g. a CREATE statement's own object) -- not a real dependency
+    edge_key = (source_object, target_object, relationship_type)
+    if edge_key in seen_edges:
+        return
+    seen_edges.add(edge_key)
+    result.dependencies.append(LakebridgeDependencyRef(
+        source_object=source_object, target_object=target_object, relationship_type=relationship_type,
+        raw_category=raw_category, source_type=source_type, target_type=target_type,
+        discovery_method="lakebridge_report", resolved=matched_key is not None,
+    ))
+
+
+def _extract_object_rel_dependencies(
+    data: dict, result: LakebridgeDiscoveryResult, qualified: dict[str, str], bare_index: dict[str, str], seen_edges: set[tuple],
+) -> None:
+    """Newer Bladespector shape: per-inventory-item `objectRel[]` /
+    `sqlStatements[].objectRel[]`, plus top-level `subJobInfo[]` (ETL job
+    hierarchy). Confirmed absent from at least one real installed Analyzer
+    version (which uses object_lineage instead, see
+    _extract_object_lineage_dependencies) -- kept so either shape works."""
+    inventory = data.get("inventory")
+    if not isinstance(inventory, list):
+        return
+
+    for item in inventory:
+        if not isinstance(item, dict):
+            continue
+        parsed = _parse_program_name(item.get("name", ""))
+        if parsed is None:
+            continue
+        source_type, source_object = parsed
+        own_schema = source_object.split(".", 1)[0].lower() if "." in source_object else None
+
+        rel_lists = [item.get("objectRel") or []]
+        for stmt in item.get("sqlStatements") or []:
+            if isinstance(stmt, dict):
+                rel_lists.append(stmt.get("objectRel") or [])
+
+        for raw_category, rel_list in zip(("objectRel", "sqlStatements.objectRel"), rel_lists):
+            for rel in rel_list:
+                if not isinstance(rel, dict):
+                    continue
+                relationship_type = _ACTION_TO_RELATIONSHIP.get(rel.get("action"))
+                _emit_dependency(
+                    result, qualified, bare_index, seen_edges, source_object, source_type, own_schema,
+                    rel.get("object"), relationship_type, raw_category,
+                )
+
+    for edge in data.get("subJobInfo") or []:
+        if not isinstance(edge, dict):
+            continue
+        parent, child = edge.get("parent"), edge.get("child")
+        if not parent or not child or parent == child:
+            continue
+        edge_key = (parent, child, "calls")
+        if edge_key in seen_edges:
+            continue
+        seen_edges.add(edge_key)
+        result.dependencies.append(LakebridgeDependencyRef(
+            source_object=parent, target_object=child, relationship_type="calls",
+            raw_category="subJobInfo", source_type="package", target_type="package",
+            discovery_method="lakebridge_report", resolved=True,
+        ))
+
+
+def _extract_object_lineage_dependencies(
+    data: dict, result: LakebridgeDiscoveryResult, qualified: dict[str, str], bare_index: dict[str, str], seen_edges: set[tuple],
+) -> None:
+    """Older/other Bladespector shape (confirmed present in a real installed
+    Analyzer's JSON, 2026-07-06 run against AdventureWorks2022): object-
+    centric `object_lineage[]`, each entry `{target, reads?: [file...],
+    writes?: [{file, sources: [object...]}]}`.
+
+    `reads` lists files that read FROM target -> file --reads--> target.
+    Each `writes` entry is a file that writes INTO target, itself sourced
+    from `sources` -> file --writes--> target, and file --reads--> each
+    source (this is the richer half: it gives per-write provenance, e.g. a
+    trigger's write to one table sourced from a *different* table it joins
+    in, which a plain regex FROM/JOIN scan of the trigger body would also
+    find, but object_lineage already gives it to us pre-resolved).
+    `target`/`sources` entries that are pseudo-objects (SQL Server's
+    inserted/deleted trigger tables, a function's own "@returnVar") are
+    filtered by _emit_dependency, not here.
+    """
+    for entry in data.get("object_lineage") or []:
+        if not isinstance(entry, dict):
+            continue
+        target = entry.get("target")
+        if not target:
+            continue
+
+        for file_name in entry.get("reads") or []:
+            parsed = _parse_program_name(file_name) if file_name else None
+            if parsed is None:
+                continue
+            source_type, source_object = parsed
+            own_schema = source_object.split(".", 1)[0].lower() if "." in source_object else None
+            _emit_dependency(
+                result, qualified, bare_index, seen_edges, source_object, source_type, own_schema,
+                target, "reads", "object_lineage",
+            )
+
+        for write in entry.get("writes") or []:
+            if not isinstance(write, dict):
+                continue
+            parsed = _parse_program_name(write.get("file", "")) if write.get("file") else None
+            if parsed is None:
+                continue
+            source_type, source_object = parsed
+            own_schema = source_object.split(".", 1)[0].lower() if "." in source_object else None
+            _emit_dependency(
+                result, qualified, bare_index, seen_edges, source_object, source_type, own_schema,
+                target, "writes", "object_lineage",
+            )
+            for source_name in write.get("sources") or []:
+                _emit_dependency(
+                    result, qualified, bare_index, seen_edges, source_object, source_type, own_schema,
+                    source_name, "reads", "object_lineage",
+                )
+
+
+def extract_native_report_dependencies(data: dict, result: LakebridgeDiscoveryResult, source_tech: str) -> None:
+    """Extracts dependency edges directly from the Analyzer's own JSON --
+    the Analyzer already computes per-object relationships, so this is the
+    primary dependency source; dependency_extractor.py's regex scan only
+    fills gaps for objects this leaves with zero edges.
+
+    Analyzer-version agnostic: tries both known native shapes
+    unconditionally (a given report will realistically only populate one,
+    but nothing breaks if both happened to be present -- overlapping edges
+    just dedupe against the same `seen_edges` set):
+      - object_lineage[] (see _extract_object_lineage_dependencies)
+      - objectRel[] / sqlStatements[].objectRel[] / subJobInfo[] (see
+        _extract_object_rel_dependencies)
+    """
+    qualified, bare_index = _build_inventory(result)
+    seen_edges: set[tuple] = set()
+    _extract_object_lineage_dependencies(data, result, qualified, bare_index, seen_edges)
+    _extract_object_rel_dependencies(data, result, qualified, bare_index, seen_edges)
 
 
 def _walk_json_for_lists(node: Any, path: str, result: LakebridgeDiscoveryResult, source_tech: str) -> int:
@@ -192,6 +398,15 @@ def _walk_json_for_lists(node: Any, path: str, result: LakebridgeDiscoveryResult
     return applied
 
 
+#  Excluded from the generic keyword-based walk below once the object
+# inventory has already been extracted from them (or, for subJobInfo/
+# object_lineage, once extract_native_report_dependencies() has handled
+# them): "job" is one of _CATEGORY_KEYWORDS' substrings (-> "package"), so
+# without this exclusion "subJobInfo" would get misclassified as SSIS
+# package objects by the generic walker.
+_NATIVE_TOP_LEVEL_KEYS = {"inventory", "subJobInfo", "object_lineage"}
+
+
 def parse_json_report(report_path: Path, result: LakebridgeDiscoveryResult, source_tech: str) -> None:
     with open(report_path, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -201,7 +416,8 @@ def parse_json_report(report_path: Path, result: LakebridgeDiscoveryResult, sour
         applied += _apply_program_inventory_rows(
             result, data["inventory"], source_tech, name_field="name", complexity_field="complexityLevel"
         )
-        remaining = {k: v for k, v in data.items() if k != "inventory"}
+        extract_native_report_dependencies(data, result, source_tech)
+        remaining = {k: v for k, v in data.items() if k not in _NATIVE_TOP_LEVEL_KEYS}
     applied += _walk_json_for_lists(remaining, "root", result, source_tech)
     result.raw_report_paths.append(str(report_path))
     if applied == 0:

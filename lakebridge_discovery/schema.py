@@ -38,6 +38,14 @@ class LakebridgeDependencyRef:
     target_object: str
     relationship_type: str = "unknown"
     raw_category: str | None = None
+    # Fields below match autovista.schema.DependencyEntity's naming so the
+    # two engines' dependencies.json are structurally comparable -- see
+    # dependency_extractor.py, the only producer of source_type/target_type
+    # for edges found by scanning this engine's own exported SQL text.
+    source_type: str = "unknown"
+    target_type: str = "unknown"
+    discovery_method: str = "lakebridge"
+    resolved: bool = True
 
 
 @dataclass
@@ -100,6 +108,7 @@ class LakebridgeDiscoveryResult:
     packages: list[LakebridgeObjectRef] = field(default_factory=list)
     unsupported_objects: list[LakebridgeObjectRef] = field(default_factory=list)
     dependencies: list[LakebridgeDependencyRef] = field(default_factory=list)
+    dependency_stats: dict = field(default_factory=dict)
 
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)

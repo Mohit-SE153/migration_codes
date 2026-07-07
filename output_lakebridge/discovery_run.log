@@ -7,3 +7,79 @@
 2026-07-03T14:35:51 INFO [LAKEBRIDGE] === Lakebridge Discovery run 3931c1ed-20e7-48ec-b4e2-396a8e177cbc finished: status=success duration=5.99s objects=122 dependencies=0 errors=0 warnings=0 ===
 2026-07-03T14:35:51 INFO [LAKEBRIDGE] Wrote 10 per-category output files to output_lakebridge
 2026-07-03T14:35:51 INFO [LAKEBRIDGE] Wrote manifest=output_lakebridge/lakebridge_manifest.json rollup=output_lakebridge/lakebridge_rollup.csv log_summary=output_lakebridge/lakebridge_log_summary.csv
+2026-07-06T20:37:23 INFO [LAKEBRIDGE] === Lakebridge Discovery run 93270206-5425-41f8-ba9d-35c22b775859 started (mode=live) ===
+2026-07-06T20:37:27 INFO [LAKEBRIDGE] SSISDB not installed -- no SSIS packages to export for Lakebridge.
+2026-07-06T20:37:27 INFO [LAKEBRIDGE] OK   source_export sql_files=51 table_ddl=71 ssis_files=0 errors=0 (3943.7ms)
+2026-07-06T20:37:32 ERROR [LAKEBRIDGE] FAIL analyze source_tech=MS SQL Server exit=1 error=exit code 1: Error: unknown flag: --source-directory
+
+Usage:
+  databricks labs [command]
+
+Installed Databricks Labs
+
+Additional Commands:
+  clear-cache Clears cache entries from everywhere relevant
+  install     Installs project
+  installed   List all installed labs
+  list        List labs that can be installed
+  show        Shows information about the project
+  uninstall   Uninstalls project
+  upgrade     Upgrades project
+
+Flags:
+  -h, --help   help for labs
+
+Global Flags:
+      --debug            enable debug logging
+  -o, --output type      output type: text or json (default text)
+  -p, --profile string   ~/.databrickscfg profile
+  -t, --target string    bundle target to use (if applicable)
+
+Use "databricks labs [command] --help" for more information about a command.
+
+
+2026-07-06T20:37:32 INFO [LAKEBRIDGE] SKIP analyze source_tech=SSIS reason=no exported source files for source-tech=SSIS, skipping analyze
+2026-07-06T20:37:32 INFO [LAKEBRIDGE] === Lakebridge Discovery run 93270206-5425-41f8-ba9d-35c22b775859 finished: status=failed duration=9.10s objects=0 dependencies=0 errors=1 warnings=0 ===
+2026-07-06T20:37:32 INFO [LAKEBRIDGE] Wrote 10 per-category output files to output_lakebridge
+2026-07-06T20:38:52 INFO [LAKEBRIDGE] === Lakebridge Discovery run a7db8152-5b0e-4607-a6be-397b8fb52728 started (mode=live) ===
+2026-07-06T20:38:56 INFO [LAKEBRIDGE] SSISDB not installed -- no SSIS packages to export for Lakebridge.
+2026-07-06T20:38:56 INFO [LAKEBRIDGE] OK   source_export sql_files=51 table_ddl=71 ssis_files=0 errors=0 (3971.9ms)
+2026-07-06T20:38:59 ERROR [LAKEBRIDGE] FAIL analyze source_tech=MS SQL Server exit=1 error=exit code 1: Error: unknown flag: --source-directory
+
+Usage:
+  databricks labs [command]
+
+Installed Databricks Labs
+
+Additional Commands:
+  clear-cache Clears cache entries from everywhere relevant
+  install     Installs project
+  installed   List all installed labs
+  list        List labs that can be installed
+  show        Shows information about the project
+  uninstall   Uninstalls project
+  upgrade     Upgrades project
+
+Flags:
+  -h, --help   help for labs
+
+Global Flags:
+      --debug            enable debug logging
+  -o, --output type      output type: text or json (default text)
+  -p, --profile string   ~/.databrickscfg profile
+  -t, --target string    bundle target to use (if applicable)
+
+Use "databricks labs [command] --help" for more information about a command.
+
+
+2026-07-06T20:38:59 INFO [LAKEBRIDGE] SKIP analyze source_tech=SSIS reason=no exported source files for source-tech=SSIS, skipping analyze
+2026-07-06T20:38:59 INFO [LAKEBRIDGE] === Lakebridge Discovery run a7db8152-5b0e-4607-a6be-397b8fb52728 finished: status=failed duration=7.07s objects=0 dependencies=0 errors=1 warnings=0 ===
+2026-07-06T20:38:59 INFO [LAKEBRIDGE] Wrote 10 per-category output files to output_lakebridge
+2026-07-06T20:47:49 INFO [LAKEBRIDGE] === Lakebridge Discovery run d313a0ad-3814-499e-924f-2c29c3c47519 started (mode=live) ===
+2026-07-06T20:47:53 INFO [LAKEBRIDGE] SSISDB not installed -- no SSIS packages to export for Lakebridge.
+2026-07-06T20:47:53 INFO [LAKEBRIDGE] OK   source_export sql_files=51 table_ddl=71 ssis_files=0 errors=0 (3962.9ms)
+2026-07-06T20:48:46 INFO [LAKEBRIDGE] OK   analyze source_tech=MS SQL Server exit=0 (53.1s) report=output_lakebridge\reports\lakebridge_report_MS_SQL_Server.xlsx
+2026-07-06T20:48:46 INFO [LAKEBRIDGE] SKIP analyze source_tech=SSIS reason=no exported source files for source-tech=SSIS, skipping analyze
+2026-07-06T20:48:46 INFO [LAKEBRIDGE] Parsed JSON report output_lakebridge\reports\lakebridge_report_MS_SQL_Server.json: 122 rows classified into inventory categories
+2026-07-06T20:48:46 INFO [LAKEBRIDGE] === Lakebridge Discovery run d313a0ad-3814-499e-924f-2c29c3c47519 finished: status=success duration=57.10s objects=122 dependencies=0 errors=0 warnings=0 ===
+2026-07-06T20:48:46 INFO [LAKEBRIDGE] Wrote 10 per-category output files to output_lakebridge

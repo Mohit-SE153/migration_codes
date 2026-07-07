@@ -78,6 +78,14 @@ def write_csv_rollup(result: LakebridgeDiscoveryResult, output_dir: str, filenam
     return out_path
 
 
+def write_dependency_stats(result: LakebridgeDiscoveryResult, output_dir: str, filename: str = "dependency_stats.json") -> Path:
+    out_path = Path(output_dir) / filename
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(result.dependency_stats, f, indent=2, default=str)
+    return out_path
+
+
 def write_run_log_summary(log_entries: list[LakebridgeLogEntry], output_dir: str, filename: str = "lakebridge_log_summary.csv") -> Path:
     out_path = Path(output_dir) / filename
     out_path.parent.mkdir(parents=True, exist_ok=True)
