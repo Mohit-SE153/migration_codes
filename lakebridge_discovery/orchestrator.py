@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from lakebridge_discovery import catalog_metadata
+from lakebridge_discovery.compatibility_remediation import apply_compatibility_remediation
 from lakebridge_discovery.compatibility_scanner import apply_compatibility_flags
 from lakebridge_discovery.config import LakebridgeConfig, load_config
 from lakebridge_discovery.dependency_extractor import extract_dependencies
@@ -90,6 +91,12 @@ def run_discovery(config: LakebridgeConfig | None = None) -> LakebridgeDiscovery
     # scan iterates over (result.tables/views/stored_procedures/functions/
     # triggers).
     apply_compatibility_flags(result, export_dir)
+
+    # LLM-assisted remediation notes (compatibility_remediation.py) -- runs
+    # after apply_compatibility_flags() so it only sends objects that
+    # already have a flag; independent of SQLGlot Discovery's own
+    # equivalent step, own enable flag and object cap (see config.py).
+    apply_compatibility_remediation(result, export_dir, config)
 
     statuses = [i.status for i in invocations]
     if any(s == "success" for s in statuses) and not any(s == "failed" for s in statuses):

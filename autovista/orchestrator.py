@@ -32,6 +32,7 @@ import hashlib
 import uuid
 from datetime import datetime, timezone
 
+from autovista.compatibility_remediation import build_compat_remediation_client, generate_remediation_note
 from autovista.compatibility_scanner import scan_compatibility_flags
 from autovista.config import AutovistaConfig, load_config
 from autovista.data_quality_analyzer import build_data_quality_summary
@@ -194,9 +195,20 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
         # --- Functions: enrich with sqlglot lineage, then scan the same
         # definition text for SQL-Server-feature compatibility flags (one
         # pass, not a second re-fetch) ---
+        compat_client = build_compat_remediation_client(config.compat_remediation)
+        compat_objects_attempted = 0
+
         for func_entity, definition in db_result.get("functions", []):
             enrich_function(func_entity, definition, known_function_names=known_function_names)
             func_entity.compatibility_flags = scan_compatibility_flags(definition)
+            if func_entity.compatibility_flags:
+                object_id = f"{func_entity.database}.{func_entity.schema}.{func_entity.name}"
+                remediation = generate_remediation_note(
+                    compat_client, object_id, func_entity.compatibility_flags, definition,
+                    compat_objects_attempted, config.compat_remediation,
+                )
+                compat_objects_attempted += 1
+                func_entity.compatibility_notes = remediation.note or None
             manifest.functions.append(func_entity)
             counters["scanned"] += 1
 
@@ -204,6 +216,14 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
         for trigger_entity, definition in db_result.get("triggers", []):
             enrich_trigger(trigger_entity, definition, known_function_names=known_function_names)
             trigger_entity.compatibility_flags = scan_compatibility_flags(definition)
+            if trigger_entity.compatibility_flags:
+                object_id = f"{trigger_entity.database}.{trigger_entity.schema}.{trigger_entity.name}"
+                remediation = generate_remediation_note(
+                    compat_client, object_id, trigger_entity.compatibility_flags, definition,
+                    compat_objects_attempted, config.compat_remediation,
+                )
+                compat_objects_attempted += 1
+                trigger_entity.compatibility_notes = remediation.note or None
             manifest.triggers.append(trigger_entity)
             counters["scanned"] += 1
 
@@ -238,6 +258,13 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
 
             enrich_stored_procedure(proc_entity, definition, known_function_names=known_function_names)
             proc_entity.compatibility_flags = scan_compatibility_flags(definition)
+            if proc_entity.compatibility_flags:
+                remediation = generate_remediation_note(
+                    compat_client, object_id, proc_entity.compatibility_flags, definition,
+                    compat_objects_attempted, config.compat_remediation,
+                )
+                compat_objects_attempted += 1
+                proc_entity.compatibility_notes = remediation.note or None
             if proc_entity.parse_status == "unresolved":
                 llm_result = extract_with_llm_fallback(
                     llm_client, object_id, definition, llm_objects_attempted, config.llm
@@ -265,6 +292,14 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
                     known_function_names=known_function_names, create_date=create_date, modify_date=modify_date,
                 )
                 view_entity.compatibility_flags = scan_compatibility_flags(definition)
+                if view_entity.compatibility_flags:
+                    object_id = f"{view_entity.database}.{view_entity.schema}.{view_entity.name}"
+                    remediation = generate_remediation_note(
+                        compat_client, object_id, view_entity.compatibility_flags, definition,
+                        compat_objects_attempted, config.compat_remediation,
+                    )
+                    compat_objects_attempted += 1
+                    view_entity.compatibility_notes = remediation.note or None
             else:
                 view_entity = view_entry
             manifest.views.append(view_entity)
@@ -291,6 +326,13 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
             for embedded in package.embedded_sql:
                 enrich_embedded_sql(embedded)
                 embedded.compatibility_flags = scan_compatibility_flags(embedded.sql_text)
+                if embedded.compatibility_flags:
+                    remediation = generate_remediation_note(
+                        compat_client, f"{object_id}::{embedded.task_name}", embedded.compatibility_flags,
+                        embedded.sql_text, compat_objects_attempted, config.compat_remediation,
+                    )
+                    compat_objects_attempted += 1
+                    embedded.compatibility_notes = remediation.note or None
                 if embedded.parse_status == "unresolved":
                     llm_result = extract_with_llm_fallback(
                         llm_client, f"{object_id}::{embedded.task_name}", embedded.sql_text,

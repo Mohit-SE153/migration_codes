@@ -42,6 +42,14 @@ class LakebridgeObjectRef:
     # inventory row that came only from the Analyzer report, not this
     # run's own export).
     compatibility_flags: list[str] = field(default_factory=list)
+    # --- additive: LLM-assisted remediation note (see
+    # lakebridge_discovery/compatibility_remediation.py) -- short
+    # plain-English explanation of the flags above, for reviewer triage
+    # only. None unless compatibility_flags is non-empty and the LLM note
+    # feature is enabled; never a substitute for compatibility_flags
+    # itself. Independent reimplementation of autovista's own
+    # compatibility_notes field -- see autovista/schema.py's ViewEntity.
+    compatibility_notes: str | None = None
 
 
 @dataclass

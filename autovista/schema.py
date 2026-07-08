@@ -199,6 +199,12 @@ class ViewEntity:
     # constructs found in this view's definition text, e.g. "PIVOT",
     # "CROSS_APPLY", "MERGE", "OPENJSON", "FOR_XML", "LINKED_SERVER".
     compatibility_flags: list[str] = field(default_factory=list)
+    # --- additive: LLM-assisted remediation note (see
+    # autovista/compatibility_remediation.py) -- short plain-English
+    # explanation of the flags above, for reviewer triage only. None
+    # unless compatibility_flags is non-empty and the LLM note feature is
+    # enabled; never a substitute for compatibility_flags itself.
+    compatibility_notes: str | None = None
 
 
 @dataclass
@@ -220,6 +226,10 @@ class TriggerEntity:
     # autovista/compatibility_scanner.py) -- named migration-risk
     # constructs found in this trigger's body text.
     compatibility_flags: list[str] = field(default_factory=list)
+    # --- additive: LLM-assisted remediation note (see
+    # autovista/compatibility_remediation.py) -- see ViewEntity for the
+    # exact semantics of this field.
+    compatibility_notes: str | None = None
 
 
 @dataclass
@@ -292,6 +302,10 @@ class StoredProcedureEntity:
     # autovista/compatibility_scanner.py) -- named migration-risk
     # constructs found in this procedure's body text.
     compatibility_flags: list[str] = field(default_factory=list)
+    # --- additive: LLM-assisted remediation note (see
+    # autovista/compatibility_remediation.py) -- see ViewEntity for the
+    # exact semantics of this field.
+    compatibility_notes: str | None = None
 
 
 @dataclass
@@ -381,6 +395,10 @@ class FunctionEntity:
     # autovista/compatibility_scanner.py) -- named migration-risk
     # constructs found in this function's body text.
     compatibility_flags: list[str] = field(default_factory=list)
+    # --- additive: LLM-assisted remediation note (see
+    # autovista/compatibility_remediation.py) -- see ViewEntity for the
+    # exact semantics of this field.
+    compatibility_notes: str | None = None
 
 
 @dataclass
@@ -613,6 +631,10 @@ class EmbeddedSqlEntity:
     # autovista/compatibility_scanner.py) -- named migration-risk
     # constructs found in this embedded SQL text.
     compatibility_flags: list[str] = field(default_factory=list)
+    # --- additive: LLM-assisted remediation note (see
+    # autovista/compatibility_remediation.py) -- see ViewEntity for the
+    # exact semantics of this field.
+    compatibility_notes: str | None = None
 
 
 @dataclass

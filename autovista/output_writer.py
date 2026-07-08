@@ -217,6 +217,21 @@ def write_csv_rollup(
             "size_mb": "", "tables": "", "procs": "", "views": "",
         })
 
+    # LLM-assisted remediation notes (autovista/compatibility_remediation.py):
+    # one aggregate row, mirroring the "unresolved_or_llm_inferred" row above --
+    # every note is needs_human_review=True by construction, so this count
+    # doubles as "how many flagged objects have a reviewer-triage note".
+    notes_generated = sum(
+        1 for collection in (manifest.stored_procedures, manifest.views, manifest.functions, manifest.triggers)
+        for obj in collection if obj.compatibility_notes
+    ) + sum(
+        1 for pkg in manifest.packages for e in pkg.embedded_sql if e.compatibility_notes
+    )
+    rows.append({
+        "object_type": "compatibility_notes_generated", "object_name": "(needs human review)", "count": notes_generated,
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+
     with open(out_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["object_type", "object_name", "count", "size_mb", "tables", "procs", "views"])
         writer.writeheader()

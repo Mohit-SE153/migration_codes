@@ -58,9 +58,27 @@ class LlmFallbackConfig:
 
 
 @dataclass(frozen=True)
+class CompatibilityRemediationConfig:
+    """Config for a second, independent LLM use: generating a short
+    human-readable remediation note for objects compatibility_scanner.py
+    already flagged with a named migration-risk construct (PIVOT, MERGE,
+    OPENJSON, ...). Deliberately its own enabled flag and object cap,
+    separate from LlmFallbackConfig above, so turning this on/off never
+    changes the lineage-fallback budget or vice versa -- the two features
+    are billed and capped independently even though they may share the
+    same API key/model. See autovista/compatibility_remediation.py."""
+
+    enabled: bool
+    api_key: str | None
+    model: str
+    max_objects_per_run: int
+
+
+@dataclass(frozen=True)
 class AutovistaConfig:
     source: SqlServerConfig
     llm: LlmFallbackConfig
+    compat_remediation: CompatibilityRemediationConfig
     run_mode: str  # "live" or "fixture"
     state_db_path: str
     output_dir: str
@@ -89,9 +107,16 @@ def load_config() -> AutovistaConfig:
         model=os.environ.get("AUTOVISTA_LLM_MODEL", "claude-sonnet-5"),
         max_objects_per_run=int(os.environ.get("AUTOVISTA_LLM_MAX_OBJECTS_PER_RUN", "200")),
     )
+    compat_remediation = CompatibilityRemediationConfig(
+        enabled=os.environ.get("AUTOVISTA_LLM_COMPAT_NOTES_ENABLED", "false").lower() == "true",
+        api_key=os.environ.get("ANTHROPIC_API_KEY"),
+        model=os.environ.get("AUTOVISTA_LLM_MODEL", "claude-sonnet-5"),
+        max_objects_per_run=int(os.environ.get("AUTOVISTA_LLM_COMPAT_MAX_OBJECTS_PER_RUN", "200")),
+    )
     return AutovistaConfig(
         source=source,
         llm=llm,
+        compat_remediation=compat_remediation,
         run_mode=os.environ.get("AUTOVISTA_RUN_MODE", "fixture"),
         state_db_path=os.environ.get("AUTOVISTA_STATE_DB", "./autovista_state.sqlite3"),
         output_dir=os.environ.get("AUTOVISTA_OUTPUT_DIR", "./output"),

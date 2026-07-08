@@ -127,6 +127,15 @@ def write_csv_rollup(result: LakebridgeDiscoveryResult, output_dir: str, filenam
     for flag_name, count in sorted(flag_counts.items()):
         rows.append({"object_type": "compatibility_flag", "object_name": flag_name, "count": count})
 
+    # LLM-assisted remediation notes (compatibility_remediation.py): one
+    # aggregate row, mirroring autovista/output_writer.py's own
+    # "compatibility_notes_generated" row for the same feature.
+    notes_generated = sum(
+        1 for collection in (result.tables, result.views, result.stored_procedures, result.functions, result.triggers)
+        for obj in collection if obj.compatibility_notes
+    )
+    rows.append({"object_type": "compatibility_notes_generated", "object_name": "(needs human review)", "count": notes_generated})
+
     with open(out_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["object_type", "object_name", "count"])
         writer.writeheader()

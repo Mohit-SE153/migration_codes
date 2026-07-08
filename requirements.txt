@@ -5,8 +5,9 @@ sqlglot>=25.0.0
 # Also requires a system ODBC driver (e.g. "ODBC Driver 18 for SQL Server").
 pyodbc>=5.0.0
 
-# Optional: only needed if AUTOVISTA_LLM_FALLBACK_ENABLED=true
-# anthropic>=0.40.0
+# Optional: only needed if AUTOVISTA_LLM_FALLBACK_ENABLED=true,
+# AUTOVISTA_LLM_COMPAT_NOTES_ENABLED=true, or LAKEBRIDGE_LLM_COMPAT_NOTES_ENABLED=true
+anthropic>=0.40.0
 
 # Dev/test
 pytest>=8.0.0

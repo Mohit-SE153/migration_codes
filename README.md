@@ -139,6 +139,8 @@ autovista/                      # the actual Discovery pipeline (production code
   dtsx_xml_parser.py            # .dtsx XML -> tasks/connmgrs/variables/precedence/embedded SQL
   ssis_catalog_extractor.py     # SSISDB catalog / file-deployed package discovery
   llm_fallback_extractor.py     # last-resort LLM extraction for unparseable constructs
+  compatibility_scanner.py      # sqlglot AST + regex scan for named migration-risk constructs
+  compatibility_remediation.py  # LLM-assisted "why is this flag risky" note for flagged objects
   dependency_graph_builder.py   # combines everything above into dependencies[]
   output_writer.py              # JSON manifest + CSV rollup + log summary
   orchestrator.py               # wires it all together; `python -m autovista.orchestrator`
@@ -225,6 +227,19 @@ constructs were detected in that object -- not a general "this SQL is migration-
 `discovery_rollup.csv` includes one `compatibility_flag` row per distinct flag with its count across
 the whole database, so `grep MERGE discovery_rollup.csv` gives a same-day answer to "how many objects
 use MERGE" without opening the manifest.
+
+**`compatibility_notes`** (same objects as `compatibility_flags[]` above) is an optional, off-by-default
+LLM-assisted enrichment produced by `autovista/compatibility_remediation.py` (see
+`AUTOVISTA_LLM_COMPAT_NOTES_ENABLED` in `.env.example`): a short plain-English note on why a flagged
+object's construct is a migration risk on Databricks/Spark SQL and roughly what rework it implies. It
+never adds, removes, or reinterprets a flag — `compatibility_flags[]` is always produced solely by the
+deterministic scanner — and is `null` unless the feature is enabled, an API key is configured, and the
+object actually has flags. Every non-null note is implicitly `needs_human_review` — a starting point for
+a reviewer, never an accepted migration plan. `discovery_rollup.csv` includes one
+`compatibility_notes_generated` aggregate row for how many flagged objects got a note this run. This is a
+second, independent use of the LLM from `llm_fallback_extractor.py` above — it has its own enable flag
+(`AUTOVISTA_LLM_COMPAT_NOTES_ENABLED`) and object cap (`AUTOVISTA_LLM_COMPAT_MAX_OBJECTS_PER_RUN`), so
+turning one on/off never changes the other's budget.
 
 **`parse_status`** appears on every entity and indicates exactly how that
 entity's data was produced — this is the traceability the Assessment phase
@@ -393,7 +408,19 @@ Writes to `./output_lakebridge/` (`LAKEBRIDGE_OUTPUT_DIR`):
   definition text — see `lakebridge_discovery/compatibility_scanner.py`,
   an independent reimplementation of `autovista/compatibility_scanner.py`'s
   detection (never an import of it), wired in by `orchestrator.py` right
-  after dependency extraction.
+  after dependency extraction. Objects with a non-empty `compatibility_flags`
+  also get a `compatibility_notes` field — an optional, off-by-default
+  LLM-assisted remediation note (`LAKEBRIDGE_LLM_COMPAT_NOTES_ENABLED` in
+  `.env.example`), produced by `lakebridge_discovery/compatibility_remediation.py`.
+  Same independent-reimplementation relationship to
+  `autovista/compatibility_remediation.py` as the scanner above — its own
+  enable flag, model, and object cap (`LAKEBRIDGE_LLM_MODEL`,
+  `LAKEBRIDGE_LLM_COMPAT_MAX_OBJECTS_PER_RUN`), sharing only
+  `ANTHROPIC_API_KEY` as a credential, never engine logic. `null` unless
+  enabled, an API key is configured, and the object has flags; every
+  non-null note is implicitly `needs_human_review`, same contract as
+  SQLGlot's LLM fallback. `lakebridge_rollup.csv` gets a matching
+  `compatibility_notes_generated` aggregate row.
 - **Supplementary catalog facts** — gathered directly by
   `source_exporter.py`'s own live `pyodbc` connection (never from the
   Analyzer report, which doesn't cover any of this), so these are

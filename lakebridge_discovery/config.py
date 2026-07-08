@@ -75,6 +75,21 @@ class LakebridgeConfig:
     # will ever need -- adding a new probe there never requires a new env var.
     catalog_metadata_sources: str
 
+    # LLM-assisted compatibility remediation notes (see
+    # lakebridge_discovery/compatibility_remediation.py) -- independent
+    # enable flag, cap, and model knob from autovista's own
+    # AUTOVISTA_LLM_* settings, per this module's own independence rule.
+    # ANTHROPIC_API_KEY is the one exception: it's a shared credential
+    # (like a secrets-manager value), not shared engine logic, so both
+    # engines read the same var name for it.
+    # Defaulted (unlike the fields above) so existing call sites that
+    # construct LakebridgeConfig directly -- e.g. test fixtures predating
+    # this feature -- don't need updating just to add an unrelated field.
+    llm_compat_notes_enabled: bool = False
+    llm_api_key: str | None = None
+    llm_model: str = "claude-sonnet-5"
+    llm_compat_max_objects_per_run: int = 200
+
 
 def load_config() -> LakebridgeConfig:
     source = SqlServerConfig(
@@ -100,4 +115,8 @@ def load_config() -> LakebridgeConfig:
         output_dir=os.environ.get("LAKEBRIDGE_OUTPUT_DIR", "./output_lakebridge"),
         source_export_dir=os.environ.get("LAKEBRIDGE_SOURCE_EXPORT_DIR", "./output_lakebridge/_source_export"),
         catalog_metadata_sources=os.environ.get("LAKEBRIDGE_CATALOG_METADATA_SOURCES", "*"),
+        llm_compat_notes_enabled=os.environ.get("LAKEBRIDGE_LLM_COMPAT_NOTES_ENABLED", "false").lower() == "true",
+        llm_api_key=os.environ.get("ANTHROPIC_API_KEY"),
+        llm_model=os.environ.get("LAKEBRIDGE_LLM_MODEL", "claude-sonnet-5"),
+        llm_compat_max_objects_per_run=int(os.environ.get("LAKEBRIDGE_LLM_COMPAT_MAX_OBJECTS_PER_RUN", "200")),
     )
