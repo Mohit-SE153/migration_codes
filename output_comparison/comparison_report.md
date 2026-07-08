@@ -1,6 +1,6 @@
 # Discovery Comparison Report
 
-Generated: 2026-07-07T05:46:27.268198Z
+Generated: 2026-07-07T14:40:29.477461Z
 
 Two independent Discovery engines analyzed the same source database. Neither engine consumed the other's output -- this report is the only place their results are read together.
 
@@ -9,18 +9,18 @@ Two independent Discovery engines analyzed the same source database. Neither eng
 ### SQLGlot Discovery
 
 - Status: **success**
-- Duration: 166.0s
-- Started: 2026-07-07T11:13:30
-- Finished: 2026-07-07T11:16:16
+- Duration: 8.0s
+- Started: 2026-07-07T20:09:34
+- Finished: 2026-07-07T20:09:42
 - Errors: 0
 - Warnings: 0
 
 ### Lakebridge Discovery
 
 - Status: **success**
-- Duration: 10.86s
-- Started: 2026-07-07T05:46:16.397418+00:00
-- Finished: 2026-07-07T05:46:27.257974+00:00
+- Duration: 46.55s
+- Started: 2026-07-07T14:39:42.783746+00:00
+- Finished: 2026-07-07T14:40:29.331060+00:00
 - Errors: 0
 - Warnings: 0
 - Note: Lakebridge Analyzer's report schema is not publicly documented at the field level. This result is mapped defensively (tolerates missing/renamed fields) and has not been verified against a real Databricks workspace run. Re-validate this mapping against your first real report and update report_parser.py's key lookups if names differ.
@@ -36,5 +36,5 @@ Two independent Discovery engines analyzed the same source database. Neither eng
 | triggers | 13 | 10 | 3 | 10 |
 | synonyms | 0 | 0 | 0 | 0 |
 | ssis_packages | 0 | 0 | 0 | 0 |
-| dependencies | 292 | 172 | 120 | 0 |
+| dependencies | 292 | 296 | -4 | 0 |
 | unsupported_objects | 4 | 0 | 4 | 0 |

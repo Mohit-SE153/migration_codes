@@ -106,6 +106,13 @@ class LakebridgeDiscoveryResult:
     synonyms: list[LakebridgeObjectRef] = field(default_factory=list)
     schemas: list[LakebridgeObjectRef] = field(default_factory=list)
     packages: list[LakebridgeObjectRef] = field(default_factory=list)
+    # Populated only by catalog_metadata's indexes.py/constraints.py/sequences.py
+    # probes -- the Analyzer report has no visibility into these at all (no
+    # matching inventory category, and the table DDL this engine exports to it
+    # is column-only, see source_exporter.py's _reconstruct_table_ddl).
+    indexes: list[LakebridgeObjectRef] = field(default_factory=list)
+    constraints: list[LakebridgeObjectRef] = field(default_factory=list)
+    sequences: list[LakebridgeObjectRef] = field(default_factory=list)
     unsupported_objects: list[LakebridgeObjectRef] = field(default_factory=list)
     dependencies: list[LakebridgeDependencyRef] = field(default_factory=list)
     dependency_stats: dict = field(default_factory=dict)

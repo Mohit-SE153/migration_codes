@@ -16,6 +16,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+from lakebridge_discovery import catalog_metadata
 from lakebridge_discovery.config import LakebridgeConfig, load_config
 from lakebridge_discovery.dependency_extractor import extract_dependencies
 from lakebridge_discovery.lakebridge_runner import run_analyze
@@ -72,6 +73,7 @@ def run_discovery(config: LakebridgeConfig | None = None) -> LakebridgeDiscovery
         parse_invocation(invocation, result)
 
     extract_dependencies(result, export_dir)
+    catalog_metadata.run(config, result)
 
     statuses = [i.status for i in invocations]
     if any(s == "success" for s in statuses) and not any(s == "failed" for s in statuses):

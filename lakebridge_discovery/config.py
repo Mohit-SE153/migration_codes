@@ -69,6 +69,12 @@ class LakebridgeConfig:
     output_dir: str
     source_export_dir: str  # working directory where exported source files are staged for the analyzer
 
+    # Allowlist of lakebridge_discovery.catalog_metadata probe names to run:
+    # "*" (default) = every registered probe, "" or "none" = disabled,
+    # otherwise a comma-separated subset. The only config knob that package
+    # will ever need -- adding a new probe there never requires a new env var.
+    catalog_metadata_sources: str
+
 
 def load_config() -> LakebridgeConfig:
     source = SqlServerConfig(
@@ -93,4 +99,5 @@ def load_config() -> LakebridgeConfig:
         analyze_timeout_seconds=int(os.environ.get("LAKEBRIDGE_ANALYZE_TIMEOUT_SECONDS", "1800")),
         output_dir=os.environ.get("LAKEBRIDGE_OUTPUT_DIR", "./output_lakebridge"),
         source_export_dir=os.environ.get("LAKEBRIDGE_SOURCE_EXPORT_DIR", "./output_lakebridge/_source_export"),
+        catalog_metadata_sources=os.environ.get("LAKEBRIDGE_CATALOG_METADATA_SOURCES", "*"),
     )

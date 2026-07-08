@@ -5,9 +5,12 @@ stored_procedure,(all),10
 function,(all),11
 trigger,(all),10
 synonym,(all),0
-schema,(all),0
+schema,(all),6
 ssis_package,(all),0
+index,(all),173
+constraint,(all),403
+sequence,(all),0
 unsupported_object,(all),0
-dependency_edge,(all),172
+dependency_edge,(all),296
 warning,(all),0
 error,(all),0

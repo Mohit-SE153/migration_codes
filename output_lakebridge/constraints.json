@@ -1,0 +1,3226 @@
+[
+  {
+    "object_type": "constraint",
+    "name": "dbo.PK_AWBuildVersion_SystemInformationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "dbo.PK_DatabaseLog_DatabaseLogID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "dbo.PK_ErrorLog_ErrorLogID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.PK_Department_DepartmentID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.PK_Employee_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.PK_EmployeeDepartmentHistory_BusinessEntityID_StartDate_DepartmentID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.PK_EmployeePayHistory_BusinessEntityID_RateChangeDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.PK_JobCandidate_JobCandidateID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.PK_Shift_ShiftID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_Address_AddressID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_AddressType_AddressTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_BusinessEntity_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_BusinessEntityAddress_BusinessEntityID_AddressID_AddressTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_BusinessEntityContact_BusinessEntityID_PersonID_ContactTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_ContactType_ContactTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_CountryRegion_CountryRegionCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_EmailAddress_BusinessEntityID_EmailAddressID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_Password_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_Person_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_PersonPhone_BusinessEntityID_PhoneNumber_PhoneNumberTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_PhoneNumberType_PhoneNumberTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.PK_StateProvince_StateProvinceID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_BillOfMaterials_BillOfMaterialsID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_Culture_CultureID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_Document_DocumentNode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_Illustration_IllustrationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_Location_LocationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductCategory_ProductCategoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductCostHistory_ProductID_StartDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductDescription_ProductDescriptionID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductDocument_ProductID_DocumentNode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductInventory_ProductID_LocationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductListPriceHistory_ProductID_StartDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductModel_ProductModelID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductModelIllustration_ProductModelID_IllustrationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductModelProductDescriptionCulture_ProductModelID_ProductDescriptionID_CultureID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductPhoto_ProductPhotoID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductProductPhoto_ProductID_ProductPhotoID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductReview_ProductReviewID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ProductSubcategory_ProductSubcategoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_ScrapReason_ScrapReasonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_TransactionHistory_TransactionID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_TransactionHistoryArchive_TransactionID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_UnitMeasure_UnitMeasureCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_WorkOrder_WorkOrderID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.PK_WorkOrderRouting_WorkOrderID_ProductID_OperationSequence",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.UQ__Document__F73921F7C81C642F",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "UNIQUE_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.PK_ProductVendor_ProductID_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.PK_PurchaseOrderDetail_PurchaseOrderID_PurchaseOrderDetailID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.PK_PurchaseOrderHeader_PurchaseOrderID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.PK_ShipMethod_ShipMethodID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.PK_Vendor_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_CountryRegionCurrency_CountryRegionCode_CurrencyCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_CreditCard_CreditCardID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_Currency_CurrencyCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_CurrencyRate_CurrencyRateID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_Customer_CustomerID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_PersonCreditCard_BusinessEntityID_CreditCardID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_SalesOrderDetail_SalesOrderID_SalesOrderDetailID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_SalesOrderHeader_SalesOrderID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_SalesOrderHeaderSalesReason_SalesOrderID_SalesReasonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_SalesPerson_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_SalesPersonQuotaHistory_BusinessEntityID_QuotaDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_SalesReason_SalesReasonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_SalesTaxRate_SalesTaxRateID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_SalesTerritory_TerritoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_SalesTerritoryHistory_BusinessEntityID_StartDate_TerritoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_ShoppingCartItem_ShoppingCartItemID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_SpecialOffer_SpecialOfferID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_SpecialOfferProduct_SpecialOfferID_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.PK_Store_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.key_constraints",
+    "complexity": null,
+    "notes": "PRIMARY_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.CK_Employee_BirthDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.CK_Employee_Gender",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.CK_Employee_HireDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.CK_Employee_MaritalStatus",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.CK_Employee_SickLeaveHours",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.CK_Employee_VacationHours",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.CK_EmployeeDepartmentHistory_EndDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.CK_EmployeePayHistory_PayFrequency",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.CK_EmployeePayHistory_Rate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.CK_Person_EmailPromotion",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.CK_Person_PersonType",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_BillOfMaterials_BOMLevel",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_BillOfMaterials_EndDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_BillOfMaterials_PerAssemblyQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_BillOfMaterials_ProductAssemblyID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Document_Status",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Location_Availability",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Location_CostRate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Product_Class",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Product_DaysToManufacture",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Product_ListPrice",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Product_ProductLine",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Product_ReorderPoint",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Product_SafetyStockLevel",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Product_SellEndDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Product_StandardCost",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Product_Style",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_Product_Weight",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_ProductCostHistory_EndDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_ProductCostHistory_StandardCost",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_ProductInventory_Bin",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_ProductInventory_Shelf",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_ProductListPriceHistory_EndDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_ProductListPriceHistory_ListPrice",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_ProductReview_Rating",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_TransactionHistory_TransactionType",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_TransactionHistoryArchive_TransactionType",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_WorkOrder_EndDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_WorkOrder_OrderQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_WorkOrder_ScrappedQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_WorkOrderRouting_ActualCost",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_WorkOrderRouting_ActualEndDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_WorkOrderRouting_ActualResourceHrs",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_WorkOrderRouting_PlannedCost",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.CK_WorkOrderRouting_ScheduledEndDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_ProductVendor_AverageLeadTime",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_ProductVendor_LastReceiptCost",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_ProductVendor_MaxOrderQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_ProductVendor_MinOrderQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_ProductVendor_OnOrderQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_ProductVendor_StandardPrice",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_PurchaseOrderDetail_OrderQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_PurchaseOrderDetail_ReceivedQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_PurchaseOrderDetail_RejectedQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_PurchaseOrderDetail_UnitPrice",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_PurchaseOrderHeader_Freight",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_PurchaseOrderHeader_ShipDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_PurchaseOrderHeader_Status",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_PurchaseOrderHeader_SubTotal",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_PurchaseOrderHeader_TaxAmt",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_ShipMethod_ShipBase",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_ShipMethod_ShipRate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.CK_Vendor_CreditRating",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesOrderDetail_OrderQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesOrderDetail_UnitPrice",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesOrderDetail_UnitPriceDiscount",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesOrderHeader_DueDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesOrderHeader_Freight",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesOrderHeader_ShipDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesOrderHeader_Status",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesOrderHeader_SubTotal",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesOrderHeader_TaxAmt",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesPerson_Bonus",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesPerson_CommissionPct",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesPerson_SalesLastYear",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesPerson_SalesQuota",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesPerson_SalesYTD",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesPersonQuotaHistory_SalesQuota",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesTaxRate_TaxType",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesTerritory_CostLastYear",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesTerritory_CostYTD",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesTerritory_SalesLastYear",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesTerritory_SalesYTD",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SalesTerritoryHistory_EndDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_ShoppingCartItem_Quantity",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SpecialOffer_DiscountPct",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SpecialOffer_EndDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SpecialOffer_MaxQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.CK_SpecialOffer_MinQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.check_constraints",
+    "complexity": null,
+    "notes": "CHECK_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "dbo.DF_AWBuildVersion_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "dbo.DF_ErrorLog_ErrorTime",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.DF_Department_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.DF_Employee_CurrentFlag",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.DF_Employee_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.DF_Employee_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.DF_Employee_SalariedFlag",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.DF_Employee_SickLeaveHours",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.DF_Employee_VacationHours",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.DF_EmployeeDepartmentHistory_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.DF_EmployeePayHistory_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.DF_JobCandidate_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.DF_Shift_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_Address_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_Address_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_AddressType_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_AddressType_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_BusinessEntity_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_BusinessEntity_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_BusinessEntityAddress_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_BusinessEntityAddress_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_BusinessEntityContact_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_BusinessEntityContact_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_ContactType_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_CountryRegion_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_EmailAddress_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_EmailAddress_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_Password_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_Password_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_Person_EmailPromotion",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_Person_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_Person_NameStyle",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_Person_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_PersonPhone_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_PhoneNumberType_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_StateProvince_IsOnlyStateProvinceFlag",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_StateProvince_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.DF_StateProvince_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_BillOfMaterials_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_BillOfMaterials_PerAssemblyQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_BillOfMaterials_StartDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Culture_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Document_ChangeNumber",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Document_FolderFlag",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Document_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Document_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Illustration_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Location_Availability",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Location_CostRate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Location_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Product_FinishedGoodsFlag",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Product_MakeFlag",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Product_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_Product_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductCategory_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductCategory_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductCostHistory_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductDescription_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductDescription_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductDocument_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductInventory_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductInventory_Quantity",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductInventory_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductListPriceHistory_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductModel_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductModel_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductModelIllustration_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductModelProductDescriptionCulture_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductPhoto_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductProductPhoto_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductProductPhoto_Primary",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductReview_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductReview_ReviewDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductSubcategory_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ProductSubcategory_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_ScrapReason_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_TransactionHistory_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_TransactionHistory_ReferenceOrderLineID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_TransactionHistory_TransactionDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_TransactionHistoryArchive_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_TransactionHistoryArchive_ReferenceOrderLineID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_TransactionHistoryArchive_TransactionDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_UnitMeasure_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_WorkOrder_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.DF_WorkOrderRouting_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_ProductVendor_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_PurchaseOrderDetail_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_PurchaseOrderHeader_Freight",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_PurchaseOrderHeader_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_PurchaseOrderHeader_OrderDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_PurchaseOrderHeader_RevisionNumber",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_PurchaseOrderHeader_Status",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_PurchaseOrderHeader_SubTotal",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_PurchaseOrderHeader_TaxAmt",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_ShipMethod_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_ShipMethod_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_ShipMethod_ShipBase",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_ShipMethod_ShipRate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_Vendor_ActiveFlag",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_Vendor_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.DF_Vendor_PreferredVendorStatus",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_CountryRegionCurrency_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_CreditCard_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_Currency_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_CurrencyRate_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_Customer_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_Customer_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_PersonCreditCard_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderDetail_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderDetail_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderDetail_UnitPriceDiscount",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderHeader_Freight",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderHeader_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderHeader_OnlineOrderFlag",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderHeader_OrderDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderHeader_RevisionNumber",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderHeader_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderHeader_Status",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderHeader_SubTotal",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderHeader_TaxAmt",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesOrderHeaderSalesReason_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesPerson_Bonus",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesPerson_CommissionPct",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesPerson_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesPerson_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesPerson_SalesLastYear",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesPerson_SalesYTD",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesPersonQuotaHistory_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesPersonQuotaHistory_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesReason_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesTaxRate_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesTaxRate_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesTaxRate_TaxRate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesTerritory_CostLastYear",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesTerritory_CostYTD",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesTerritory_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesTerritory_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesTerritory_SalesLastYear",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesTerritory_SalesYTD",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesTerritoryHistory_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SalesTerritoryHistory_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_ShoppingCartItem_DateCreated",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_ShoppingCartItem_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_ShoppingCartItem_Quantity",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SpecialOffer_DiscountPct",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SpecialOffer_MinQty",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SpecialOffer_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SpecialOffer_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SpecialOfferProduct_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_SpecialOfferProduct_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_Store_ModifiedDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.DF_Store_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.default_constraints",
+    "complexity": null,
+    "notes": "DEFAULT_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.FK_Employee_Person_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.FK_EmployeeDepartmentHistory_Department_DepartmentID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.FK_EmployeeDepartmentHistory_Employee_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.FK_EmployeeDepartmentHistory_Shift_ShiftID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.FK_EmployeePayHistory_Employee_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "HumanResources.FK_JobCandidate_Employee_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_Address_StateProvince_StateProvinceID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_BusinessEntityAddress_Address_AddressID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_BusinessEntityAddress_AddressType_AddressTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_BusinessEntityAddress_BusinessEntity_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_BusinessEntityContact_BusinessEntity_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_BusinessEntityContact_ContactType_ContactTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_BusinessEntityContact_Person_PersonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_EmailAddress_Person_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_Password_Person_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_Person_BusinessEntity_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_PersonPhone_Person_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_PersonPhone_PhoneNumberType_PhoneNumberTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_StateProvince_CountryRegion_CountryRegionCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Person.FK_StateProvince_SalesTerritory_TerritoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_BillOfMaterials_Product_ComponentID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_BillOfMaterials_Product_ProductAssemblyID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_BillOfMaterials_UnitMeasure_UnitMeasureCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_Document_Employee_Owner",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_Product_ProductModel_ProductModelID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_Product_ProductSubcategory_ProductSubcategoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_Product_UnitMeasure_SizeUnitMeasureCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_Product_UnitMeasure_WeightUnitMeasureCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductCostHistory_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductDocument_Document_DocumentNode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductDocument_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductInventory_Location_LocationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductInventory_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductListPriceHistory_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductModelIllustration_Illustration_IllustrationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductModelIllustration_ProductModel_ProductModelID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductModelProductDescriptionCulture_Culture_CultureID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductModelProductDescriptionCulture_ProductDescription_ProductDescriptionID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductModelProductDescriptionCulture_ProductModel_ProductModelID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductProductPhoto_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductProductPhoto_ProductPhoto_ProductPhotoID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductReview_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_ProductSubcategory_ProductCategory_ProductCategoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_TransactionHistory_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_WorkOrder_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_WorkOrder_ScrapReason_ScrapReasonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_WorkOrderRouting_Location_LocationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Production.FK_WorkOrderRouting_WorkOrder_WorkOrderID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.FK_ProductVendor_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.FK_ProductVendor_UnitMeasure_UnitMeasureCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.FK_ProductVendor_Vendor_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.FK_PurchaseOrderDetail_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.FK_PurchaseOrderDetail_PurchaseOrderHeader_PurchaseOrderID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.FK_PurchaseOrderHeader_Employee_EmployeeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.FK_PurchaseOrderHeader_ShipMethod_ShipMethodID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.FK_PurchaseOrderHeader_Vendor_VendorID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Purchasing.FK_Vendor_BusinessEntity_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_CountryRegionCurrency_CountryRegion_CountryRegionCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_CountryRegionCurrency_Currency_CurrencyCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_CurrencyRate_Currency_FromCurrencyCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_CurrencyRate_Currency_ToCurrencyCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_Customer_Person_PersonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_Customer_SalesTerritory_TerritoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_Customer_Store_StoreID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_PersonCreditCard_CreditCard_CreditCardID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_PersonCreditCard_Person_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesOrderDetail_SalesOrderHeader_SalesOrderID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesOrderDetail_SpecialOfferProduct_SpecialOfferIDProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesOrderHeader_Address_BillToAddressID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesOrderHeader_Address_ShipToAddressID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesOrderHeader_CreditCard_CreditCardID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesOrderHeader_CurrencyRate_CurrencyRateID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesOrderHeader_Customer_CustomerID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesOrderHeader_SalesPerson_SalesPersonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesOrderHeader_SalesTerritory_TerritoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesOrderHeader_ShipMethod_ShipMethodID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesOrderHeaderSalesReason_SalesOrderHeader_SalesOrderID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesOrderHeaderSalesReason_SalesReason_SalesReasonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesPerson_Employee_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesPerson_SalesTerritory_TerritoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesPersonQuotaHistory_SalesPerson_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesTaxRate_StateProvince_StateProvinceID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesTerritory_CountryRegion_CountryRegionCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesTerritoryHistory_SalesPerson_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SalesTerritoryHistory_SalesTerritory_TerritoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_ShoppingCartItem_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SpecialOfferProduct_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_SpecialOfferProduct_SpecialOffer_SpecialOfferID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_Store_BusinessEntity_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  },
+  {
+    "object_type": "constraint",
+    "name": "Sales.FK_Store_SalesPerson_SalesPersonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.foreign_keys",
+    "complexity": null,
+    "notes": "FOREIGN_KEY_CONSTRAINT"
+  }
+]

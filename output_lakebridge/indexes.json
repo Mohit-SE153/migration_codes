@@ -1,0 +1,1386 @@
+[
+  {
+    "object_type": "index",
+    "name": "dbo.AWBuildVersion.PK_AWBuildVersion_SystemInformationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "dbo.DatabaseLog.PK_DatabaseLog_DatabaseLogID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "dbo.ErrorLog.PK_ErrorLog_ErrorLogID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.Department.AK_Department_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.Department.PK_Department_DepartmentID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.Employee.AK_Employee_LoginID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.Employee.AK_Employee_NationalIDNumber",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.Employee.AK_Employee_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.Employee.IX_Employee_OrganizationLevel_OrganizationNode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.Employee.IX_Employee_OrganizationNode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.Employee.PK_Employee_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.EmployeeDepartmentHistory.IX_EmployeeDepartmentHistory_DepartmentID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.EmployeeDepartmentHistory.IX_EmployeeDepartmentHistory_ShiftID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.EmployeeDepartmentHistory.PK_EmployeeDepartmentHistory_BusinessEntityID_StartDate_DepartmentID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.EmployeePayHistory.PK_EmployeePayHistory_BusinessEntityID_RateChangeDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.JobCandidate.IX_JobCandidate_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.JobCandidate.PK_JobCandidate_JobCandidateID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.Shift.AK_Shift_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.Shift.AK_Shift_StartTime_EndTime",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "HumanResources.Shift.PK_Shift_ShiftID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Address.AK_Address_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Address.IX_Address_AddressLine1_AddressLine2_City_StateProvinceID_PostalCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Address.IX_Address_StateProvinceID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Address.PK_Address_AddressID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.AddressType.AK_AddressType_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.AddressType.AK_AddressType_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.AddressType.PK_AddressType_AddressTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.BusinessEntity.AK_BusinessEntity_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.BusinessEntity.PK_BusinessEntity_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.BusinessEntityAddress.AK_BusinessEntityAddress_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.BusinessEntityAddress.IX_BusinessEntityAddress_AddressID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.BusinessEntityAddress.IX_BusinessEntityAddress_AddressTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.BusinessEntityAddress.PK_BusinessEntityAddress_BusinessEntityID_AddressID_AddressTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.BusinessEntityContact.AK_BusinessEntityContact_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.BusinessEntityContact.IX_BusinessEntityContact_ContactTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.BusinessEntityContact.IX_BusinessEntityContact_PersonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.BusinessEntityContact.PK_BusinessEntityContact_BusinessEntityID_PersonID_ContactTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.ContactType.AK_ContactType_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.ContactType.PK_ContactType_ContactTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.CountryRegion.AK_CountryRegion_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.CountryRegion.PK_CountryRegion_CountryRegionCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.EmailAddress.IX_EmailAddress_EmailAddress",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.EmailAddress.PK_EmailAddress_BusinessEntityID_EmailAddressID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Password.PK_Password_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Person.AK_Person_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Person.IX_Person_LastName_FirstName_MiddleName",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Person.PK_Person_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Person.PXML_Person_AddContact",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=XML"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Person.PXML_Person_Demographics",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=XML"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Person.XMLPATH_Person_Demographics",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=XML"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Person.XMLPROPERTY_Person_Demographics",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=XML"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.Person.XMLVALUE_Person_Demographics",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=XML"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.PersonPhone.IX_PersonPhone_PhoneNumber",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.PersonPhone.PK_PersonPhone_BusinessEntityID_PhoneNumber_PhoneNumberTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.PhoneNumberType.PK_PhoneNumberType_PhoneNumberTypeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.StateProvince.AK_StateProvince_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.StateProvince.AK_StateProvince_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.StateProvince.AK_StateProvince_StateProvinceCode_CountryRegionCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Person.StateProvince.PK_StateProvince_StateProvinceID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.BillOfMaterials.AK_BillOfMaterials_ProductAssemblyID_ComponentID_StartDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.BillOfMaterials.IX_BillOfMaterials_UnitMeasureCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.BillOfMaterials.PK_BillOfMaterials_BillOfMaterialsID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Culture.AK_Culture_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Culture.PK_Culture_CultureID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Document.AK_Document_DocumentLevel_DocumentNode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Document.AK_Document_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Document.IX_Document_FileName_Revision",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Document.PK_Document_DocumentNode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Document.UQ__Document__F73921F7C81C642F",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Illustration.PK_Illustration_IllustrationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Location.AK_Location_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Location.PK_Location_LocationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Product.AK_Product_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Product.AK_Product_ProductNumber",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Product.AK_Product_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.Product.PK_Product_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductCategory.AK_ProductCategory_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductCategory.AK_ProductCategory_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductCategory.PK_ProductCategory_ProductCategoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductCostHistory.PK_ProductCostHistory_ProductID_StartDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductDescription.AK_ProductDescription_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductDescription.PK_ProductDescription_ProductDescriptionID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductDocument.PK_ProductDocument_ProductID_DocumentNode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductInventory.PK_ProductInventory_ProductID_LocationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductListPriceHistory.PK_ProductListPriceHistory_ProductID_StartDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductModel.AK_ProductModel_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductModel.AK_ProductModel_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductModel.PK_ProductModel_ProductModelID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductModel.PXML_ProductModel_CatalogDescription",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=XML"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductModel.PXML_ProductModel_Instructions",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=XML"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductModelIllustration.PK_ProductModelIllustration_ProductModelID_IllustrationID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductModelProductDescriptionCulture.PK_ProductModelProductDescriptionCulture_ProductModelID_ProductDescriptionID_CultureID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductPhoto.PK_ProductPhoto_ProductPhotoID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductProductPhoto.PK_ProductProductPhoto_ProductID_ProductPhotoID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductReview.IX_ProductReview_ProductID_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductReview.PK_ProductReview_ProductReviewID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductSubcategory.AK_ProductSubcategory_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductSubcategory.AK_ProductSubcategory_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ProductSubcategory.PK_ProductSubcategory_ProductSubcategoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ScrapReason.AK_ScrapReason_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.ScrapReason.PK_ScrapReason_ScrapReasonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.TransactionHistory.IX_TransactionHistory_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.TransactionHistory.IX_TransactionHistory_ReferenceOrderID_ReferenceOrderLineID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.TransactionHistory.PK_TransactionHistory_TransactionID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.TransactionHistoryArchive.IX_TransactionHistoryArchive_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.TransactionHistoryArchive.IX_TransactionHistoryArchive_ReferenceOrderID_ReferenceOrderLineID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.TransactionHistoryArchive.PK_TransactionHistoryArchive_TransactionID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.UnitMeasure.AK_UnitMeasure_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.UnitMeasure.PK_UnitMeasure_UnitMeasureCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.WorkOrder.IX_WorkOrder_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.WorkOrder.IX_WorkOrder_ScrapReasonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.WorkOrder.PK_WorkOrder_WorkOrderID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.WorkOrderRouting.IX_WorkOrderRouting_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Production.WorkOrderRouting.PK_WorkOrderRouting_WorkOrderID_ProductID_OperationSequence",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.ProductVendor.IX_ProductVendor_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.ProductVendor.IX_ProductVendor_UnitMeasureCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.ProductVendor.PK_ProductVendor_ProductID_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.PurchaseOrderDetail.IX_PurchaseOrderDetail_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.PurchaseOrderDetail.PK_PurchaseOrderDetail_PurchaseOrderID_PurchaseOrderDetailID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.PurchaseOrderHeader.IX_PurchaseOrderHeader_EmployeeID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.PurchaseOrderHeader.IX_PurchaseOrderHeader_VendorID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.PurchaseOrderHeader.PK_PurchaseOrderHeader_PurchaseOrderID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.ShipMethod.AK_ShipMethod_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.ShipMethod.AK_ShipMethod_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.ShipMethod.PK_ShipMethod_ShipMethodID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.Vendor.AK_Vendor_AccountNumber",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Purchasing.Vendor.PK_Vendor_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.CountryRegionCurrency.IX_CountryRegionCurrency_CurrencyCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.CountryRegionCurrency.PK_CountryRegionCurrency_CountryRegionCode_CurrencyCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.CreditCard.AK_CreditCard_CardNumber",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.CreditCard.PK_CreditCard_CreditCardID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.Currency.AK_Currency_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.Currency.PK_Currency_CurrencyCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.CurrencyRate.AK_CurrencyRate_CurrencyRateDate_FromCurrencyCode_ToCurrencyCode",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.CurrencyRate.PK_CurrencyRate_CurrencyRateID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.Customer.AK_Customer_AccountNumber",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.Customer.AK_Customer_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.Customer.IX_Customer_TerritoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.Customer.PK_Customer_CustomerID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.PersonCreditCard.PK_PersonCreditCard_BusinessEntityID_CreditCardID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesOrderDetail.AK_SalesOrderDetail_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesOrderDetail.IX_SalesOrderDetail_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesOrderDetail.PK_SalesOrderDetail_SalesOrderID_SalesOrderDetailID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesOrderHeader.AK_SalesOrderHeader_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesOrderHeader.AK_SalesOrderHeader_SalesOrderNumber",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesOrderHeader.IX_SalesOrderHeader_CustomerID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesOrderHeader.IX_SalesOrderHeader_SalesPersonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesOrderHeader.PK_SalesOrderHeader_SalesOrderID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesOrderHeaderSalesReason.PK_SalesOrderHeaderSalesReason_SalesOrderID_SalesReasonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesPerson.AK_SalesPerson_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesPerson.PK_SalesPerson_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesPersonQuotaHistory.AK_SalesPersonQuotaHistory_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesPersonQuotaHistory.PK_SalesPersonQuotaHistory_BusinessEntityID_QuotaDate",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesReason.PK_SalesReason_SalesReasonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesTaxRate.AK_SalesTaxRate_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesTaxRate.AK_SalesTaxRate_StateProvinceID_TaxType",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesTaxRate.PK_SalesTaxRate_SalesTaxRateID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesTerritory.AK_SalesTerritory_Name",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesTerritory.AK_SalesTerritory_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesTerritory.PK_SalesTerritory_TerritoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesTerritoryHistory.AK_SalesTerritoryHistory_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SalesTerritoryHistory.PK_SalesTerritoryHistory_BusinessEntityID_StartDate_TerritoryID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.ShoppingCartItem.IX_ShoppingCartItem_ShoppingCartID_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.ShoppingCartItem.PK_ShoppingCartItem_ShoppingCartItemID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SpecialOffer.AK_SpecialOffer_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SpecialOffer.PK_SpecialOffer_SpecialOfferID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SpecialOfferProduct.AK_SpecialOfferProduct_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SpecialOfferProduct.IX_SpecialOfferProduct_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.SpecialOfferProduct.PK_SpecialOfferProduct_SpecialOfferID_ProductID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.Store.AK_Store_rowguid",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.Store.IX_Store_SalesPersonID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=NONCLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.Store.PK_Store_BusinessEntityID",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=CLUSTERED"
+  },
+  {
+    "object_type": "index",
+    "name": "Sales.Store.PXML_Store_Demographics",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.indexes",
+    "complexity": null,
+    "notes": "type=XML"
+  }
+]

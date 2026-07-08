@@ -1,1 +1,50 @@
-[]
+[
+  {
+    "object_type": "schema",
+    "name": "dbo",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.schemas",
+    "complexity": null,
+    "notes": null
+  },
+  {
+    "object_type": "schema",
+    "name": "HumanResources",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.schemas",
+    "complexity": null,
+    "notes": null
+  },
+  {
+    "object_type": "schema",
+    "name": "Person",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.schemas",
+    "complexity": null,
+    "notes": null
+  },
+  {
+    "object_type": "schema",
+    "name": "Production",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.schemas",
+    "complexity": null,
+    "notes": null
+  },
+  {
+    "object_type": "schema",
+    "name": "Purchasing",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.schemas",
+    "complexity": null,
+    "notes": null
+  },
+  {
+    "object_type": "schema",
+    "name": "Sales",
+    "source_tech": "MS SQL Server",
+    "raw_category": "sys.schemas",
+    "complexity": null,
+    "notes": null
+  }
+]

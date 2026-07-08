@@ -185,6 +185,23 @@ def _parse_program_name(program_name: str) -> tuple[str, str] | None:
     return category, name
 
 
+# SSIS inventory rows (unlike the SQL-side rows _parse_program_name handles)
+# don't follow source_exporter.py's "{kind}__{name}" file-naming convention --
+# each row already carries its own "type" field instead (confirmed against a
+# real SSIS Analyzer report: every entry has "type": "Package" and a plain
+# "name" like "Pkg_ArchiveOldData", no "__" separator at all), so
+# _parse_program_name always returns None for them. This is the fallback
+# classification path for exactly that case.
+_ROW_TYPE_TO_CATEGORY = {
+    "Package": "package",
+}
+
+
+def _classify_by_row_type(row: dict) -> str | None:
+    row_type = row.get("type")
+    return _ROW_TYPE_TO_CATEGORY.get(row_type) if isinstance(row_type, str) else None
+
+
 def _apply_program_inventory_rows(
     result: LakebridgeDiscoveryResult, rows: list[dict], source_tech: str, name_field: str, complexity_field: str
 ) -> int:
@@ -196,9 +213,13 @@ def _apply_program_inventory_rows(
         if not program_name:
             continue
         parsed = _parse_program_name(program_name)
-        if parsed is None:
-            continue
-        category, name = parsed
+        if parsed is not None:
+            category, name = parsed
+        else:
+            category = _classify_by_row_type(row)
+            if category is None:
+                continue
+            name = str(program_name)
         bucket = getattr(result, _PLURAL.get(category, category), None)
         if bucket is None:
             continue

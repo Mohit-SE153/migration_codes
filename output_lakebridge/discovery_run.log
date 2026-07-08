@@ -1,18 +1,78 @@
-2026-07-07T11:13:45 INFO [LAKEBRIDGE] === Lakebridge Discovery run 07c2053d-dbee-4ba1-8f77-b10bb9c5ffb0 started (mode=live) ===
-2026-07-07T11:14:00 ERROR [LAKEBRIDGE] FAIL source_export output_lakebridge/_source_export error=OperationalError: ('HYT00', '[HYT00] [Microsoft][ODBC Driver 18 for SQL Server]Login timeout expired (0) (SQLDriverConnect)') (15001.5ms)
-2026-07-07T11:14:00 INFO [LAKEBRIDGE] SKIP analyze source_tech=MS SQL Server reason=no exported source files for source-tech=MS SQL Server, skipping analyze
-2026-07-07T11:14:00 INFO [LAKEBRIDGE] SKIP analyze source_tech=SSIS reason=no exported source files for source-tech=SSIS, skipping analyze
-2026-07-07T11:14:00 INFO [LAKEBRIDGE] Lakebridge dependency extraction (regex gap-fill): 0 new edges found (0 resolved, 0 unresolved) from 0 candidate source objects (0 edges already known from the Analyzer report)
-2026-07-07T11:14:00 INFO [LAKEBRIDGE] === Lakebridge Discovery run 07c2053d-dbee-4ba1-8f77-b10bb9c5ffb0 finished: status=failed duration=15.00s objects=0 dependencies=0 errors=0 warnings=0 ===
-2026-07-07T11:14:00 INFO [LAKEBRIDGE] Wrote 10 per-category output files to output_lakebridge
-2026-07-07T11:14:00 INFO [LAKEBRIDGE] Wrote manifest=output_lakebridge/lakebridge_manifest.json rollup=output_lakebridge/lakebridge_rollup.csv log_summary=output_lakebridge/lakebridge_log_summary.csv dependency_stats=output_lakebridge/dependency_stats.json
-2026-07-07T11:16:16 INFO [LAKEBRIDGE] === Lakebridge Discovery run d9158902-fbeb-4f76-b92b-dd45e53be1fe started (mode=live) ===
-2026-07-07T11:16:17 INFO [LAKEBRIDGE] SSISDB not installed -- no SSIS packages to export for Lakebridge.
-2026-07-07T11:16:17 INFO [LAKEBRIDGE] OK   source_export sql_files=51 table_ddl=71 ssis_files=0 errors=0 (886.2ms)
-2026-07-07T11:16:27 INFO [LAKEBRIDGE] OK   analyze source_tech=MS SQL Server exit=0 (9.9s) report=output_lakebridge/reports/lakebridge_report_MS_SQL_Server.xlsx
-2026-07-07T11:16:27 INFO [LAKEBRIDGE] SKIP analyze source_tech=SSIS reason=no exported source files for source-tech=SSIS, skipping analyze
-2026-07-07T11:16:27 INFO [LAKEBRIDGE] Parsed JSON report output_lakebridge/reports/lakebridge_report_MS_SQL_Server.json: 122 rows classified into inventory categories
-2026-07-07T11:16:27 INFO [LAKEBRIDGE] Lakebridge dependency extraction (regex gap-fill): 43 new edges found (43 resolved, 0 unresolved) from 51 candidate source objects (129 edges already known from the Analyzer report)
-2026-07-07T11:16:27 INFO [LAKEBRIDGE] === Lakebridge Discovery run d9158902-fbeb-4f76-b92b-dd45e53be1fe finished: status=success duration=10.86s objects=122 dependencies=172 errors=0 warnings=0 ===
-2026-07-07T11:16:27 INFO [LAKEBRIDGE] Wrote 10 per-category output files to output_lakebridge
-2026-07-07T11:16:27 INFO [LAKEBRIDGE] Wrote manifest=output_lakebridge/lakebridge_manifest.json rollup=output_lakebridge/lakebridge_rollup.csv log_summary=output_lakebridge/lakebridge_log_summary.csv dependency_stats=output_lakebridge/dependency_stats.json
+2026-07-07T20:09:42 INFO [LAKEBRIDGE] === Lakebridge Discovery run 8710b41f-fb62-4cdc-a22c-3e791ed4776d started (mode=live) ===
+2026-07-07T20:09:44 INFO [LAKEBRIDGE] SSISDB not installed -- no SSIS packages to export for Lakebridge.
+2026-07-07T20:09:44 INFO [LAKEBRIDGE] OK   source_export sql_files=51 table_ddl=71 ssis_files=0 errors=0 (2142.9ms)
+2026-07-07T20:10:28 INFO [LAKEBRIDGE] OK   analyze source_tech=MS SQL Server exit=0 (43.2s) report=output_lakebridge\reports\lakebridge_report_MS_SQL_Server.xlsx
+2026-07-07T20:10:28 INFO [LAKEBRIDGE] SKIP analyze source_tech=SSIS reason=no exported source files for source-tech=SSIS, skipping analyze
+2026-07-07T20:10:28 INFO [LAKEBRIDGE] Parsed JSON report output_lakebridge\reports\lakebridge_report_MS_SQL_Server.json: 122 rows classified into inventory categories
+2026-07-07T20:10:28 INFO [LAKEBRIDGE] Lakebridge dependency extraction (regex gap-fill): 141 new edges found (141 resolved, 0 unresolved) from 51 candidate source objects (25 edges already known from the Analyzer report)
+2026-07-07T20:10:28 INFO [LAKEBRIDGE] OK   catalog_metadata probe=foreign_keys             new_objects=86
+2026-07-07T20:10:28 INFO [LAKEBRIDGE] OK   catalog_metadata probe=user_defined_types       new_objects=37
+2026-07-07T20:10:28 INFO [LAKEBRIDGE] OK   catalog_metadata probe=xml_schema_collections   new_objects=6
+2026-07-07T20:10:29 INFO [LAKEBRIDGE] OK   catalog_metadata probe=computed_column_functions new_objects=1
+2026-07-07T20:10:29 INFO [LAKEBRIDGE] OK   catalog_metadata probe=indexes                  new_objects=173
+2026-07-07T20:10:29 INFO [LAKEBRIDGE] OK   catalog_metadata probe=constraints              new_objects=403
+2026-07-07T20:10:29 INFO [LAKEBRIDGE] OK   catalog_metadata probe=sequences                new_objects=0
+2026-07-07T20:10:29 INFO [LAKEBRIDGE] OK   catalog_metadata probe=schemas                  new_objects=6
+2026-07-07T20:10:29 INFO [LAKEBRIDGE] OK   catalog_metadata probe=synonyms                 new_objects=0
+2026-07-07T20:10:29 INFO [LAKEBRIDGE] === Lakebridge Discovery run 8710b41f-fb62-4cdc-a22c-3e791ed4776d finished: status=success duration=46.55s objects=128 dependencies=296 errors=0 warnings=0 ===
+2026-07-07T20:10:29 INFO [LAKEBRIDGE] Wrote 13 per-category output files to output_lakebridge
+2026-07-07T20:10:29 INFO [LAKEBRIDGE] Wrote manifest=output_lakebridge\lakebridge_manifest.json rollup=output_lakebridge\lakebridge_rollup.csv log_summary=output_lakebridge\lakebridge_log_summary.csv dependency_stats=output_lakebridge\dependency_stats.json
+2026-07-07T20:19:27 INFO [LAKEBRIDGE] === Lakebridge Discovery run bcfce832-066f-4e49-abc8-2ee0ef2d41ff started (mode=live) ===
+2026-07-07T20:19:32 INFO [LAKEBRIDGE] SSISDB not installed -- no SSIS packages to export for Lakebridge.
+2026-07-07T20:19:32 INFO [LAKEBRIDGE] OK   source_export sql_files=51 table_ddl=71 ssis_files=0 errors=0 (4419.2ms)
+2026-07-07T20:19:35 ERROR [LAKEBRIDGE] FAIL analyze source_tech=MS SQL Server exit=1 error=exit code 1: C:\Users\Mohit_Srivastava\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\Users\\Mohit_Srivastava\\.databricks\\labs\\lakebridge\\lib\\src\\databricks\\labs\\lakebridge\\cli.py': [Errno 2] No such file or directory
+Error: exit status 2
+
+2026-07-07T20:19:35 INFO [LAKEBRIDGE] SKIP analyze source_tech=SSIS reason=no exported source files for source-tech=SSIS, skipping analyze
+2026-07-07T20:19:35 INFO [LAKEBRIDGE] Lakebridge dependency extraction (regex gap-fill): 0 new edges found (0 resolved, 0 unresolved) from 0 candidate source objects (0 edges already known from the Analyzer report)
+2026-07-07T20:19:35 INFO [LAKEBRIDGE] OK   catalog_metadata probe=foreign_keys             new_objects=86
+2026-07-07T20:19:36 INFO [LAKEBRIDGE] OK   catalog_metadata probe=user_defined_types       new_objects=37
+2026-07-07T20:19:36 INFO [LAKEBRIDGE] OK   catalog_metadata probe=xml_schema_collections   new_objects=6
+2026-07-07T20:19:36 INFO [LAKEBRIDGE] OK   catalog_metadata probe=computed_column_functions new_objects=1
+2026-07-07T20:19:36 INFO [LAKEBRIDGE] OK   catalog_metadata probe=indexes                  new_objects=173
+2026-07-07T20:19:36 INFO [LAKEBRIDGE] OK   catalog_metadata probe=constraints              new_objects=403
+2026-07-07T20:19:36 INFO [LAKEBRIDGE] OK   catalog_metadata probe=sequences                new_objects=0
+2026-07-07T20:19:36 INFO [LAKEBRIDGE] OK   catalog_metadata probe=schemas                  new_objects=6
+2026-07-07T20:19:36 INFO [LAKEBRIDGE] OK   catalog_metadata probe=synonyms                 new_objects=0
+2026-07-07T20:19:36 INFO [LAKEBRIDGE] === Lakebridge Discovery run bcfce832-066f-4e49-abc8-2ee0ef2d41ff finished: status=failed duration=8.74s objects=6 dependencies=130 errors=1 warnings=0 ===
+2026-07-07T20:19:36 INFO [LAKEBRIDGE] Wrote 13 per-category output files to output_lakebridge
+2026-07-07T20:19:36 INFO [LAKEBRIDGE] Wrote manifest=output_lakebridge\lakebridge_manifest.json rollup=output_lakebridge\lakebridge_rollup.csv log_summary=output_lakebridge\lakebridge_log_summary.csv dependency_stats=output_lakebridge\dependency_stats.json
+2026-07-07T20:23:23 INFO [LAKEBRIDGE] === Lakebridge Discovery run 3d816f94-911e-42ff-ae89-2f98ab7925f1 started (mode=live) ===
+2026-07-07T20:23:25 INFO [LAKEBRIDGE] SSISDB not installed -- no SSIS packages to export for Lakebridge.
+2026-07-07T20:23:25 INFO [LAKEBRIDGE] OK   source_export sql_files=51 table_ddl=71 ssis_files=0 errors=0 (2046.1ms)
+2026-07-07T20:23:29 ERROR [LAKEBRIDGE] FAIL analyze source_tech=MS SQL Server exit=1 error=exit code 1: C:\Users\Mohit_Srivastava\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\Users\\Mohit_Srivastava\\.databricks\\labs\\lakebridge\\lib\\src\\databricks\\labs\\lakebridge\\cli.py': [Errno 2] No such file or directory
+Error: exit status 2
+
+2026-07-07T20:23:29 INFO [LAKEBRIDGE] SKIP analyze source_tech=SSIS reason=no exported source files for source-tech=SSIS, skipping analyze
+2026-07-07T20:23:29 INFO [LAKEBRIDGE] Lakebridge dependency extraction (regex gap-fill): 0 new edges found (0 resolved, 0 unresolved) from 0 candidate source objects (0 edges already known from the Analyzer report)
+2026-07-07T20:23:29 INFO [LAKEBRIDGE] OK   catalog_metadata probe=foreign_keys             new_objects=86
+2026-07-07T20:23:29 INFO [LAKEBRIDGE] OK   catalog_metadata probe=user_defined_types       new_objects=37
+2026-07-07T20:23:29 INFO [LAKEBRIDGE] OK   catalog_metadata probe=xml_schema_collections   new_objects=6
+2026-07-07T20:23:30 INFO [LAKEBRIDGE] OK   catalog_metadata probe=computed_column_functions new_objects=1
+2026-07-07T20:23:30 INFO [LAKEBRIDGE] OK   catalog_metadata probe=indexes                  new_objects=173
+2026-07-07T20:23:30 INFO [LAKEBRIDGE] OK   catalog_metadata probe=constraints              new_objects=403
+2026-07-07T20:23:30 INFO [LAKEBRIDGE] OK   catalog_metadata probe=sequences                new_objects=0
+2026-07-07T20:23:30 INFO [LAKEBRIDGE] OK   catalog_metadata probe=schemas                  new_objects=6
+2026-07-07T20:23:30 INFO [LAKEBRIDGE] OK   catalog_metadata probe=synonyms                 new_objects=0
+2026-07-07T20:23:30 INFO [LAKEBRIDGE] === Lakebridge Discovery run 3d816f94-911e-42ff-ae89-2f98ab7925f1 finished: status=failed duration=6.52s objects=6 dependencies=130 errors=1 warnings=0 ===
+2026-07-07T20:23:30 INFO [LAKEBRIDGE] Wrote 13 per-category output files to output_lakebridge
+2026-07-07T20:23:30 INFO [LAKEBRIDGE] Wrote manifest=output_lakebridge\lakebridge_manifest.json rollup=output_lakebridge\lakebridge_rollup.csv log_summary=output_lakebridge\lakebridge_log_summary.csv dependency_stats=output_lakebridge\dependency_stats.json
+2026-07-07T20:47:40 INFO [LAKEBRIDGE] === Lakebridge Discovery run feda06f1-b0c1-4fc8-afe3-8481e9448a81 started (mode=live) ===
+2026-07-07T20:47:43 INFO [LAKEBRIDGE] SSISDB not installed -- no SSIS packages to export for Lakebridge.
+2026-07-07T20:47:43 INFO [LAKEBRIDGE] OK   source_export sql_files=51 table_ddl=71 ssis_files=0 errors=0 (2440.9ms)
+2026-07-07T20:47:52 INFO [LAKEBRIDGE] OK   analyze source_tech=MS SQL Server exit=0 (9.7s) report=output_lakebridge\reports\lakebridge_report_MS_SQL_Server.xlsx
+2026-07-07T20:47:52 INFO [LAKEBRIDGE] SKIP analyze source_tech=SSIS reason=no exported source files for source-tech=SSIS, skipping analyze
+2026-07-07T20:47:52 INFO [LAKEBRIDGE] Parsed JSON report output_lakebridge\reports\lakebridge_report_MS_SQL_Server.json: 122 rows classified into inventory categories
+2026-07-07T20:47:52 INFO [LAKEBRIDGE] Lakebridge dependency extraction (regex gap-fill): 141 new edges found (141 resolved, 0 unresolved) from 51 candidate source objects (25 edges already known from the Analyzer report)
+2026-07-07T20:47:52 INFO [LAKEBRIDGE] OK   catalog_metadata probe=foreign_keys             new_objects=86
+2026-07-07T20:47:53 INFO [LAKEBRIDGE] OK   catalog_metadata probe=user_defined_types       new_objects=37
+2026-07-07T20:47:53 INFO [LAKEBRIDGE] OK   catalog_metadata probe=xml_schema_collections   new_objects=6
+2026-07-07T20:47:53 INFO [LAKEBRIDGE] OK   catalog_metadata probe=computed_column_functions new_objects=1
+2026-07-07T20:47:53 INFO [LAKEBRIDGE] OK   catalog_metadata probe=indexes                  new_objects=173
+2026-07-07T20:47:53 INFO [LAKEBRIDGE] OK   catalog_metadata probe=constraints              new_objects=403
+2026-07-07T20:47:53 INFO [LAKEBRIDGE] OK   catalog_metadata probe=sequences                new_objects=0
+2026-07-07T20:47:53 INFO [LAKEBRIDGE] OK   catalog_metadata probe=schemas                  new_objects=6
+2026-07-07T20:47:53 INFO [LAKEBRIDGE] OK   catalog_metadata probe=synonyms                 new_objects=0
+2026-07-07T20:47:53 INFO [LAKEBRIDGE] === Lakebridge Discovery run feda06f1-b0c1-4fc8-afe3-8481e9448a81 finished: status=success duration=12.65s objects=128 dependencies=296 errors=0 warnings=0 ===
+2026-07-07T20:47:53 INFO [LAKEBRIDGE] Wrote 13 per-category output files to output_lakebridge
+2026-07-07T20:47:53 INFO [LAKEBRIDGE] Wrote manifest=output_lakebridge\lakebridge_manifest.json rollup=output_lakebridge\lakebridge_rollup.csv log_summary=output_lakebridge\lakebridge_log_summary.csv dependency_stats=output_lakebridge\dependency_stats.json

@@ -6,5 +6,5 @@ functions,11,11,0,11,"best-effort normalized name match -- not guaranteed precis
 triggers,13,10,3,10,"best-effort normalized name match -- not guaranteed precise, see README"
 synonyms,0,0,0,0,"best-effort normalized name match -- not guaranteed precise, see README"
 ssis_packages,0,0,0,0,"best-effort normalized name match -- not guaranteed precise, see README"
-dependencies,292,172,120,0,count-only -- dependency edges are not name-matched
+dependencies,292,296,-4,0,count-only -- dependency edges are not name-matched
 unsupported_objects,4,0,4,0,count-only (sqlglot: unresolved/llm_inferred proc+embedded-sql count; lakebridge: Analyzer-flagged unsupported objects)

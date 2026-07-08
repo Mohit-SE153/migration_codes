@@ -1,26 +1,33 @@
 {
-  "total_dependencies": 172,
-  "unique_relationships": 172,
+  "total_dependencies": 296,
+  "unique_relationships": 296,
   "by_relationship_type": {
-    "reads": 120,
+    "reads": 114,
     "writes": 20,
-    "calls": 22,
-    "fires_on": 10
+    "calls": 23,
+    "fires_on": 10,
+    "foreign_key": 86,
+    "uses_type": 43
   },
   "by_type_pair": {
     "function->table": 14,
     "stored_procedure->stored_procedure": 4,
     "stored_procedure->table": 14,
-    "stored_procedure->unknown": 6,
+    "stored_procedure->user_defined_type": 2,
+    "table->function": 1,
+    "table->table": 86,
+    "table->user_defined_type": 35,
+    "table->xml_schema_collection": 6,
     "trigger->function": 2,
     "trigger->stored_procedure": 16,
     "trigger->table": 32,
     "view->table": 84
   },
   "by_discovery_method": {
-    "lakebridge_report": 129,
-    "lakebridge": 43
+    "lakebridge_report": 25,
+    "lakebridge": 141,
+    "catalog_metadata": 130
   },
-  "resolved": 166,
-  "unresolved": 6
+  "resolved": 296,
+  "unresolved": 0
 }
