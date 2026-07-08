@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from lakebridge_discovery import catalog_metadata
+from lakebridge_discovery.compatibility_scanner import apply_compatibility_flags
 from lakebridge_discovery.config import LakebridgeConfig, load_config
 from lakebridge_discovery.dependency_extractor import extract_dependencies
 from lakebridge_discovery.lakebridge_runner import run_analyze
@@ -30,7 +31,7 @@ from lakebridge_discovery.output_writer import (
 )
 from lakebridge_discovery.report_parser import parse_invocation
 from lakebridge_discovery.schema import LakebridgeDiscoveryResult, LakebridgeLogEntry
-from lakebridge_discovery.source_exporter import export_source
+from lakebridge_discovery.source_exporter import export_source, export_supplementary_metadata
 
 
 def run_discovery(config: LakebridgeConfig | None = None) -> LakebridgeDiscoveryResult:
@@ -57,6 +58,14 @@ def run_discovery(config: LakebridgeConfig | None = None) -> LakebridgeDiscovery
     all_log_entries.extend(export_log_entries)
     result.export_summary = export_summary
 
+    # Supplementary catalog facts (server instance, table structural
+    # flags, proc/function parameters, server-level security) --
+    # independent of the file-staging export above, but gathered over the
+    # same source_exporter.py connection/fixture path. Never blocks the
+    # rest of the run: failures are recorded as log entries, same as
+    # export_source() above.
+    all_log_entries.extend(export_supplementary_metadata(config, result))
+
     export_dir = Path(config.source_export_dir)
     invocations = [
         run_analyze(config, export_dir / "sql", config.source_tech_sql, Path(config.output_dir) / "reports"),
@@ -74,6 +83,13 @@ def run_discovery(config: LakebridgeConfig | None = None) -> LakebridgeDiscovery
 
     extract_dependencies(result, export_dir)
     catalog_metadata.run(config, result)
+
+    # SQL-Server-feature compatibility scan -- runs after
+    # extract_dependencies() so the same export_dir is already resolved,
+    # and after report_parser.py has populated the object inventory this
+    # scan iterates over (result.tables/views/stored_procedures/functions/
+    # triggers).
+    apply_compatibility_flags(result, export_dir)
 
     statuses = [i.status for i in invocations]
     if any(s == "success" for s in statuses) and not any(s == "failed" for s in statuses):

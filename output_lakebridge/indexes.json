@@ -5,7 +5,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -13,7 +14,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -21,7 +23,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -29,7 +32,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -37,7 +41,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -45,7 +50,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -53,7 +59,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -61,7 +68,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -69,7 +77,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -77,7 +86,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -85,7 +95,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -93,7 +104,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -101,7 +113,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -109,7 +122,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -117,7 +131,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -125,7 +140,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -133,7 +149,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -141,7 +158,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -149,7 +167,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -157,7 +176,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -165,7 +185,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -173,7 +194,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -181,7 +203,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -189,7 +212,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -197,7 +221,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -205,7 +230,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -213,7 +239,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -221,7 +248,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -229,7 +257,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -237,7 +266,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -245,7 +275,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -253,7 +284,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -261,7 +293,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -269,7 +302,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -277,7 +311,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -285,7 +320,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -293,7 +329,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -301,7 +338,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -309,7 +347,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -317,7 +356,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -325,7 +365,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -333,7 +374,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -341,7 +383,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -349,7 +392,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -357,7 +401,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -365,7 +410,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -373,7 +419,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -381,7 +428,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=XML"
+    "notes": "type=XML",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -389,7 +437,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=XML"
+    "notes": "type=XML",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -397,7 +446,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=XML"
+    "notes": "type=XML",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -405,7 +455,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=XML"
+    "notes": "type=XML",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -413,7 +464,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=XML"
+    "notes": "type=XML",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -421,7 +473,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -429,7 +482,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -437,7 +491,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -445,7 +500,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -453,7 +509,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -461,7 +518,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -469,7 +527,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -477,7 +536,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -485,7 +545,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -493,7 +554,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -501,7 +563,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -509,7 +572,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -517,7 +581,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -525,7 +590,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -533,7 +599,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -541,7 +608,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -549,7 +617,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -557,7 +626,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -565,7 +635,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -573,7 +644,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -581,7 +653,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -589,7 +662,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -597,7 +671,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -605,7 +680,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -613,7 +689,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -621,7 +698,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -629,7 +707,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -637,7 +716,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -645,7 +725,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -653,7 +734,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -661,7 +743,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -669,7 +752,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -677,7 +761,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -685,7 +770,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -693,7 +779,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -701,7 +788,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -709,7 +797,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=XML"
+    "notes": "type=XML",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -717,7 +806,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=XML"
+    "notes": "type=XML",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -725,7 +815,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -733,7 +824,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -741,7 +833,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -749,7 +842,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -757,7 +851,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -765,7 +860,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -773,7 +869,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -781,7 +878,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -789,7 +887,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -797,7 +896,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -805,7 +905,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -813,7 +914,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -821,7 +923,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -829,7 +932,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -837,7 +941,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -845,7 +950,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -853,7 +959,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -861,7 +968,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -869,7 +977,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -877,7 +986,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -885,7 +995,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -893,7 +1004,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -901,7 +1013,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -909,7 +1022,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -917,7 +1031,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -925,7 +1040,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -933,7 +1049,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -941,7 +1058,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -949,7 +1067,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -957,7 +1076,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -965,7 +1085,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -973,7 +1094,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -981,7 +1103,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -989,7 +1112,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -997,7 +1121,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1005,7 +1130,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1013,7 +1139,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1021,7 +1148,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1029,7 +1157,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1037,7 +1166,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1045,7 +1175,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1053,7 +1184,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1061,7 +1193,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1069,7 +1202,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1077,7 +1211,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1085,7 +1220,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1093,7 +1229,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1101,7 +1238,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1109,7 +1247,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1117,7 +1256,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1125,7 +1265,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1133,7 +1274,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1141,7 +1283,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1149,7 +1292,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1157,7 +1301,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1165,7 +1310,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1173,7 +1319,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1181,7 +1328,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1189,7 +1337,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1197,7 +1346,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1205,7 +1355,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1213,7 +1364,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1221,7 +1373,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1229,7 +1382,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1237,7 +1391,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1245,7 +1400,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1253,7 +1409,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1261,7 +1418,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1269,7 +1427,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1277,7 +1436,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1285,7 +1445,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1293,7 +1454,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1301,7 +1463,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1309,7 +1472,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1317,7 +1481,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1325,7 +1490,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1333,7 +1499,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1341,7 +1508,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1349,7 +1517,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1357,7 +1526,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1365,7 +1535,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=NONCLUSTERED"
+    "notes": "type=NONCLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1373,7 +1544,8 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=CLUSTERED"
+    "notes": "type=CLUSTERED",
+    "compatibility_flags": []
   },
   {
     "object_type": "index",
@@ -1381,6 +1553,7 @@
     "source_tech": "MS SQL Server",
     "raw_category": "sys.indexes",
     "complexity": null,
-    "notes": "type=XML"
+    "notes": "type=XML",
+    "compatibility_flags": []
   }
 ]

@@ -181,6 +181,13 @@ class LineageResult:
     # so detection needs no name cross-referencing (unlike function calls,
     # there's no exp.Anonymous ambiguity to resolve here).
     referenced_sequences: list[str] = field(default_factory=list)
+    # True when DYNAMIC_SQL_MARKERS matched anywhere in the input text.
+    # Kept as its own boolean rather than inferred from
+    # parse_status == "unresolved" at the call site, since a statement can
+    # end up "unresolved" for reasons that have nothing to do with dynamic
+    # SQL (a genuine sqlglot parse error), and this is the field
+    # enrich_stored_procedure() wires into StoredProcedureEntity.dynamic_sql_usage.
+    dynamic_sql_detected: bool = False
 
 
 def _normalize_table_name(table: exp.Table) -> str:
@@ -289,10 +296,12 @@ def parse_lineage(sql_text: str, dialect: str = "tsql", known_function_names: fr
     empty. Pass a set of "schema.name" function names (from this
     database's own Discovery-extracted function list) to also detect
     inline user-defined-function calls (see _extract_function_calls)."""
-    if DYNAMIC_SQL_MARKERS.search(sql_text):
+    original_sql_text = sql_text
+    if DYNAMIC_SQL_MARKERS.search(original_sql_text):
         return LineageResult(
             referenced_tables=[], referenced_procs=[], parse_status="unresolved",
             unresolved_reason="dynamic SQL (sp_executesql / EXEC(@var)) -- table names not statically resolvable",
+            dynamic_sql_detected=True,
         )
 
     sql_text = _strip_unparsed_hints(sql_text)
@@ -388,6 +397,19 @@ def parse_lineage(sql_text: str, dialect: str = "tsql", known_function_names: fr
         ) if saw_unsupported else None,
         referenced_functions=sorted(functions),
         referenced_sequences=sorted(sequences),
+        # Independent re-check against the original input text, evaluated
+        # separately from the early-return path above (not just relying
+        # on that branch never having triggered) -- always False here
+        # today, since the early return already covers every
+        # DYNAMIC_SQL_MARKERS match anywhere in original_sql_text before
+        # any parsing is attempted, but this keeps the invariant "this
+        # field reflects whether dynamic SQL syntax is present anywhere
+        # in the source" explicit and self-verifying even if a future
+        # change (e.g. per-statement/per-branch splitting) makes the
+        # early-return path no longer exhaustive -- e.g. dynamic SQL
+        # confined to one branch of an IF/ELSE that the rest of the
+        # statement still parses cleanly around.
+        dynamic_sql_detected=bool(DYNAMIC_SQL_MARKERS.search(original_sql_text)),
     )
 
 
@@ -403,6 +425,7 @@ def enrich_stored_procedure(
     proc.referenced_sequences = result.referenced_sequences
     proc.parse_status = result.parse_status
     proc.unresolved_reason = result.unresolved_reason
+    proc.dynamic_sql_usage = result.dynamic_sql_detected
     return proc
 
 

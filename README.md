@@ -171,16 +171,60 @@ Top-level keys and their entity shape (see `autovista/schema.py` for exact
 dataclass definitions):
 
 ```
+server_instance     { product_version, product_level, edition, engine_edition, machine_name, instance_name,
+                       cpu_count, physical_memory_mb, max_server_memory_mb, parse_status }
+                    -- singular, not a list: one per Discovery run (server-scoped, SERVERPROPERTY()/
+                       sys.dm_os_sys_info/sys.configurations), regardless of how many databases are scanned.
+                       null if server-level discovery itself failed (see server_instance.json).
 databases[]        { name, size_mb, table_count, proc_count, view_count, parse_status }
-tables[]            { database, schema, name, row_count, size_mb, column_count, columns[], parse_status }
-views[]             { database, schema, name, referenced_tables[], parse_status }
-triggers[]          { database, schema, name, table, event, parse_status }
+tables[]            { database, schema, name, row_count, size_mb, column_count, columns[], parse_status,
+                       is_temporal_table, is_memory_optimized, is_cdc_enabled, is_change_tracking_enabled,
+                       is_partitioned, partition_count, compression }
+                    -- compression is the dominant/single data_compression_desc value across the table's
+                       partitions (sys.partitions, index_id IN (0,1)); if a table's partitions carry
+                       different compression settings, compression is reported as "MIXED (a, b, ...)"
+                       rather than silently picking one.
+views[]             { database, schema, name, referenced_tables[], parse_status, compatibility_flags[] }
+triggers[]          { database, schema, name, table, event, parse_status, compatibility_flags[] }
 agent_jobs[]        { name, enabled, steps[], parse_status }
-stored_procedures[] { database, schema, name, loc, referenced_tables[], referenced_procs[], parse_status, unresolved_reason }
+stored_procedures[] { database, schema, name, loc, referenced_tables[], referenced_procs[], parameters[],
+                       parameter_count, dynamic_sql_usage, parse_status, unresolved_reason, compatibility_flags[] }
+                    -- parameters[] (sys.parameters joined to sys.types, ordered by parameter_id) also
+                       populates FunctionEntity.parameters/parameter_count; mode is "OUT" for output
+                       parameters (sys.parameters.is_output = 1), else "IN".
+                    -- dynamic_sql_usage is set from the same dynamic-SQL detection
+                       (sp_executesql / EXEC(@var)) that already drives parse_status="unresolved"
+                       for that object -- see sql_lineage_parser.py's DYNAMIC_SQL_MARKERS.
+functions[]         { database, schema, name, function_type, return_type, parameters[], parameter_count,
+                       parse_status, compatibility_flags[] }
 packages[]          { name, project, deployment_model, tasks[], connection_managers[], variables[],
                        precedence_constraints[], embedded_sql[], parse_status }
+                    -- each embedded_sql[] entry also carries compatibility_flags[].
 dependencies[]      { source_object, source_type, target_object, target_type, relationship_type, discovery_method }
+security_principals[] { database, name, principal_type, scope, ... }
+                    -- scope is "database" (existing sys.database_principals rows, principal_type
+                       "USER"/"ROLE") or "server" (sys.server_principals rows, principal_type
+                       "LOGIN"/"SERVER_ROLE", database=""). Server-scoped rows also carry
+                       member_of_roles[] (sys.server_role_members). One discovery run only ever
+                       fetches server-scoped principals once, not once per database.
+permissions[]       { database, grantee, principal_type, scope, ... } -- same scope discriminator
+                       as security_principals[] ("server" rows: sys.server_permissions, database="").
+linked_servers[]    { name, product, provider, data_source, provider_string_redacted, parse_status }
+                    -- singular list, server-scoped (sys.servers WHERE is_linked = 1), not per-database.
+                       provider_string_redacted has any password=/pwd=... substring replaced with
+                       ***REDACTED*** (same defensive pattern as dtsx_xml_parser.py's connection-string
+                       redaction), even though this hasn't been observed to contain one in practice.
 ```
+
+**`compatibility_flags[]`** (on `stored_procedures[]`, `views[]`, `functions[]`, `triggers[]`, and each
+`packages[].embedded_sql[]` entry) is produced by `autovista/compatibility_scanner.py` scanning that
+object's already-fetched definition/SQL text for named SQL-Server-feature migration-risk constructs --
+`PIVOT`, `UNPIVOT`, `CROSS_APPLY`, `OUTER_APPLY`, `MERGE`, `OPENJSON`, `FOR_XML`, `FOR_JSON`, `OPENQUERY`,
+`OPENDATASOURCE`, `LINKED_SERVER`, `XP_CMDSHELL`, `SP_OA`. Empty list means none of these specific
+constructs were detected in that object -- not a general "this SQL is migration-clean" verdict.
+`discovery_rollup.csv` includes one `compatibility_flag` row per distinct flag with its count across
+the whole database, so `grep MERGE discovery_rollup.csv` gives a same-day answer to "how many objects
+use MERGE" without opening the manifest.
 
 **`parse_status`** appears on every entity and indicates exactly how that
 entity's data was produced — this is the traceability the Assessment phase
@@ -339,8 +383,51 @@ Writes to `./output_lakebridge/` (`LAKEBRIDGE_OUTPUT_DIR`):
   invocations, inventory, dependencies, warnings/errors, `mapping_verified`)
 - `tables.json`, `views.json`, `stored_procedures.json`, `functions.json`,
   `triggers.json`, `synonyms.json`, `schemas.json`, `packages.json`,
-  `unsupported_objects.json`, `dependencies.json` — per-category files
-- `lakebridge_rollup.csv` — flat counts
+  `unsupported_objects.json`, `dependencies.json` — per-category files,
+  from the Analyzer report inventory (`report_parser.py`). Every object in
+  `tables`/`views`/`stored_procedures`/`functions`/`triggers` also carries
+  a `compatibility_flags` list — named migration-risk constructs
+  (`PIVOT`/`UNPIVOT`/`CROSS_APPLY`/`OUTER_APPLY`/`MERGE`/`OPENJSON`/
+  `LINKED_SERVER`/`FOR_XML`/`FOR_JSON`/`OPENQUERY`/`OPENDATASOURCE`/
+  `XP_CMDSHELL`/`SP_OA`) found by scanning that object's own exported
+  definition text — see `lakebridge_discovery/compatibility_scanner.py`,
+  an independent reimplementation of `autovista/compatibility_scanner.py`'s
+  detection (never an import of it), wired in by `orchestrator.py` right
+  after dependency extraction.
+- **Supplementary catalog facts** — gathered directly by
+  `source_exporter.py`'s own live `pyodbc` connection (never from the
+  Analyzer report, which doesn't cover any of this), so these are
+  populated independently of whether the `analyze` step itself succeeds:
+  - `server_instance.json` — one `ServerInstanceEntity`
+    (`SERVERPROPERTY(...)` / `sys.dm_os_sys_info` / `sys.configurations`),
+    server-scoped, or `null` if unavailable.
+  - `table_features.json` — one `TableFeatureEntity` per table
+    (temporal/memory-optimized/CDC/change-tracking/partitioning/
+    compression flags), joinable by `(schema, name)`.
+  - `procedure_parameters.json` — one `ProcedureParameterEntity` per
+    `sys.parameters` row for every stored procedure/function in the
+    source database; `name` is the containing proc/function's name, not
+    the parameter's own name (that's `parameter_name`). Standalone rather
+    than merged into the object inventory above, since the Analyzer-report-
+    derived `LakebridgeObjectRef` has no parameters field.
+  - `server_security.json` — `{"server_principals": [...],
+    "server_permissions": [...]}`, both server-scoped
+    (`sys.server_principals`/`sys.server_role_members`/
+    `sys.server_permissions`).
+  - `linked_servers.json` — `sys.servers` filtered to linked servers,
+    with `provider_string_redacted` defensively scrubbed of any
+    `password=`/`pwd=` substring.
+
+  In `fixture` mode these are populated from plausible, clearly-marked
+  synthetic values (`server_instance.json`'s `edition`/`product_version`
+  are tagged `[FIXTURE DATA]`) parsed via plain regex out of the same
+  `fixtures/sql/ddl_sample.sql` this engine already stages for the
+  Analyzer — never via `fixtures/mock_catalog.py` (that module is SQLGlot
+  Discovery's own sqlglot-AST fixture parser).
+- `lakebridge_rollup.csv` — flat counts, including one row per
+  supplementary-metadata category above and one row per distinct
+  `compatibility_flags` value found across the object inventory (e.g.
+  `compatibility_flag,PIVOT,3`)
 - `lakebridge_log_summary.csv`, `discovery_run.log`
 - `reports/lakebridge_report_<source-tech>.xlsx` / `.json` — the raw
   Lakebridge Analyzer report(s), kept for manual inspection

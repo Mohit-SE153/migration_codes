@@ -32,6 +32,7 @@ import hashlib
 import uuid
 from datetime import datetime, timezone
 
+from autovista.compatibility_scanner import scan_compatibility_flags
 from autovista.config import AutovistaConfig, load_config
 from autovista.data_quality_analyzer import build_data_quality_summary
 from autovista.dependency_graph_builder import build_dependency_graph
@@ -136,6 +137,7 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
         db_result, log_entries = extract_database_metadata(metadata_source, database=database_name)
         all_log_entries.extend(log_entries)
 
+        manifest.server_instance = db_result.get("server_instance")
         manifest.databases = db_result["databases"]
         manifest.agent_jobs = db_result["agent_jobs"]
         manifest.database_files = db_result.get("database_files", [])
@@ -147,6 +149,7 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
         manifest.assemblies = db_result.get("assemblies", [])
         manifest.security_principals = db_result.get("security_principals", [])
         manifest.permissions = db_result.get("permissions", [])
+        manifest.linked_servers = db_result.get("linked_servers", [])
         manifest.database_summary = db_result.get("database_summary", [])
         manifest.constraints = db_result.get("constraints", [])
 
@@ -187,15 +190,19 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
             build_data_quality_summary(database_name, manifest.tables, manifest.indexes, manifest.constraints)
         ]
 
-        # --- Functions: enrich with sqlglot lineage ---
+        # --- Functions: enrich with sqlglot lineage, then scan the same
+        # definition text for SQL-Server-feature compatibility flags (one
+        # pass, not a second re-fetch) ---
         for func_entity, definition in db_result.get("functions", []):
             enrich_function(func_entity, definition, known_function_names=known_function_names)
+            func_entity.compatibility_flags = scan_compatibility_flags(definition)
             manifest.functions.append(func_entity)
             counters["scanned"] += 1
 
-        # --- Triggers: enrich with sqlglot lineage ---
+        # --- Triggers: enrich with sqlglot lineage, then compatibility-scan ---
         for trigger_entity, definition in db_result.get("triggers", []):
             enrich_trigger(trigger_entity, definition, known_function_names=known_function_names)
+            trigger_entity.compatibility_flags = scan_compatibility_flags(definition)
             manifest.triggers.append(trigger_entity)
             counters["scanned"] += 1
 
@@ -229,6 +236,7 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
                 logger.info("SKIP proc         %-45s unchanged since last run (still re-enriched)", object_id)
 
             enrich_stored_procedure(proc_entity, definition, known_function_names=known_function_names)
+            proc_entity.compatibility_flags = scan_compatibility_flags(definition)
             if proc_entity.parse_status == "unresolved":
                 llm_result = extract_with_llm_fallback(
                     llm_client, object_id, definition, llm_objects_attempted, config.llm
@@ -255,6 +263,7 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
                     database=database_name, schema=schema_name, name=view_name, definition=definition,
                     known_function_names=known_function_names, create_date=create_date, modify_date=modify_date,
                 )
+                view_entity.compatibility_flags = scan_compatibility_flags(definition)
             else:
                 view_entity = view_entry
             manifest.views.append(view_entity)
@@ -280,6 +289,7 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
 
             for embedded in package.embedded_sql:
                 enrich_embedded_sql(embedded)
+                embedded.compatibility_flags = scan_compatibility_flags(embedded.sql_text)
                 if embedded.parse_status == "unresolved":
                     llm_result = extract_with_llm_fallback(
                         llm_client, f"{object_id}::{embedded.task_name}", embedded.sql_text,

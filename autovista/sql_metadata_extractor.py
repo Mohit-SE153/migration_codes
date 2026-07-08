@@ -17,6 +17,7 @@ Two `MetadataSource` implementations:
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Protocol
 
@@ -32,10 +33,12 @@ from autovista.schema import (
     FileEntity,
     FunctionEntity,
     IndexEntity,
+    LinkedServerEntity,
     ParameterEntity,
     PermissionEntity,
     SequenceEntity,
     SecurityPrincipalEntity,
+    ServerInstanceEntity,
     StoredProcedureEntity,
     SynonymEntity,
     TableEntity,
@@ -71,11 +74,102 @@ def _decode_int_time(value) -> str | None:
     return f"{s[0:2]}:{s[2:4]}:{s[4:6]}"
 
 
+# Mirrors dtsx_xml_parser.py's _redact_connection_string -- duplicated
+# rather than imported (same "small, self-contained piece" call
+# dependency_graph_builder.py already makes for _PSEUDO_TABLES) since
+# this module has no other reason to depend on the SSIS-specific parser
+# module. Used defensively on sys.servers.provider_string (Phase 2.5,
+# linked-server discovery), which CAN embed a password in some OLE DB/
+# ODBC provider connection strings even though this hasn't been observed
+# to contain one in practice.
+_CONN_STRING_SECRET_PATTERN = re.compile(r"(?i)(password|pwd)\s*=\s*[^;]*")
+
+
+def _redact_connection_string(conn_str: str) -> str:
+    return _CONN_STRING_SECRET_PATTERN.sub(r"\1=***REDACTED***", conn_str)
+
+
 def _decode_schedule_frequency(freq_type, freq_interval) -> str:
     label = _JOB_FREQ_TYPE.get(freq_type, "Unknown")
     if freq_type in (4, 8, 16) and freq_interval:
         return f"{label} (interval={freq_interval})"
     return label
+
+# --- Server/instance-level discovery (Phase 1.2) -- server-scoped, not
+# per-database. SERVERPROPERTY() is available to any login with CONNECT
+# permission (no elevated permission needed), so this base query is never
+# wrapped in try/except, unlike the two below.
+QUERY_SERVER_PROPERTIES = """
+SELECT
+    CAST(SERVERPROPERTY('ProductVersion') AS NVARCHAR(128)) AS product_version,
+    CAST(SERVERPROPERTY('ProductLevel') AS NVARCHAR(128)) AS product_level,
+    CAST(SERVERPROPERTY('Edition') AS NVARCHAR(128)) AS edition,
+    CAST(SERVERPROPERTY('EngineEdition') AS INT) AS engine_edition,
+    CAST(SERVERPROPERTY('MachineName') AS NVARCHAR(128)) AS machine_name,
+    CAST(SERVERPROPERTY('InstanceName') AS NVARCHAR(128)) AS instance_name
+"""
+
+# sys.dm_os_sys_info is a sys.dm_* DMV -- requires VIEW SERVER STATE, which
+# the read-only discovery account (see README) isn't guaranteed to have.
+QUERY_SERVER_SYS_INFO = """
+SELECT cpu_count, physical_memory_kb
+FROM sys.dm_os_sys_info
+"""
+
+# sys.configurations.value_in_use for 'max server memory (MB)' is visible
+# to any login, but querying it can still be restricted on some locked-down
+# instances -- wrapped defensively like the DMV above rather than assumed
+# always-available.
+QUERY_SERVER_MAX_MEMORY = """
+SELECT CAST(value_in_use AS INT) AS max_server_memory_mb
+FROM sys.configurations
+WHERE name = 'max server memory (MB)'
+"""
+
+# --- Server-level security discovery (Phase 2.5) -- server-scoped, not
+# per-database. Plain catalog views (not sys.dm_*/msdb), so -- consistent
+# with QUERY_SECURITY/QUERY_PERMISSIONS (their database-scoped
+# equivalents) being unwrapped -- these are not wrapped in try/except
+# either; a login with VIEW ANY DEFINITION (the discovery account's
+# documented minimum, see README) can read all of them.
+#
+# type: 'S' = SQL login, 'U' = Windows login, 'G' = Windows group,
+# 'R' = server role.
+QUERY_SERVER_PRINCIPALS = """
+SELECT sp.name, sp.type, sp.is_disabled, sp.is_fixed_role, sp.default_database_name
+FROM sys.server_principals sp
+WHERE sp.type IN ('S', 'U', 'G', 'R')
+"""
+
+QUERY_SERVER_ROLE_MEMBERS = """
+SELECT role.name AS role_name, member.name AS member_name
+FROM sys.server_role_members rm
+JOIN sys.server_principals role ON role.principal_id = rm.role_principal_id
+JOIN sys.server_principals member ON member.principal_id = rm.member_principal_id
+"""
+
+# major_id's meaning depends on class_desc (SQL Server's permissions
+# catalog is class-polymorphic) -- the only class this query resolves a
+# target name for is SERVER_PRINCIPAL (e.g. IMPERSONATE granted on
+# another login), since that's the common, directly-resolvable case;
+# other classes (ENDPOINT, AVAILABILITY GROUP, ...) are out of scope and
+# leave object_name NULL rather than guessing.
+QUERY_SERVER_PERMISSIONS = """
+SELECT sp.name AS grantee_name, sp.type AS principal_type, perm.class_desc,
+       tgt.name AS object_name, perm.permission_name, perm.state_desc
+FROM sys.server_permissions perm
+JOIN sys.server_principals sp ON sp.principal_id = perm.grantee_principal_id
+LEFT JOIN sys.server_principals tgt ON tgt.principal_id = perm.major_id AND perm.class_desc = 'SERVER_PRINCIPAL'
+"""
+
+# is_linked = 1 excludes the row sys.servers always carries for the local
+# server itself (server_id = 0, is_linked = 0) -- only real linked-server
+# definitions are wanted here.
+QUERY_LINKED_SERVERS = """
+SELECT name, product, provider, data_source, provider_string
+FROM sys.servers
+WHERE is_linked = 1
+"""
 
 QUERY_DATABASES = """
 SELECT d.name, SUM(mf.size) * 8.0 / 1024 AS size_mb
@@ -138,6 +232,43 @@ LEFT JOIN sys.allocation_units a ON a.container_id = ps.partition_id
 GROUP BY s.name, t.name, t.create_date, t.modify_date, t.object_id
 """
 
+# --- Table structural flags (Phase 1.1) --------------------------------
+# Kept as separate per-database queries rather than folded into
+# QUERY_TABLES (which already GROUP BYs across sys.dm_db_partition_stats/
+# sys.allocation_units for size -- adding these would either force more
+# GROUP BY columns onto that aggregate or double-count rows). Joined back
+# onto QUERY_TABLES's rows by (schema_name, table_name) in Python, one
+# call each for the whole database rather than per-table.
+#
+# sys.tables.temporal_type: 0 = none, 1 = history table, 2 = the
+# system-versioned table itself (has a history table). Both 1 and 2 mean
+# "this table participates in temporal versioning."
+# sys.change_tracking_tables has one row per table with change tracking
+# enabled (via ALTER DATABASE ... SET CHANGE_TRACKING then ALTER TABLE
+# ... ENABLE CHANGE_TRACKING) -- existence, not a flag column.
+QUERY_TABLE_FEATURES = """
+SELECT s.name AS schema_name, t.name AS table_name, t.temporal_type, t.is_memory_optimized, t.is_tracked_by_cdc,
+       CASE WHEN ctt.object_id IS NOT NULL THEN 1 ELSE 0 END AS is_change_tracking_enabled
+FROM sys.tables t
+JOIN sys.schemas s ON s.schema_id = t.schema_id
+LEFT JOIN sys.change_tracking_tables ctt ON ctt.object_id = t.object_id
+"""
+
+# Partition count + per-partition compression, scoped to index_id IN (0, 1)
+# (heap or clustered index -- the table's own row storage). Secondary
+# nonclustered indexes (index_id > 1) can carry independent compression
+# settings and partition counts of their own, which would misrepresent
+# "how many partitions does this table have" if included here -- that's a
+# separate, index-level concern already covered by IndexEntity.
+QUERY_TABLE_PARTITION_COMPRESSION = """
+SELECT s.name AS schema_name, t.name AS table_name, p.partition_number, p.data_compression_desc
+FROM sys.partitions p
+JOIN sys.tables t ON t.object_id = p.object_id
+JOIN sys.schemas s ON s.schema_id = t.schema_id
+WHERE p.index_id IN (0, 1)
+ORDER BY s.name, t.name, p.partition_number
+"""
+
 QUERY_COLUMNS = """
 SELECT c.name, ty.name AS data_type, c.is_nullable, c.column_id,
        dc.definition AS default_constraint,
@@ -172,6 +303,21 @@ SELECT s.name AS schema_name, p.name AS proc_name, m.definition, p.create_date, 
 FROM sys.procedures p
 JOIN sys.schemas s ON s.schema_id = p.schema_id
 JOIN sys.sql_modules m ON m.object_id = p.object_id
+"""
+
+# --- Parameter discovery (Phase 1.3) -- one whole-database query shared by
+# both list_procedures() and list_functions() (sys.parameters is keyed by
+# object_id regardless of whether that object is a proc or a function), so
+# each proc/function build loop just does an in-memory dict lookup instead
+# of N+1 per-object queries. parameter_id = 0 (the function return value --
+# already used for FunctionEntity.return_type via QUERY_FUNCTIONS' own
+# join) is excluded here since it isn't a real parameter.
+QUERY_PARAMETERS = """
+SELECT p.object_id, p.parameter_id, p.name, ty.name AS data_type, p.is_output
+FROM sys.parameters p
+JOIN sys.types ty ON ty.user_type_id = p.user_type_id
+WHERE p.parameter_id > 0
+ORDER BY p.object_id, p.parameter_id
 """
 
 QUERY_TRIGGERS = """
@@ -224,6 +370,16 @@ WHERE h.step_id = 0
   )
 """
 
+# NOT used by LiveSqlServerSource itself as of Phase 2.7 -- FK discovery
+# was consolidated onto QUERY_FOREIGN_KEY_CONSTRAINTS as the single
+# source of truth (see _fetch_foreign_key_constraints / list_foreign_keys
+# below), so this query no longer runs as a second, independent live
+# query for the same underlying sys.foreign_keys data. Left defined here
+# (not deleted) because tools/dependency_validator/sql_server_catalog.py
+# imports this exact constant as its own independent ground-truth query
+# for foreign keys -- removing it would break that import. If touching
+# the validator's ground-truth source is ever in scope, prefer pointing
+# it at QUERY_FOREIGN_KEY_CONSTRAINTS instead of deleting this constant.
 QUERY_FOREIGN_KEYS = """
 SELECT ps.name AS parent_schema, pt.name AS parent_table, rs.name AS ref_schema, rt.name AS ref_table
 FROM sys.foreign_keys fk
@@ -451,6 +607,10 @@ _RELEVANT_DEPENDENCY_CLASSES = frozenset({"OBJECT_OR_COLUMN", "TYPE", "XML_NAMES
 
 
 class MetadataSource(Protocol):
+    def list_server_instance(self) -> ServerInstanceEntity | None: ...  # server-scoped, not per-database
+    def list_server_security_principals(self) -> list[SecurityPrincipalEntity]: ...  # server-scoped
+    def list_server_permissions(self) -> list[PermissionEntity]: ...  # server-scoped
+    def list_linked_servers(self) -> list[LinkedServerEntity]: ...  # server-scoped
     def list_databases(self) -> list[DatabaseEntity]: ...
     def list_tables(self, database: str) -> list[TableEntity]: ...
     def list_procedures(self, database: str) -> list[tuple[StoredProcedureEntity, str]]: ...  # (entity, definition text)
@@ -550,6 +710,99 @@ class LiveSqlServerSource:
         except Exception:
             pass  # msdb backup/restore history unavailable -- leave fields at their defaults (None)
 
+    def list_server_instance(self) -> ServerInstanceEntity | None:
+        """Server-scoped (not per-database) -- the caller invokes this
+        once per run regardless of database context."""
+        cur = self.connection.cursor()
+        cur.execute(QUERY_SERVER_PROPERTIES)
+        row = cur.fetchone()
+        if row is None:
+            return None
+        product_version, product_level, edition, engine_edition, machine_name, instance_name = row
+        entity = ServerInstanceEntity(
+            product_version=product_version,
+            product_level=product_level,
+            edition=edition,
+            engine_edition=int(engine_edition) if engine_edition is not None else None,
+            machine_name=machine_name,
+            instance_name=instance_name,
+        )
+
+        try:
+            cur = self.connection.cursor()
+            cur.execute(QUERY_SERVER_SYS_INFO)
+            sys_row = cur.fetchone()
+            if sys_row:
+                cpu_count, physical_memory_kb = sys_row
+                entity.cpu_count = int(cpu_count) if cpu_count is not None else None
+                entity.physical_memory_mb = (
+                    round(float(physical_memory_kb) / 1024.0, 2) if physical_memory_kb is not None else None
+                )
+        except Exception:
+            pass  # sys.dm_os_sys_info requires VIEW SERVER STATE -- leave cpu_count/physical_memory_mb at defaults
+
+        try:
+            cur = self.connection.cursor()
+            cur.execute(QUERY_SERVER_MAX_MEMORY)
+            mem_row = cur.fetchone()
+            if mem_row and mem_row[0] is not None:
+                entity.max_server_memory_mb = int(mem_row[0])
+        except Exception:
+            pass  # sys.configurations restricted -- leave max_server_memory_mb at default
+
+        return entity
+
+    def list_server_security_principals(self) -> list[SecurityPrincipalEntity]:
+        """Server-scoped logins (SQL/Windows/group) and server roles, with
+        server-role membership attached. Called once per run, not once
+        per database -- same placement as list_server_instance()."""
+        role_members: dict[str, list[str]] = {}
+        cur = self.connection.cursor()
+        cur.execute(QUERY_SERVER_ROLE_MEMBERS)
+        for role_name, member_name in cur.fetchall():
+            role_members.setdefault(member_name, []).append(role_name)
+
+        cur = self.connection.cursor()
+        cur.execute(QUERY_SERVER_PRINCIPALS)
+        out = []
+        for name, principal_type_code, is_disabled, is_fixed_role, default_database_name in cur.fetchall():
+            out.append(
+                SecurityPrincipalEntity(
+                    database="",
+                    name=name,
+                    principal_type="SERVER_ROLE" if principal_type_code == "R" else "LOGIN",
+                    default_schema=default_database_name,
+                    is_fixed_role=bool(is_fixed_role) if is_fixed_role is not None else None,
+                    is_disabled=bool(is_disabled) if is_disabled is not None else None,
+                    scope="server",
+                    member_of_roles=role_members.get(name, []),
+                )
+            )
+        return out
+
+    def list_server_permissions(self) -> list[PermissionEntity]:
+        cur = self.connection.cursor()
+        cur.execute(QUERY_SERVER_PERMISSIONS)
+        return [
+            PermissionEntity(
+                database="", grantee=grantee_name, principal_type=principal_type,
+                class_desc=class_desc, object_name=object_name,
+                permission_name=permission_name, state_desc=state_desc, scope="server",
+            )
+            for grantee_name, principal_type, class_desc, object_name, permission_name, state_desc in cur.fetchall()
+        ]
+
+    def list_linked_servers(self) -> list[LinkedServerEntity]:
+        cur = self.connection.cursor()
+        cur.execute(QUERY_LINKED_SERVERS)
+        return [
+            LinkedServerEntity(
+                name=name, product=product, provider=provider, data_source=data_source,
+                provider_string_redacted=_redact_connection_string(provider_string) if provider_string else None,
+            )
+            for name, product, provider, data_source, provider_string in cur.fetchall()
+        ]
+
     def list_databases(self) -> list[DatabaseEntity]:
         cur = self.connection.cursor()
         cur.execute(QUERY_DATABASES)
@@ -592,10 +845,43 @@ class LiveSqlServerSource:
         size_row = cur.fetchone()
         total_database_size_mb = float(size_row[1]) if size_row else 0.0
 
+        # (schema_name, table_name) -> (temporal_type, is_memory_optimized,
+        # is_tracked_by_cdc, is_change_tracking_enabled)
+        features_by_table: dict[tuple[str, str], tuple] = {}
+        cur = self.connection.cursor()
+        cur.execute(QUERY_TABLE_FEATURES)
+        for schema_name, table_name, temporal_type, is_memory_optimized, is_tracked_by_cdc, is_change_tracking_enabled in cur.fetchall():
+            features_by_table[(schema_name, table_name)] = (
+                temporal_type, is_memory_optimized, is_tracked_by_cdc, is_change_tracking_enabled,
+            )
+
+        # (schema_name, table_name) -> [(partition_number, data_compression_desc), ...]
+        partitions_by_table: dict[tuple[str, str], list[tuple[int, str]]] = {}
+        cur = self.connection.cursor()
+        cur.execute(QUERY_TABLE_PARTITION_COMPRESSION)
+        for schema_name, table_name, partition_number, data_compression_desc in cur.fetchall():
+            partitions_by_table.setdefault((schema_name, table_name), []).append(
+                (partition_number, data_compression_desc)
+            )
+
         cur = self.connection.cursor()
         cur.execute(QUERY_TABLES)
         tables = []
         for schema_name, table_name, create_date, modify_date, table_type, row_count, size_mb, nonclustered_index_count, foreign_key_count, referenced_table_count, referencing_table_count, trigger_count, reserved_pages, used_pages, data_pages in cur.fetchall():
+            temporal_type, is_memory_optimized, is_tracked_by_cdc, is_change_tracking_enabled = features_by_table.get(
+                (schema_name, table_name), (0, False, False, False)
+            )
+            partitions = partitions_by_table.get((schema_name, table_name), [])
+            partition_count = len(partitions)
+            compression_descs = sorted({desc for _, desc in partitions if desc})
+            if len(compression_descs) > 1:
+                # A table can have mixed compression per partition (e.g.
+                # only the oldest partition compressed) -- reported
+                # explicitly rather than silently picking one.
+                compression = f"MIXED ({', '.join(compression_descs)})"
+            else:
+                compression = compression_descs[0] if compression_descs else None
+
             col_cur = self.connection.cursor()
             col_cur.execute(QUERY_COLUMNS, f"[{schema_name}].[{table_name}]")
             columns = []
@@ -656,17 +942,42 @@ class LiveSqlServerSource:
                     identity_columns=[c.name for c in columns if c.identity_seed is not None],
                     computed_columns=[c.name for c in columns if c.computed_expression is not None],
                     sparse_columns=[c.name for c in columns if c.is_sparse],
+                    is_temporal_table=temporal_type in (1, 2),
+                    is_memory_optimized=bool(is_memory_optimized),
+                    is_cdc_enabled=bool(is_tracked_by_cdc),
+                    is_change_tracking_enabled=bool(is_change_tracking_enabled),
+                    is_partitioned=partition_count > 1,
+                    partition_count=partition_count,
+                    compression=compression,
                 )
             )
         tables.sort(key=lambda t: t.size_mb, reverse=True)
         return tables
 
+    def _fetch_parameters_by_object_id(self) -> dict[int, list[ParameterEntity]]:
+        """One whole-database query (QUERY_PARAMETERS), shared by
+        list_procedures() and list_functions() -- see that query's
+        docstring. Not permission-sensitive (sys.parameters/sys.types are
+        plain catalog views), so not wrapped in try/except -- consistent
+        with QUERY_PROCEDURES/QUERY_FUNCTIONS themselves."""
+        cur = self.connection.cursor()
+        cur.execute(QUERY_PARAMETERS)
+        params_by_object: dict[int, list[ParameterEntity]] = {}
+        for object_id, _parameter_id, name, data_type, is_output in cur.fetchall():
+            params_by_object.setdefault(object_id, []).append(
+                ParameterEntity(name=name, data_type=data_type, mode="OUT" if is_output else "IN")
+            )
+        return params_by_object
+
     def list_procedures(self, database: str) -> list[tuple[StoredProcedureEntity, str]]:
         self._use_database(database)
+        params_by_object = self._fetch_parameters_by_object_id()
         cur = self.connection.cursor()
         cur.execute(QUERY_PROCEDURES)
-        return [
-            (
+        out = []
+        for schema_name, proc_name, definition, create_date, modify_date, is_encrypted, execute_as_principal_id, object_id in cur.fetchall():
+            parameters = params_by_object.get(object_id, [])
+            out.append((
                 StoredProcedureEntity(
                     database=database,
                     schema=schema_name,
@@ -676,13 +987,13 @@ class LiveSqlServerSource:
                     modify_date=self._format_datetime(modify_date),
                     is_encrypted=bool(is_encrypted),
                     execute_as=repr(execute_as_principal_id),
-                    parameter_count=0,
+                    parameters=parameters,
+                    parameter_count=len(parameters),
                     parse_status="direct_metadata",
                 ),
                 definition,
-            )
-            for schema_name, proc_name, definition, create_date, modify_date, is_encrypted, execute_as_principal_id, _ in cur.fetchall()
-        ]
+            ))
+        return out
 
     def list_triggers(self, database: str) -> list[tuple[TriggerEntity, str]]:
         self._use_database(database)
@@ -811,10 +1122,14 @@ class LiveSqlServerSource:
         ]
 
     def list_foreign_keys(self, database: str) -> list[tuple[str, str]]:
-        self._use_database(database)
-        cur = self.connection.cursor()
-        cur.execute(QUERY_FOREIGN_KEYS)
-        return [(f"{ps}.{pt}", f"{rs}.{rt}") for ps, pt, rs, rt in cur.fetchall()]
+        """Derived from the same FK rows list_constraints() produces (see
+        _fetch_foreign_key_constraints) rather than a second, independent
+        live query -- Phase 2.7 consolidation, see that method's
+        docstring. Protocol shape is unchanged: still (from "schema.table",
+        to "schema.table") tuples, dependency_graph_builder.py's
+        table->table "foreign_key" edges are unaffected."""
+        fk_constraints = self._fetch_foreign_key_constraints(database)
+        return [(f"{c.schema}.{c.table}", c.referenced_table) for c in fk_constraints]
 
     def list_indexes(self, database: str) -> list[IndexEntity]:
         self._use_database(database)
@@ -922,15 +1237,21 @@ class LiveSqlServerSource:
 
     def list_functions(self, database: str) -> list[tuple[FunctionEntity, str]]:
         self._use_database(database)
+        params_by_object = self._fetch_parameters_by_object_id()
         cur = self.connection.cursor()
         cur.execute(QUERY_FUNCTIONS)
-        return [
-            (
-                FunctionEntity(database=database, schema=schema_name, name=function_name, function_type=function_type or 'SCALAR', return_type=return_type),
+        out = []
+        for schema_name, function_name, function_type, return_type, object_id, definition in cur.fetchall():
+            parameters = params_by_object.get(object_id, [])
+            out.append((
+                FunctionEntity(
+                    database=database, schema=schema_name, name=function_name,
+                    function_type=function_type or 'SCALAR', return_type=return_type,
+                    parameters=parameters, parameter_count=len(parameters),
+                ),
                 definition or "",
-            )
-            for schema_name, function_name, function_type, return_type, _, definition in cur.fetchall()
-        ]
+            ))
+        return out
 
     def list_synonyms(self, database: str) -> list[SynonymEntity]:
         self._use_database(database)
@@ -1028,6 +1349,36 @@ class LiveSqlServerSource:
             )
         ]
 
+    def _fetch_foreign_key_constraints(self, database: str) -> list[ConstraintEntity]:
+        """Runs QUERY_FOREIGN_KEY_CONSTRAINTS and groups rows into one
+        ConstraintEntity per FK (a composite-key FK spans multiple rows,
+        one per column pair). Shared by list_constraints() (the
+        authoritative constraint list) and list_foreign_keys() (a thin
+        (from, to) tuple derivation over these SAME rows) -- Phase 2.7:
+        previously QUERY_FOREIGN_KEYS was a second, independent live query
+        for the same underlying sys.foreign_keys data, which could drift
+        from QUERY_FOREIGN_KEY_CONSTRAINTS (e.g. one join getting fixed/
+        extended without the other). Now there is exactly one source of
+        truth for FK metadata."""
+        self._use_database(database)
+        cur = self.connection.cursor()
+        cur.execute(QUERY_FOREIGN_KEY_CONSTRAINTS)
+        fks: dict[tuple, ConstraintEntity] = {}
+        for (parent_schema, parent_table, constraint_name, ref_schema, ref_table, parent_column, ref_column,
+             _, delete_action, update_action, is_not_trusted, is_disabled, is_system_named) in cur.fetchall():
+            key = (parent_schema, parent_table, constraint_name)
+            entity = fks.setdefault(key, ConstraintEntity(
+                database=database, schema=parent_schema, table=parent_table, name=constraint_name,
+                constraint_type="FOREIGN_KEY",
+                referenced_table=f"{ref_schema}.{ref_table}",
+                delete_action=delete_action, update_action=update_action,
+                is_trusted=not bool(is_not_trusted), is_disabled=bool(is_disabled),
+                is_system_named=bool(is_system_named),
+            ))
+            entity.columns.append(parent_column)
+            entity.referenced_columns.append(ref_column)
+        return list(fks.values())
+
     def list_constraints(self, database: str) -> list[ConstraintEntity]:
         self._use_database(database)
         constraints: list[ConstraintEntity] = []
@@ -1045,23 +1396,7 @@ class LiveSqlServerSource:
             entity.columns.append(column_name)
         constraints.extend(pk_unique.values())
 
-        cur = self.connection.cursor()
-        cur.execute(QUERY_FOREIGN_KEY_CONSTRAINTS)
-        fks: dict[tuple, ConstraintEntity] = {}
-        for (parent_schema, parent_table, constraint_name, ref_schema, ref_table, parent_column, ref_column,
-             _, delete_action, update_action, is_not_trusted, is_disabled, is_system_named) in cur.fetchall():
-            key = (parent_schema, parent_table, constraint_name)
-            entity = fks.setdefault(key, ConstraintEntity(
-                database=database, schema=parent_schema, table=parent_table, name=constraint_name,
-                constraint_type="FOREIGN_KEY",
-                referenced_table=f"{ref_schema}.{ref_table}",
-                delete_action=delete_action, update_action=update_action,
-                is_trusted=not bool(is_not_trusted), is_disabled=bool(is_disabled),
-                is_system_named=bool(is_system_named),
-            ))
-            entity.columns.append(parent_column)
-            entity.referenced_columns.append(ref_column)
-        constraints.extend(fks.values())
+        constraints.extend(self._fetch_foreign_key_constraints(database))
 
         cur = self.connection.cursor()
         cur.execute(QUERY_CHECK_CONSTRAINTS)
@@ -1117,6 +1452,67 @@ class FixtureMetadataSource:
 
     catalog: "object"
 
+    def list_server_instance(self) -> ServerInstanceEntity | None:
+        return ServerInstanceEntity(
+            product_version="16.0.4115.5",
+            product_level="RTM",
+            edition="Developer Edition (64-bit)",
+            engine_edition=3,  # 3 = Enterprise/Developer/Evaluation
+            machine_name="FIXTURE-SQLHOST",
+            instance_name=None,  # default instance
+            cpu_count=8,
+            physical_memory_mb=32768.0,
+            max_server_memory_mb=24576,
+        )
+
+    def list_server_security_principals(self) -> list[SecurityPrincipalEntity]:
+        return [
+            SecurityPrincipalEntity(
+                database="", name="sa", principal_type="LOGIN", is_fixed_role=False, is_disabled=False,
+                scope="server", member_of_roles=["sysadmin"],
+            ),
+            SecurityPrincipalEntity(
+                database="", name="svc_autovista_readonly", principal_type="LOGIN",
+                is_fixed_role=False, is_disabled=False, scope="server", member_of_roles=["public"],
+            ),
+            SecurityPrincipalEntity(
+                database="", name="sysadmin", principal_type="SERVER_ROLE",
+                is_fixed_role=True, is_disabled=False, scope="server", member_of_roles=[],
+            ),
+            SecurityPrincipalEntity(
+                database="", name="public", principal_type="SERVER_ROLE",
+                is_fixed_role=True, is_disabled=False, scope="server", member_of_roles=[],
+            ),
+        ]
+
+    def list_server_permissions(self) -> list[PermissionEntity]:
+        return [
+            PermissionEntity(
+                database="", grantee="svc_autovista_readonly", principal_type="S",
+                class_desc="SERVER", permission_name="VIEW SERVER STATE", state_desc="GRANT", scope="server",
+            ),
+            PermissionEntity(
+                database="", grantee="svc_autovista_readonly", principal_type="S",
+                class_desc="SERVER", permission_name="VIEW ANY DEFINITION", state_desc="GRANT", scope="server",
+            ),
+        ]
+
+    def list_linked_servers(self) -> list[LinkedServerEntity]:
+        # One representative linked server, with its provider_string
+        # deliberately containing a password to prove the redaction path
+        # actually strips it in fixture output too, not just live mode.
+        return [
+            LinkedServerEntity(
+                name="LEGACY_REPORTING_SRV",
+                product="SQL Server",
+                provider="SQLNCLI",
+                data_source="legacy-reporting.internal,1433",
+                provider_string_redacted=_redact_connection_string(
+                    "Data Source=legacy-reporting.internal;User ID=svc_link;Password=Fixture#Only1"
+                ),
+            )
+        ]
+
     def list_databases(self) -> list[DatabaseEntity]:
         c = self.catalog
         return [
@@ -1159,12 +1555,34 @@ class FixtureMetadataSource:
 
     def list_tables(self, database: str) -> list[TableEntity]:
         c = self.catalog
+        # Structural-flag demo values (Phase 1.1) -- one table per
+        # interesting flag, keyed by "schema.name", so fixture-mode output
+        # actually exercises these fields end-to-end instead of every
+        # table reporting False/None. Picked from real fixture DDL tables
+        # (fixtures/sql/ddl_sample.sql): Orders is the natural CDC
+        # candidate (high-churn transactional table), OrderDetails for
+        # change tracking, ArchiveOrders for temporal (it's already an
+        # archive/history-shaped table), and one staging landing table for
+        # memory-optimized (SSIS staging tables are a common real-world
+        # memory-optimized-table use case).
+        cdc_tables = {"dbo.Orders"}
+        change_tracking_tables = {"dbo.OrderDetails"}
+        temporal_tables = {"dbo.ArchiveOrders"}
+        memory_optimized_tables = {"staging.stg_Customers"}
+        partitioned_tables = {"dbo.Orders": (4, ["PAGE", "PAGE", "ROW", "NONE"])}  # mixed compression, on purpose
+
         out = []
         for key, t in c.tables.items():
             columns = [
                 ColumnEntity(name=col.name, data_type=col.data_type, nullable=col.nullable, ordinal_position=col.ordinal_position, identity_seed=1 if col.name == "OrderId" else None, identity_increment=1 if col.name == "OrderId" else None, is_part_of_pk=col.name == "OrderId", is_nullable=(False if col.name == "OrderId" else col.nullable))
                 for col in t.columns
             ]
+            partition_count, compression_descs = partitioned_tables.get(key, (1, ["NONE"]))
+            distinct_compressions = sorted(set(compression_descs))
+            compression = (
+                f"MIXED ({', '.join(distinct_compressions)})" if len(distinct_compressions) > 1
+                else distinct_compressions[0]
+            )
             out.append(
                 TableEntity(
                     database=database,
@@ -1177,6 +1595,7 @@ class FixtureMetadataSource:
                     create_date="2024-01-01T00:00:00",
                     modify_date="2024-06-15T00:00:00",
                     table_type="CLUSTERED",
+                    compression=compression,
                     index_count=2,
                     nonclustered_index_count=1,
                     foreign_key_count=1,
@@ -1188,12 +1607,12 @@ class FixtureMetadataSource:
                     sparse_columns=[],
                     rowguid_columns=[],
                     lob_columns=[],
-                    is_temporal_table=False,
-                    is_memory_optimized=False,
-                    is_cdc_enabled=False,
-                    is_change_tracking_enabled=False,
-                    is_partitioned=False,
-                    partition_count=1,
+                    is_temporal_table=key in temporal_tables,
+                    is_memory_optimized=key in memory_optimized_tables,
+                    is_cdc_enabled=key in cdc_tables,
+                    is_change_tracking_enabled=key in change_tracking_tables,
+                    is_partitioned=partition_count > 1,
+                    partition_count=partition_count,
                     estimated_reserved_pages=100,
                     used_pages=80,
                     data_pages=70,
@@ -1204,8 +1623,20 @@ class FixtureMetadataSource:
 
     def list_procedures(self, database: str) -> list[tuple[StoredProcedureEntity, str]]:
         c = self.catalog
-        return [
-            (
+        # Real parameter declarations from the fixture DDL (fixtures/sql/
+        # ddl_sample.sql) -- most fixture procs take no parameters;
+        # usp_ArchiveOldOrders/usp_DynamicReportBuilder are the two that do.
+        parameters_by_proc = {
+            "usp_ArchiveOldOrders": [ParameterEntity(name="CutoffDate", data_type="datetime2", mode="IN")],
+            "usp_DynamicReportBuilder": [
+                ParameterEntity(name="TableName", data_type="sysname", mode="IN"),
+                ParameterEntity(name="RegionFilter", data_type="nvarchar", mode="IN"),
+            ],
+        }
+        out = []
+        for p in c.procedures.values():
+            parameters = parameters_by_proc.get(p.name, [])
+            out.append((
                 StoredProcedureEntity(
                     database=database,
                     schema=p.schema,
@@ -1215,14 +1646,14 @@ class FixtureMetadataSource:
                     modify_date="2024-06-15T00:00:00",
                     is_encrypted=False,
                     execute_as="dbo",
-                    parameter_count=2,
+                    parameters=parameters,
+                    parameter_count=len(parameters),
                     dynamic_sql_usage=False,
                     parse_status="direct_metadata",
                 ),
                 p.definition,
-            )
-            for p in c.procedures.values()
-        ]
+            ))
+        return out
 
     def list_triggers(self, database: str) -> list[tuple[TriggerEntity, str]]:
         c = self.catalog
@@ -1244,7 +1675,14 @@ class FixtureMetadataSource:
         ]
 
     def list_foreign_keys(self, database: str) -> list[tuple[str, str]]:
-        return list(self.catalog.foreign_keys)
+        """Derived from list_constraints()'s FOREIGN_KEY rows (same
+        single-source-of-truth principle as LiveSqlServerSource's Phase
+        2.7 consolidation -- see that class's _fetch_foreign_key_constraints
+        docstring) rather than reading self.catalog.foreign_keys
+        independently, so fixture mode can't have the two drift from each
+        other either."""
+        fk_constraints = [c for c in self.list_constraints(database) if c.constraint_type == "FOREIGN_KEY"]
+        return [(f"{c.schema}.{c.table}", c.referenced_table) for c in fk_constraints]
 
     def list_indexes(self, database: str) -> list[IndexEntity]:
         return [
@@ -1264,15 +1702,23 @@ class FixtureMetadataSource:
     def list_functions(self, database: str) -> list[tuple[FunctionEntity, str]]:
         # Two functions, one calling the other and reading a table, so
         # fixture mode demonstrates Function->Table and Function->Function
-        # detection without needing real live SQL Server metadata.
+        # detection without needing real live SQL Server metadata. Both
+        # take a single @OrderId INT parameter, matching their definitions
+        # below verbatim.
         return [
             (
-                FunctionEntity(database=database, schema="dbo", name="ufn_GetOrderStatus", function_type="SCALAR"),
+                FunctionEntity(
+                    database=database, schema="dbo", name="ufn_GetOrderStatus", function_type="SCALAR",
+                    parameters=[ParameterEntity(name="OrderId", data_type="int", mode="IN")], parameter_count=1,
+                ),
                 "CREATE FUNCTION dbo.ufn_GetOrderStatus(@OrderId INT) RETURNS NVARCHAR(20) AS "
                 "BEGIN RETURN (SELECT dbo.ufn_GetOrderStatusLabel(o.OrderId) FROM dbo.Orders o WHERE o.OrderId = @OrderId) END",
             ),
             (
-                FunctionEntity(database=database, schema="dbo", name="ufn_GetOrderStatusLabel", function_type="SCALAR"),
+                FunctionEntity(
+                    database=database, schema="dbo", name="ufn_GetOrderStatusLabel", function_type="SCALAR",
+                    parameters=[ParameterEntity(name="OrderId", data_type="int", mode="IN")], parameter_count=1,
+                ),
                 "CREATE FUNCTION dbo.ufn_GetOrderStatusLabel(@OrderId INT) RETURNS NVARCHAR(20) AS "
                 "BEGIN RETURN 'Open' END",
             ),
@@ -1349,6 +1795,28 @@ def extract_database_metadata(source: MetadataSource, database: str):
     """Runs the full database-level extraction for one database, isolating
     each entity type's failures via @log_object_result so e.g. a broken
     trigger query doesn't take down table extraction."""
+
+    @log_object_result("server_instance")
+    def _server_instance(name):
+        # Server-scoped, not per-database -- called once per
+        # extract_database_metadata() invocation (which today's
+        # orchestrator itself only calls once per run, since it loops a
+        # single database) rather than once per database looped.
+        return source.list_server_instance(), "direct_metadata"
+
+    @log_object_result("server_security_principal")
+    def _server_security_principals(name):
+        # Server-scoped, not per-database -- same placement as
+        # _server_instance above.
+        return source.list_server_security_principals(), "direct_metadata"
+
+    @log_object_result("server_permission")
+    def _server_permissions(name):
+        return source.list_server_permissions(), "direct_metadata"
+
+    @log_object_result("linked_server")
+    def _linked_servers(name):
+        return source.list_linked_servers(), "direct_metadata"
 
     @log_object_result("database")
     def _databases(name):
@@ -1427,6 +1895,10 @@ def extract_database_metadata(source: MetadataSource, database: str):
         return source.list_constraints(database), "direct_metadata"
 
     log_entries = []
+    server_instance, e = _server_instance("server_instance"); log_entries.append(e)
+    server_security_principals, e = _server_security_principals("server_security_principals"); log_entries.append(e)
+    server_permissions, e = _server_permissions("server_permissions"); log_entries.append(e)
+    linked_servers, e = _linked_servers("linked_servers"); log_entries.append(e)
     databases, e = _databases(database); log_entries.append(e)
     tables, e = _tables(database); log_entries.append(e)
     procedures, e = _procedures(database); log_entries.append(e)
@@ -1480,6 +1952,7 @@ def extract_database_metadata(source: MetadataSource, database: str):
             summary.total_default_constraints = sum(1 for c in constraints or [] if c.constraint_type == "DEFAULT")
 
     return {
+        "server_instance": server_instance,
         "databases": databases or [],
         "tables": tables or [],
         "stored_procedures": procedures or [],
@@ -1495,8 +1968,16 @@ def extract_database_metadata(source: MetadataSource, database: str):
         "user_defined_types": user_defined_types or [],
         "xml_schema_collections": xml_schema_collections or [],
         "assemblies": assemblies or [],
-        "security_principals": security_principals or [],
-        "permissions": permissions or [],
+        # Server-scoped rows (scope="server") appended after the
+        # database-scoped ones -- merged here, after database_summary's
+        # total_users/total_roles counts above already consumed the
+        # database-only security_principals list, so that summary stays
+        # exactly database-scoped (server LOGIN/SERVER_ROLE principal
+        # types never match its "USER"/"ROLE" comparisons anyway, but
+        # merging after keeps the ordering unambiguous regardless).
+        "security_principals": (security_principals or []) + (server_security_principals or []),
+        "permissions": (permissions or []) + (server_permissions or []),
+        "linked_servers": linked_servers or [],
         "database_summary": database_summary or [],
         "constraints": constraints or [],
     }, log_entries

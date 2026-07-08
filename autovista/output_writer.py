@@ -24,6 +24,7 @@ from autovista.schema import DiscoveryLogEntry, DiscoveryManifest
 # DiscoveryManifest so write_manifest_json can assemble a complete,
 # byte-for-byte-equivalent aggregate from these files alone.
 ENTITY_OUTPUT_FILES = {
+    "server_instance": "server_instance.json",
     "databases": "database.json",
     "database_summary": "database_summary.json",
     "tables": "tables.json",
@@ -38,6 +39,7 @@ ENTITY_OUTPUT_FILES = {
     "dependencies": "dependencies.json",
     "permissions": "permissions.json",
     "security_principals": "security_principals.json",
+    "linked_servers": "linked_servers.json",
     "synonyms": "synonyms.json",
     "sequences": "sequences.json",
     "assemblies": "assemblies.json",
@@ -171,6 +173,25 @@ def write_csv_rollup(manifest: DiscoveryManifest, output_dir: str, filename: str
         "object_type": "unresolved_or_llm_inferred", "object_name": "(needs human review)", "count": needs_review,
         "size_mb": "", "tables": "", "procs": "", "views": "",
     })
+
+    # SQL-Server-feature compatibility scan (autovista/compatibility_scanner.py):
+    # one row per distinct flag across every scanned object (stored procs,
+    # views, functions, triggers, embedded SQL), so a reviewer can see e.g.
+    # "3 objects use MERGE" without opening the manifest.
+    flag_counts: dict[str, int] = {}
+    for collection in (manifest.stored_procedures, manifest.views, manifest.functions, manifest.triggers):
+        for obj in collection:
+            for flag in obj.compatibility_flags:
+                flag_counts[flag] = flag_counts.get(flag, 0) + 1
+    for pkg in manifest.packages:
+        for embedded in pkg.embedded_sql:
+            for flag in embedded.compatibility_flags:
+                flag_counts[flag] = flag_counts.get(flag, 0) + 1
+    for flag_name, count in sorted(flag_counts.items()):
+        rows.append({
+            "object_type": "compatibility_flag", "object_name": flag_name, "count": count,
+            "size_mb": "", "tables": "", "procs": "", "views": "",
+        })
 
     with open(out_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["object_type", "object_name", "count", "size_mb", "tables", "procs", "views"])

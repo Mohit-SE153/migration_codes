@@ -27,6 +27,7 @@ htmlcov/
 autovista_state.sqlite3
 *.sqlite3
 output/*
+output_*/
 !output/sample_run/
 !output/sample_run/**
 

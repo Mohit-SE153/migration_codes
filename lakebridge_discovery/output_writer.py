@@ -29,6 +29,13 @@ ENTITY_OUTPUT_FILES = {
     "sequences": "sequences.json",
     "unsupported_objects": "unsupported_objects.json",
     "dependencies": "dependencies.json",
+    # --- additive: supplementary catalog facts (source_exporter.py's own
+    # live pyodbc connection -- see schema.py's LakebridgeDiscoveryResult
+    # docstring for these fields) ---
+    "server_instance": "server_instance.json",
+    "table_features": "table_features.json",
+    "procedure_parameters": "procedure_parameters.json",
+    "linked_servers": "linked_servers.json",
 }
 
 
@@ -43,6 +50,21 @@ def write_entity_outputs(result: LakebridgeDiscoveryResult, output_dir: str) -> 
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(result_dict[field_name], f, indent=2, default=str)
         paths[field_name] = out_path
+
+    # server_security.json combines server_principals + server_permissions
+    # (both server-scoped facts from the same source_exporter.py fetch
+    # pass) into one file rather than two -- Lakebridge's own choice, see
+    # README.md "Lakebridge Discovery" for the documented output list.
+    security_path = out_dir / "server_security.json"
+    with open(security_path, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "server_principals": result_dict["server_principals"],
+                "server_permissions": result_dict["server_permissions"],
+            },
+            f, indent=2, default=str,
+        )
+    paths["server_security"] = security_path
 
     logger.info("Wrote %d per-category output files to %s", len(paths), out_dir)
     return paths
@@ -76,7 +98,27 @@ def write_csv_rollup(result: LakebridgeDiscoveryResult, output_dir: str, filenam
         {"object_type": "dependency_edge", "object_name": "(all)", "count": len(result.dependencies)},
         {"object_type": "warning", "object_name": "(all)", "count": len(result.warnings)},
         {"object_type": "error", "object_name": "(all)", "count": len(result.errors)},
+        # --- additive: supplementary catalog facts (source_exporter.py) ---
+        {"object_type": "server_instance", "object_name": "(all)", "count": 1 if result.server_instance else 0},
+        {"object_type": "table_feature", "object_name": "(all)", "count": len(result.table_features)},
+        {"object_type": "procedure_parameter", "object_name": "(all)", "count": len(result.procedure_parameters)},
+        {"object_type": "server_principal", "object_name": "(all)", "count": len(result.server_principals)},
+        {"object_type": "server_permission", "object_name": "(all)", "count": len(result.server_permissions)},
+        {"object_type": "linked_server", "object_name": "(all)", "count": len(result.linked_servers)},
     ]
+
+    # SQL-Server-feature compatibility scan (compatibility_scanner.py): one
+    # row per distinct flag across every scanned object category, mirroring
+    # how autovista/output_writer.py's write_csv_rollup extends its own
+    # rollup CSV for the same scanner's output.
+    flag_counts: dict[str, int] = {}
+    for collection in (result.tables, result.views, result.stored_procedures, result.functions, result.triggers):
+        for obj in collection:
+            for flag in obj.compatibility_flags:
+                flag_counts[flag] = flag_counts.get(flag, 0) + 1
+    for flag_name, count in sorted(flag_counts.items()):
+        rows.append({"object_type": "compatibility_flag", "object_name": flag_name, "count": count})
+
     with open(out_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["object_type", "object_name", "count"])
         writer.writeheader()

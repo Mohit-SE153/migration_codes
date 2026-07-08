@@ -22,13 +22,24 @@ be a byte-perfect CREATE TABLE statement (no defaults/constraints/indexes).
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import time
 from pathlib import Path
 
 from lakebridge_discovery.config import LakebridgeConfig
 from lakebridge_discovery.logging_setup import logger
-from lakebridge_discovery.schema import ExportSummaryEntity, LakebridgeLogEntry
+from lakebridge_discovery.schema import (
+    ExportSummaryEntity,
+    LakebridgeDiscoveryResult,
+    LakebridgeLogEntry,
+    LinkedServerEntity,
+    ProcedureParameterEntity,
+    ServerInstanceEntity,
+    ServerPermissionEntity,
+    ServerPrincipalEntity,
+    TableFeatureEntity,
+)
 
 QUERY_TABLE_LIST = """
 SELECT s.name AS schema_name, t.name AS table_name
@@ -76,6 +87,461 @@ DECLARE @project_stream VARBINARY(MAX);
 EXEC SSISDB.catalog.get_project @folder_name = ?, @project_name = ?, @project_stream = @project_stream OUTPUT;
 SELECT @project_stream;
 """
+
+
+# --- Supplementary catalog metadata (server instance / table structural
+# flags / proc & function parameters / server-level security) -- retyped
+# independently of autovista/sql_metadata_extractor.py's equivalent
+# queries, per this codebase's no-shared-parsing/query-logic rule between
+# the two Discovery engines (see module docstring and README.md). Fetched
+# by export_supplementary_metadata() below over the SAME connection
+# _export_live() already opens -- this module is the only place in
+# lakebridge_discovery/ that talks to a live SQL Server, so it's the
+# natural home for these even though they're not files staged for the
+# Analyzer CLI to scan. ---
+
+QUERY_SERVER_PROPERTIES = """
+SELECT
+    CAST(SERVERPROPERTY('ProductVersion') AS NVARCHAR(128)) AS product_version,
+    CAST(SERVERPROPERTY('ProductLevel') AS NVARCHAR(128)) AS product_level,
+    CAST(SERVERPROPERTY('Edition') AS NVARCHAR(128)) AS edition,
+    CAST(SERVERPROPERTY('EngineEdition') AS INT) AS engine_edition,
+    CAST(SERVERPROPERTY('MachineName') AS NVARCHAR(128)) AS machine_name,
+    CAST(SERVERPROPERTY('InstanceName') AS NVARCHAR(128)) AS instance_name
+"""
+
+# sys.dm_os_sys_info is a sys.dm_* DMV -- requires VIEW SERVER STATE, not
+# guaranteed for a read-only discovery account, so callers wrap this in
+# try/except.
+QUERY_SERVER_SYS_INFO = """
+SELECT cpu_count, physical_memory_kb
+FROM sys.dm_os_sys_info
+"""
+
+QUERY_SERVER_MAX_MEMORY = """
+SELECT CAST(value_in_use AS INT) AS max_server_memory_mb
+FROM sys.configurations
+WHERE name = 'max server memory (MB)'
+"""
+
+# sys.tables.temporal_type: 0 = none, 1 = history table, 2 = the
+# system-versioned table itself. sys.change_tracking_tables has one row
+# per table with change tracking enabled -- existence, not a flag column.
+QUERY_TABLE_FEATURES = """
+SELECT s.name AS schema_name, t.name AS table_name, t.temporal_type, t.is_memory_optimized, t.is_tracked_by_cdc,
+       CASE WHEN ctt.object_id IS NOT NULL THEN 1 ELSE 0 END AS is_change_tracking_enabled
+FROM sys.tables t
+JOIN sys.schemas s ON s.schema_id = t.schema_id
+LEFT JOIN sys.change_tracking_tables ctt ON ctt.object_id = t.object_id
+"""
+
+# Scoped to index_id IN (0, 1) (heap or clustered index -- the table's own
+# row storage), same reasoning as autovista's equivalent query: secondary
+# nonclustered indexes can carry independent partition/compression
+# settings that would misrepresent "how many partitions does this table
+# have" if included here.
+QUERY_TABLE_PARTITION_COMPRESSION = """
+SELECT s.name AS schema_name, t.name AS table_name, p.partition_number, p.data_compression_desc
+FROM sys.partitions p
+JOIN sys.tables t ON t.object_id = p.object_id
+JOIN sys.schemas s ON s.schema_id = t.schema_id
+WHERE p.index_id IN (0, 1)
+ORDER BY s.name, t.name, p.partition_number
+"""
+
+# One whole-database query covering both procedures and functions (P/FN/
+# IF/TF all live in sys.objects + sys.parameters) -- parameter_id > 0
+# excludes a function's own return-value row.
+QUERY_PROCEDURE_FUNCTION_PARAMETERS = """
+SELECT s.name AS schema_name, o.name AS object_name, p.name AS parameter_name, ty.name AS data_type, p.is_output
+FROM sys.parameters p
+JOIN sys.objects o ON o.object_id = p.object_id
+JOIN sys.schemas s ON s.schema_id = o.schema_id
+JOIN sys.types ty ON ty.user_type_id = p.user_type_id
+WHERE p.parameter_id > 0 AND o.type IN ('P', 'FN', 'IF', 'TF')
+ORDER BY s.name, o.name, p.parameter_id
+"""
+
+# type: 'S' = SQL login, 'U' = Windows login, 'G' = Windows group, 'R' = server role.
+QUERY_SERVER_PRINCIPALS = """
+SELECT sp.name, sp.type, sp.is_disabled, sp.is_fixed_role
+FROM sys.server_principals sp
+WHERE sp.type IN ('S', 'U', 'G', 'R')
+"""
+
+QUERY_SERVER_ROLE_MEMBERS = """
+SELECT role.name AS role_name, member.name AS member_name
+FROM sys.server_role_members rm
+JOIN sys.server_principals role ON role.principal_id = rm.role_principal_id
+JOIN sys.server_principals member ON member.principal_id = rm.member_principal_id
+"""
+
+QUERY_SERVER_PERMISSIONS = """
+SELECT sp.name AS grantee_name, sp.type AS principal_type, perm.class_desc,
+       tgt.name AS object_name, perm.permission_name, perm.state_desc
+FROM sys.server_permissions perm
+JOIN sys.server_principals sp ON sp.principal_id = perm.grantee_principal_id
+LEFT JOIN sys.server_principals tgt ON tgt.principal_id = perm.major_id AND perm.class_desc = 'SERVER_PRINCIPAL'
+"""
+
+# is_linked = 1 excludes the row sys.servers always carries for the local
+# server itself.
+QUERY_LINKED_SERVERS = """
+SELECT name, product, provider, data_source, provider_string
+FROM sys.servers
+WHERE is_linked = 1
+"""
+
+# Defensive redaction for sys.servers.provider_string, which can embed a
+# password in some OLE DB/ODBC provider connection strings -- retyped
+# independently of autovista/sql_metadata_extractor.py's
+# _redact_connection_string (and dtsx_xml_parser.py's, which it itself
+# mirrors), per this module's no-shared-code rule.
+_CONN_STRING_SECRET_PATTERN = re.compile(r"(?i)(password|pwd)\s*=\s*[^;]*")
+
+
+def _redact_connection_string(conn_str: str) -> str:
+    return _CONN_STRING_SECRET_PATTERN.sub(r"\1=***REDACTED***", conn_str)
+
+
+def _fetch_server_instance(connection) -> ServerInstanceEntity | None:
+    cur = connection.cursor()
+    cur.execute(QUERY_SERVER_PROPERTIES)
+    row = cur.fetchone()
+    if row is None:
+        return None
+    product_version, product_level, edition, engine_edition, machine_name, instance_name = row
+    entity = ServerInstanceEntity(
+        product_version=product_version,
+        product_level=product_level,
+        edition=edition,
+        engine_edition=int(engine_edition) if engine_edition is not None else None,
+        machine_name=machine_name,
+        instance_name=instance_name,
+    )
+
+    try:
+        cur = connection.cursor()
+        cur.execute(QUERY_SERVER_SYS_INFO)
+        sys_row = cur.fetchone()
+        if sys_row:
+            cpu_count, physical_memory_kb = sys_row
+            entity.cpu_count = int(cpu_count) if cpu_count is not None else None
+            entity.physical_memory_mb = (
+                round(float(physical_memory_kb) / 1024.0, 2) if physical_memory_kb is not None else None
+            )
+    except Exception:
+        pass  # sys.dm_os_sys_info requires VIEW SERVER STATE -- leave cpu_count/physical_memory_mb at defaults
+
+    try:
+        cur = connection.cursor()
+        cur.execute(QUERY_SERVER_MAX_MEMORY)
+        mem_row = cur.fetchone()
+        if mem_row and mem_row[0] is not None:
+            entity.max_server_memory_mb = int(mem_row[0])
+    except Exception:
+        pass  # sys.configurations restricted -- leave max_server_memory_mb at default
+
+    return entity
+
+
+def _fetch_table_features(connection) -> list[TableFeatureEntity]:
+    partitions_by_table: dict[tuple[str, str], list[tuple[int, str]]] = {}
+    cur = connection.cursor()
+    cur.execute(QUERY_TABLE_PARTITION_COMPRESSION)
+    for schema_name, table_name, partition_number, data_compression_desc in cur.fetchall():
+        partitions_by_table.setdefault((schema_name, table_name), []).append(
+            (partition_number, data_compression_desc)
+        )
+
+    cur = connection.cursor()
+    cur.execute(QUERY_TABLE_FEATURES)
+    out = []
+    for schema_name, table_name, temporal_type, is_memory_optimized, is_tracked_by_cdc, is_change_tracking_enabled in cur.fetchall():
+        partitions = partitions_by_table.get((schema_name, table_name), [])
+        partition_count = len(partitions)
+        compression_descs = sorted({desc for _, desc in partitions if desc})
+        if len(compression_descs) > 1:
+            compression = f"MIXED ({', '.join(compression_descs)})"
+        else:
+            compression = compression_descs[0] if compression_descs else None
+        out.append(
+            TableFeatureEntity(
+                schema=schema_name,
+                name=table_name,
+                is_temporal_table=temporal_type in (1, 2),
+                is_memory_optimized=bool(is_memory_optimized),
+                is_cdc_enabled=bool(is_tracked_by_cdc),
+                is_change_tracking_enabled=bool(is_change_tracking_enabled),
+                is_partitioned=partition_count > 1,
+                partition_count=partition_count,
+                compression=compression,
+            )
+        )
+    return out
+
+
+def _fetch_procedure_parameters(connection) -> list[ProcedureParameterEntity]:
+    cur = connection.cursor()
+    cur.execute(QUERY_PROCEDURE_FUNCTION_PARAMETERS)
+    return [
+        ProcedureParameterEntity(
+            schema=schema_name, name=object_name, parameter_name=parameter_name,
+            data_type=data_type, mode="OUT" if is_output else "IN",
+        )
+        for schema_name, object_name, parameter_name, data_type, is_output in cur.fetchall()
+    ]
+
+
+def _fetch_server_principals(connection) -> list[ServerPrincipalEntity]:
+    role_members: dict[str, list[str]] = {}
+    cur = connection.cursor()
+    cur.execute(QUERY_SERVER_ROLE_MEMBERS)
+    for role_name, member_name in cur.fetchall():
+        role_members.setdefault(member_name, []).append(role_name)
+
+    cur = connection.cursor()
+    cur.execute(QUERY_SERVER_PRINCIPALS)
+    out = []
+    for name, type_code, is_disabled, is_fixed_role in cur.fetchall():
+        out.append(
+            ServerPrincipalEntity(
+                name=name,
+                principal_type="SERVER_ROLE" if type_code == "R" else "LOGIN",
+                is_disabled=bool(is_disabled) if is_disabled is not None else None,
+                is_fixed_role=bool(is_fixed_role) if is_fixed_role is not None else None,
+                member_of_roles=role_members.get(name, []),
+            )
+        )
+    return out
+
+
+def _fetch_server_permissions(connection) -> list[ServerPermissionEntity]:
+    cur = connection.cursor()
+    cur.execute(QUERY_SERVER_PERMISSIONS)
+    return [
+        ServerPermissionEntity(
+            grantee=grantee_name, principal_type=principal_type, class_desc=class_desc,
+            object_name=object_name, permission_name=permission_name, state_desc=state_desc,
+        )
+        for grantee_name, principal_type, class_desc, object_name, permission_name, state_desc in cur.fetchall()
+    ]
+
+
+def _fetch_linked_servers(connection) -> list[LinkedServerEntity]:
+    cur = connection.cursor()
+    cur.execute(QUERY_LINKED_SERVERS)
+    return [
+        LinkedServerEntity(
+            name=name, product=product, provider=provider, data_source=data_source,
+            provider_string_redacted=_redact_connection_string(provider_string) if provider_string else None,
+        )
+        for name, product, provider, data_source, provider_string in cur.fetchall()
+    ]
+
+
+# --- Fixture-mode supplementary metadata: no live SQL Server to query, so
+# these are parsed via plain regex from the same fixtures/sql/ddl_sample.sql
+# this engine already stages for the Analyzer (see _export_fixture) --
+# same "plain-regex scan, not a SQL parser" convention as
+# dependency_extractor.py. Deliberately does NOT import
+# fixtures/mock_catalog.py -- that module is SQLGlot Discovery's own
+# sqlglot-AST-based fixture parser; reusing it here would blur the
+# two-engines boundary for no real benefit, since only table/parameter
+# *names* are needed, not a full AST. ---
+
+_GO_SPLIT = re.compile(r"^\s*GO\s*$", re.MULTILINE)
+# Unlike CREATE PROCEDURE/TRIGGER (one per GO-separated batch in
+# ddl_sample.sql), several CREATE TABLE statements can share one GO batch
+# (see the "dbo schema: 15 core tables" block) -- scanned directly against
+# the whole file text via finditer, each table's own body captured up to
+# its closing ");" rather than assuming one CREATE TABLE per batch.
+_CREATE_TABLE_BLOCK = re.compile(
+    r"CREATE\s+TABLE\s+(?:\[?(\w+)\]?\.)?\[?(\w+)\]?\s*\((.*?)\)\s*;", re.IGNORECASE | re.DOTALL,
+)
+_TEMPORAL_MARKER = re.compile(r"PERIOD\s+FOR\s+SYSTEM_TIME|SYSTEM_VERSIONING\s*=\s*ON", re.IGNORECASE)
+_MEMORY_OPTIMIZED_MARKER = re.compile(r"MEMORY_OPTIMIZED\s*=\s*ON", re.IGNORECASE)
+_DATA_COMPRESSION_MARKER = re.compile(r"DATA_COMPRESSION\s*=\s*(\w+)", re.IGNORECASE)
+_CREATE_PROC_HEADER = re.compile(
+    r"CREATE\s+PROCEDURE\s+(?:\[?(\w+)\]?\.)?\[?(\w+)\]?\s*(.*?)\bAS\b", re.IGNORECASE | re.DOTALL,
+)
+_PARAM_TOKEN = re.compile(
+    r"@(\w+)\s+([A-Za-z][\w]*(?:\(\s*(?:MAX|\d+)\s*(?:,\s*\d+\s*)?\))?)\s*(OUTPUT|OUT)?", re.IGNORECASE,
+)
+
+
+def _split_ddl_batches(raw_sql: str) -> list[str]:
+    return [b.strip() for b in _GO_SPLIT.split(raw_sql) if b.strip()]
+
+
+def _populate_fixture_supplementary_metadata(result: LakebridgeDiscoveryResult) -> None:
+    result.server_instance = ServerInstanceEntity(
+        product_version="15.0.4153.1 [FIXTURE DATA]",
+        product_level="RTM",
+        edition="Developer Edition (64-bit) [FIXTURE DATA]",
+        engine_edition=3,
+        machine_name="LAKEBRIDGE-FIXTURE-HOST",
+        instance_name=None,
+        cpu_count=4,
+        physical_memory_mb=16384.0,
+        max_server_memory_mb=12288,
+    )
+
+    base_dir = Path(__file__).resolve().parent.parent
+    ddl_path = base_dir / "fixtures" / "sql" / "ddl_sample.sql"
+    table_features: list[TableFeatureEntity] = []
+    procedure_parameters: list[ProcedureParameterEntity] = []
+    if ddl_path.exists():
+        raw_sql = ddl_path.read_text(encoding="utf-8")
+
+        for table_match in _CREATE_TABLE_BLOCK.finditer(raw_sql):
+            schema_name, table_name, body = table_match.group(1), table_match.group(2), table_match.group(3)
+            compression_match = _DATA_COMPRESSION_MARKER.search(body)
+            table_features.append(
+                TableFeatureEntity(
+                    schema=schema_name or "dbo",
+                    name=table_name,
+                    is_temporal_table=bool(_TEMPORAL_MARKER.search(body)),
+                    is_memory_optimized=bool(_MEMORY_OPTIMIZED_MARKER.search(body)),
+                    # CDC / change tracking are enabled via
+                    # sp_cdc_enable_table / ALTER TABLE ... ENABLE
+                    # CHANGE_TRACKING, never part of CREATE TABLE text
+                    # itself -- always False from a static DDL scan.
+                    is_cdc_enabled=False,
+                    is_change_tracking_enabled=False,
+                    is_partitioned=False,
+                    partition_count=0,
+                    compression=compression_match.group(1).upper() if compression_match else None,
+                )
+            )
+
+        for batch in _split_ddl_batches(raw_sql):
+            proc_match = _CREATE_PROC_HEADER.search(batch)
+            if proc_match:
+                schema_name = proc_match.group(1) or "dbo"
+                proc_name = proc_match.group(2)
+                for token_match in _PARAM_TOKEN.finditer(proc_match.group(3)):
+                    param_name, data_type, output_kw = token_match.groups()
+                    procedure_parameters.append(
+                        ProcedureParameterEntity(
+                            schema=schema_name, name=proc_name, parameter_name=param_name,
+                            data_type=data_type, mode="OUT" if output_kw else "IN",
+                        )
+                    )
+
+    result.table_features = table_features
+    result.procedure_parameters = procedure_parameters
+
+    # Server-level security/linked-server fixtures: plausible, clearly
+    # synthetic values (no live sys.server_principals/sys.servers to query
+    # in fixture mode).
+    result.server_principals = [
+        ServerPrincipalEntity(
+            name="sa", principal_type="LOGIN", is_disabled=False, is_fixed_role=False,
+            member_of_roles=["sysadmin"],
+        ),
+        ServerPrincipalEntity(
+            name="sysadmin", principal_type="SERVER_ROLE", is_disabled=None, is_fixed_role=True,
+        ),
+        ServerPrincipalEntity(
+            name="lakebridge_fixture_svc", principal_type="LOGIN", is_disabled=False, is_fixed_role=False,
+            member_of_roles=["db_datareader"],
+        ),
+    ]
+    result.server_permissions = [
+        ServerPermissionEntity(
+            grantee="lakebridge_fixture_svc", principal_type="S", class_desc="SERVER",
+            object_name=None, permission_name="VIEW ANY DEFINITION", state_desc="GRANT",
+        ),
+    ]
+    result.linked_servers = []  # no linked servers in the fixture sample environment
+
+
+def export_supplementary_metadata(config: LakebridgeConfig, result: LakebridgeDiscoveryResult) -> list[LakebridgeLogEntry]:
+    """Populates server_instance/table_features/procedure_parameters/
+    server_principals/server_permissions/linked_servers on `result`, in
+    place -- same "mutate result, return per-stage log entries" shape as
+    dependency_extractor.extract_dependencies()/export_source() use.
+    These are supplementary catalog facts the Analyzer CLI itself never
+    reports (it only ever sees the raw SQL text export_source() stages for
+    it) -- gathered here, over source_exporter.py's own independent
+    pyodbc connection, since this module is the only place in
+    lakebridge_discovery/ that opens one. Each sub-fetch is isolated in
+    its own try/except (same permission-sensitive-DMV pattern as
+    autovista/sql_metadata_extractor.py) so e.g. a locked-down
+    sys.dm_os_sys_info doesn't take down table_features/procedure_parameters."""
+    start = time.perf_counter()
+    log_entries: list[LakebridgeLogEntry] = []
+
+    def _record(object_type: str, ok: bool, error: str | None = None) -> None:
+        log_entries.append(
+            LakebridgeLogEntry(
+                stage="source_export", object_type=object_type, object_name=object_type,
+                status="success" if ok else "failed", error=error,
+                duration_ms=round((time.perf_counter() - start) * 1000, 2),
+            )
+        )
+
+    if config.run_mode == "fixture":
+        _populate_fixture_supplementary_metadata(result)
+        for object_type in ("server_instance", "table_features", "procedure_parameters", "server_security", "linked_servers"):
+            _record(object_type, True)
+        return log_entries
+
+    if config.run_mode != "live":
+        return log_entries
+
+    try:
+        connection = _connect_live_sql(config)
+    except Exception as exc:  # noqa: BLE001 - isolate a bad connection from the rest of the run
+        error = f"{type(exc).__name__}: {exc}"
+        logger.error("FAIL supplementary_metadata connection error=%s", error)
+        for object_type in ("server_instance", "table_features", "procedure_parameters", "server_security", "linked_servers"):
+            _record(object_type, False, error)
+        return log_entries
+
+    try:
+        result.server_instance = _fetch_server_instance(connection)
+        _record("server_instance", True)
+    except Exception as exc:  # noqa: BLE001
+        error = f"{type(exc).__name__}: {exc}"
+        logger.error("FAIL supplementary_metadata server_instance error=%s", error)
+        _record("server_instance", False, error)
+
+    try:
+        result.table_features = _fetch_table_features(connection)
+        _record("table_features", True)
+    except Exception as exc:  # noqa: BLE001
+        error = f"{type(exc).__name__}: {exc}"
+        logger.error("FAIL supplementary_metadata table_features error=%s", error)
+        _record("table_features", False, error)
+
+    try:
+        result.procedure_parameters = _fetch_procedure_parameters(connection)
+        _record("procedure_parameters", True)
+    except Exception as exc:  # noqa: BLE001
+        error = f"{type(exc).__name__}: {exc}"
+        logger.error("FAIL supplementary_metadata procedure_parameters error=%s", error)
+        _record("procedure_parameters", False, error)
+
+    try:
+        result.server_principals = _fetch_server_principals(connection)
+        result.server_permissions = _fetch_server_permissions(connection)
+        _record("server_security", True)
+    except Exception as exc:  # noqa: BLE001
+        error = f"{type(exc).__name__}: {exc}"
+        logger.error("FAIL supplementary_metadata server_security error=%s", error)
+        _record("server_security", False, error)
+
+    try:
+        result.linked_servers = _fetch_linked_servers(connection)
+        _record("linked_servers", True)
+    except Exception as exc:  # noqa: BLE001
+        error = f"{type(exc).__name__}: {exc}"
+        logger.error("FAIL supplementary_metadata linked_servers error=%s", error)
+        _record("linked_servers", False, error)
+
+    return log_entries
 
 
 def _connect_live_sql(config: LakebridgeConfig):

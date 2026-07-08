@@ -22,6 +22,25 @@ class DiscoveryLogEntry:
 
 
 @dataclass
+class ServerInstanceEntity:
+    """Instance/server-level facts -- SERVERPROPERTY(...) and
+    sys.dm_os_sys_info/sys.configurations, all server-scoped (not
+    per-database). Exactly one of these per Discovery run, regardless of
+    how many databases are scanned -- see DiscoveryManifest.server_instance."""
+
+    product_version: str | None = None  # SERVERPROPERTY('ProductVersion')
+    product_level: str | None = None  # SERVERPROPERTY('ProductLevel'), e.g. "RTM"/"SP1"
+    edition: str | None = None  # SERVERPROPERTY('Edition')
+    engine_edition: int | None = None  # SERVERPROPERTY('EngineEdition'), e.g. 3 = Enterprise
+    machine_name: str | None = None  # SERVERPROPERTY('MachineName')
+    instance_name: str | None = None  # SERVERPROPERTY('InstanceName'); None for the default instance
+    cpu_count: int | None = None  # sys.dm_os_sys_info.cpu_count -- requires VIEW SERVER STATE
+    physical_memory_mb: float | None = None  # sys.dm_os_sys_info.physical_memory_kb / 1024
+    max_server_memory_mb: int | None = None  # sys.configurations 'max server memory (MB)'.value_in_use
+    parse_status: ParseStatus = "direct_metadata"
+
+
+@dataclass
 class DatabaseEntity:
     name: str
     size_mb: float
@@ -175,6 +194,11 @@ class ViewEntity:
     referenced_functions: list[str] = field(default_factory=list)
     referenced_sequences: list[str] = field(default_factory=list)
     unresolved_reason: str | None = None
+    # --- additive: SQL-Server-feature compatibility scanner (see
+    # autovista/compatibility_scanner.py) -- named migration-risk
+    # constructs found in this view's definition text, e.g. "PIVOT",
+    # "CROSS_APPLY", "MERGE", "OPENJSON", "FOR_XML", "LINKED_SERVER".
+    compatibility_flags: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -192,6 +216,10 @@ class TriggerEntity:
     referenced_functions: list[str] = field(default_factory=list)
     referenced_sequences: list[str] = field(default_factory=list)
     unresolved_reason: str | None = None
+    # --- additive: SQL-Server-feature compatibility scanner (see
+    # autovista/compatibility_scanner.py) -- named migration-risk
+    # constructs found in this trigger's body text.
+    compatibility_flags: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -260,6 +288,10 @@ class StoredProcedureEntity:
     dynamic_sql_usage: bool | None = None
     parse_status: ParseStatus = "direct_metadata"
     unresolved_reason: str | None = None
+    # --- additive: SQL-Server-feature compatibility scanner (see
+    # autovista/compatibility_scanner.py) -- named migration-risk
+    # constructs found in this procedure's body text.
+    compatibility_flags: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -345,6 +377,10 @@ class FunctionEntity:
     referenced_functions: list[str] = field(default_factory=list)
     referenced_sequences: list[str] = field(default_factory=list)
     unresolved_reason: str | None = None
+    # --- additive: SQL-Server-feature compatibility scanner (see
+    # autovista/compatibility_scanner.py) -- named migration-risk
+    # constructs found in this function's body text.
+    compatibility_flags: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -401,18 +437,34 @@ class AssemblyEntity:
 
 @dataclass
 class SecurityPrincipalEntity:
+    # `database` stays a required field for backward compatibility with
+    # every existing database-scoped caller/test -- server-scoped rows
+    # (scope="server") set it to "" (there is no database context) rather
+    # than changing this to Optional and touching every existing
+    # construction site. `scope` is the discriminator a consumer should
+    # actually branch on.
     database: str
     name: str
-    principal_type: str
+    principal_type: str  # database scope: "USER"/"ROLE"; server scope: "LOGIN"/"SERVER_ROLE"
     default_schema: str | None = None
     owning_principal: str | None = None
     is_fixed_role: bool | None = None
     is_disabled: bool | None = None
     parse_status: ParseStatus = "direct_metadata"
 
+    # --- additive: server-level security discovery ---
+    scope: Literal["server", "database"] = "database"
+    # sys.server_role_members -- server role names this principal belongs
+    # to (e.g. a login that's a member of "sysadmin"). Only populated for
+    # scope="server" rows; database-scoped role membership is out of
+    # scope for this pass.
+    member_of_roles: list[str] = field(default_factory=list)
+
 
 @dataclass
 class PermissionEntity:
+    # Same "required field, server-scoped rows use ''" reasoning as
+    # SecurityPrincipalEntity.database above.
     database: str
     grantee: str
     principal_type: str
@@ -420,6 +472,31 @@ class PermissionEntity:
     object_name: str | None = None
     permission_name: str | None = None
     state_desc: str | None = None
+    parse_status: ParseStatus = "direct_metadata"
+
+    # --- additive: server-level security discovery ---
+    scope: Literal["server", "database"] = "database"
+
+
+@dataclass
+class LinkedServerEntity:
+    """sys.servers, filtered to is_linked = 1 (excludes the row
+    representing the local server itself, server_id = 0). Server-scoped,
+    not per-database -- see DiscoveryManifest.linked_servers.
+
+    provider_string_redacted: sys.servers.provider_string can hold a raw
+    OLE DB/ODBC provider connection string, which can itself embed a
+    password -- redacted defensively with the same password=/pwd=
+    pattern dtsx_xml_parser.py:_redact_connection_string uses, even
+    though this hasn't been observed to contain one in practice. name/
+    product/data_source/provider are plain identifying metadata, not
+    credentials, and are captured verbatim."""
+
+    name: str
+    product: str | None = None
+    provider: str | None = None
+    data_source: str | None = None
+    provider_string_redacted: str | None = None
     parse_status: ParseStatus = "direct_metadata"
 
 
@@ -518,6 +595,10 @@ class EmbeddedSqlEntity:
     referenced_sequences: list[str] = field(default_factory=list)
     parse_status: ParseStatus = "xml_parsed"
     unresolved_reason: str | None = None
+    # --- additive: SQL-Server-feature compatibility scanner (see
+    # autovista/compatibility_scanner.py) -- named migration-risk
+    # constructs found in this embedded SQL text.
+    compatibility_flags: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -577,6 +658,9 @@ class DependencyEntity:
 
 @dataclass
 class DiscoveryManifest:
+    # Server-scoped (not per-database) -- exactly one per run, or None if
+    # SERVERPROPERTY-level discovery itself failed. See ServerInstanceEntity.
+    server_instance: ServerInstanceEntity | None = None
     databases: list[DatabaseEntity] = field(default_factory=list)
     tables: list[TableEntity] = field(default_factory=list)
     views: list[ViewEntity] = field(default_factory=list)
@@ -595,6 +679,8 @@ class DiscoveryManifest:
     assemblies: list[AssemblyEntity] = field(default_factory=list)
     security_principals: list[SecurityPrincipalEntity] = field(default_factory=list)
     permissions: list[PermissionEntity] = field(default_factory=list)
+    # Server-scoped, not per-database -- see LinkedServerEntity.
+    linked_servers: list[LinkedServerEntity] = field(default_factory=list)
     database_summary: list[DatabaseSummaryEntity] = field(default_factory=list)
     constraints: list[ConstraintEntity] = field(default_factory=list)
     data_quality_summary: list[DataQualitySummaryEntity] = field(default_factory=list)

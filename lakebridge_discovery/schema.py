@@ -30,6 +30,118 @@ class LakebridgeObjectRef:
     raw_category: str | None = None
     complexity: str | None = None
     notes: str | None = None
+    # --- additive: SQL-Server-feature compatibility scanner (see
+    # lakebridge_discovery/compatibility_scanner.py -- an independent
+    # reimplementation of autovista/compatibility_scanner.py's detection,
+    # never an import of it) -- named migration-risk constructs found by
+    # scanning this object's exported definition text at
+    # <source_export_dir>/sql/{kind}__{schema}.{name}.sql. Populated by
+    # orchestrator.py after extract_dependencies() runs, for every object
+    # in tables/views/stored_procedures/functions/triggers that has a
+    # matching exported file; stays empty for objects with none (e.g. an
+    # inventory row that came only from the Analyzer report, not this
+    # run's own export).
+    compatibility_flags: list[str] = field(default_factory=list)
+
+
+@dataclass
+class ServerInstanceEntity:
+    """Instance/server-level facts -- SERVERPROPERTY(...) and
+    sys.dm_os_sys_info/sys.configurations, all server-scoped (not
+    per-database). Exactly one of these per Discovery run. Field shape
+    deliberately mirrors autovista.schema.ServerInstanceEntity (retyped
+    independently, not imported -- see source_exporter.py's own
+    SERVERPROPERTY/sys.dm_os_sys_info/sys.configurations queries) so the
+    two engines' server_instance.json outputs are directly comparable."""
+
+    product_version: str | None = None
+    product_level: str | None = None
+    edition: str | None = None
+    engine_edition: int | None = None
+    machine_name: str | None = None
+    instance_name: str | None = None
+    cpu_count: int | None = None
+    physical_memory_mb: float | None = None
+    max_server_memory_mb: int | None = None
+
+
+@dataclass
+class TableFeatureEntity:
+    """Structural flags for one table -- temporal/memory-optimized/CDC/
+    change-tracking/partitioning/compression. Populated in
+    source_exporter.py's live path from sys.tables/sys.change_tracking_tables/
+    sys.partitions (retyped independently of autovista/sql_metadata_extractor.py's
+    equivalent queries). Lakebridge's own object inventory
+    (LakebridgeObjectRef, from report_parser.py) has no room for these
+    structural flags, so they're reported here as a standalone, joinable-by-
+    (schema, name) list instead of being merged into it."""
+
+    schema: str
+    name: str
+    is_temporal_table: bool = False
+    is_memory_optimized: bool = False
+    is_cdc_enabled: bool = False
+    is_change_tracking_enabled: bool = False
+    is_partitioned: bool = False
+    partition_count: int = 0
+    compression: str | None = None
+
+
+@dataclass
+class ProcedureParameterEntity:
+    """One sys.parameters row for a stored procedure or function.
+    `name` is the containing proc/function's name (schema-qualified name
+    lives in `schema` + `name`), not the parameter's own name -- that's
+    `parameter_name`. Standalone (not merged into LakebridgeObjectRef,
+    which has no parameters field) for the same reason as
+    TableFeatureEntity above."""
+
+    schema: str
+    name: str
+    parameter_name: str
+    data_type: str
+    mode: str = "IN"
+
+
+@dataclass
+class ServerPrincipalEntity:
+    """sys.server_principals (SQL/Windows logins, Windows groups, server
+    roles), server-scoped. Retyped independently of
+    autovista.schema.SecurityPrincipalEntity's server-scope rows -- no
+    shared dataclass between the two engines."""
+
+    name: str
+    principal_type: str  # "LOGIN" | "SERVER_ROLE"
+    is_disabled: bool | None = None
+    is_fixed_role: bool | None = None
+    # sys.server_role_members -- server role names this principal belongs to.
+    member_of_roles: list[str] = field(default_factory=list)
+
+
+@dataclass
+class ServerPermissionEntity:
+    """sys.server_permissions, server-scoped."""
+
+    grantee: str
+    principal_type: str
+    class_desc: str | None = None
+    object_name: str | None = None
+    permission_name: str | None = None
+    state_desc: str | None = None
+
+
+@dataclass
+class LinkedServerEntity:
+    """sys.servers, filtered to is_linked = 1. provider_string_redacted is
+    defensively scrubbed of any password=/pwd= substring the same way
+    autovista.schema.LinkedServerEntity documents (retyped independently
+    here -- see source_exporter.py's own _redact_connection_string)."""
+
+    name: str
+    product: str | None = None
+    provider: str | None = None
+    data_source: str | None = None
+    provider_string_redacted: str | None = None
 
 
 @dataclass
@@ -95,6 +207,19 @@ class LakebridgeDiscoveryResult:
 
     export_summary: ExportSummaryEntity = field(default_factory=ExportSummaryEntity)
     analyze_invocations: list[AnalyzeInvocationEntity] = field(default_factory=list)
+
+    # --- additive: supplementary catalog facts gathered directly by
+    # source_exporter.py's own live pyodbc connection (see that module's
+    # docstring) -- NOT sourced from the Analyzer report, since none of
+    # this is in scope for what the Analyzer itself inventories. Server-
+    # scoped (not per-database) except table_features/procedure_parameters,
+    # which are scoped to the one source database this run points at.
+    server_instance: ServerInstanceEntity | None = None
+    table_features: list[TableFeatureEntity] = field(default_factory=list)
+    procedure_parameters: list[ProcedureParameterEntity] = field(default_factory=list)
+    server_principals: list[ServerPrincipalEntity] = field(default_factory=list)
+    server_permissions: list[ServerPermissionEntity] = field(default_factory=list)
+    linked_servers: list[LinkedServerEntity] = field(default_factory=list)
 
     # Best-effort normalized inventory, categorized to line up with
     # autovista's manifest categories for comparison purposes.

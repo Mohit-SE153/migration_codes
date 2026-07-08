@@ -279,6 +279,10 @@ def test_list_agent_jobs_tolerates_missing_history_and_schedule_tables():
 def test_list_tables_computes_percent_of_database_and_sorts_largest_first():
     source = _source([
         ("JOIN sys.master_files mf", [("SalesDW", 1000.0)]),
+        # QUERY_TABLE_FEATURES' FROM clause is also "sys.tables t" like the
+        # main table query -- match on a substring unique to it instead
+        # (same disambiguation pattern used for QUERY_INDEX_STORAGE below).
+        ("sys.change_tracking_tables", []),
         ("FROM sys.tables t", [
             ("dbo", "SmallTable", "2024-01-01", "2024-06-01", "CLUSTERED", 10, 100.0, 0, 0, 0, 0, 0, 1, 1, 1),
             ("dbo", "BigTable", "2024-01-01", "2024-06-01", "CLUSTERED", 1000, 400.0, 0, 0, 0, 0, 0, 1, 1, 1),
