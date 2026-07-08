@@ -87,6 +87,48 @@ def write_markdown_report(result: ComparisonResult, output_dir: str, filename: s
                 lines.append(f"- Only in Lakebridge ({len(cat.lakebridge_only_sample)} shown, capped): {', '.join(cat.lakebridge_only_sample)}")
             lines.append("")
 
+    if result.sqlglot_dependency_stats or result.lakebridge_dependency_stats:
+        lines.append("## Dependency edge breakdown")
+        lines.append("")
+        lines.append(
+            "Read verbatim from each engine's own dependency_stats.json (not recomputed here) -- "
+            "see each engine's dependency_stats.py / catalog_metadata._compute_stats for how these "
+            "are derived from that engine's own dependencies.json."
+        )
+        lines.append("")
+        sqlglot_by_rel = result.sqlglot_dependency_stats.get("by_relationship_type", {})
+        lakebridge_by_rel = result.lakebridge_dependency_stats.get("by_relationship_type", {})
+        all_relationship_types = sorted(set(sqlglot_by_rel) | set(lakebridge_by_rel))
+        if all_relationship_types:
+            lines.append("| Relationship type | SQLGlot | Lakebridge |")
+            lines.append("|---|---:|---:|")
+            for rel in all_relationship_types:
+                lines.append(f"| {rel} | {sqlglot_by_rel.get(rel, 0)} | {lakebridge_by_rel.get(rel, 0)} |")
+            lines.append("")
+        sqlglot_by_method = result.sqlglot_dependency_stats.get("by_discovery_method", {})
+        lakebridge_by_method = result.lakebridge_dependency_stats.get("by_discovery_method", {})
+        all_methods = sorted(set(sqlglot_by_method) | set(lakebridge_by_method))
+        if all_methods:
+            lines.append("| Discovery method | SQLGlot | Lakebridge |")
+            lines.append("|---|---:|---:|")
+            for method in all_methods:
+                lines.append(f"| {method} | {sqlglot_by_method.get(method, 0)} | {lakebridge_by_method.get(method, 0)} |")
+            lines.append("")
+
+    if result.category_notes:
+        lines.append("## Generated vs. native categories")
+        lines.append("")
+        lines.append(
+            "The categories below are produced by the discovery engines themselves -- SQL Server has "
+            "no single native catalog object that reproduces them, so a difference here does not mean "
+            "the same thing as a difference in, say, a table count (which SSMS *can* verify directly "
+            "with one query)."
+        )
+        lines.append("")
+        for category in sorted(result.category_notes):
+            lines.append(f"**{category}**: {result.category_notes[category]}")
+            lines.append("")
+
     if result.notes:
         lines.append("## Notes")
         lines.append("")

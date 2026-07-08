@@ -186,9 +186,27 @@ tables[]            { database, schema, name, row_count, size_mb, column_count, 
                        partitions (sys.partitions, index_id IN (0,1)); if a table's partitions carry
                        different compression settings, compression is reported as "MIXED (a, b, ...)"
                        rather than silently picking one.
+indexes[]           { database, schema, table, name, index_type, is_clustered, is_nonclustered, is_unique,
+                       is_primary_key, is_disabled, is_filtered, key_columns[], included_columns[], ... }
+                    -- index_type is sys.indexes.type_desc verbatim: CLUSTERED/NONCLUSTERED (relational),
+                       XML, SPATIAL, CLUSTERED COLUMNSTORE/NONCLUSTERED COLUMNSTORE, and NONCLUSTERED HASH
+                       (memory-optimized) are all included -- every named, deployed index type a migration
+                       planner needs to see, even ones with no direct Databricks equivalent (an XML index
+                       should be *flagged* for redesign, not silently dropped from inventory). Two
+                       exclusions only, both structural: the type=0 HEAP placeholder row every heap table
+                       has (not a named index object; heap-ness is on TableEntity.table_type instead), and
+                       is_hypothetical=1 rows (Database Engine Tuning Advisor "what-if" indexes -- never
+                       deployed, not real schema). See QUERY_INDEXES in sql_metadata_extractor.py for the
+                       full index-category analysis this scope is drawn from.
 views[]             { database, schema, name, referenced_tables[], parse_status, compatibility_flags[] }
 triggers[]          { database, schema, name, table, event, parse_status, compatibility_flags[] }
-agent_jobs[]        { name, enabled, steps[], parse_status }
+agent_jobs[]        { name, enabled, steps[], parse_status, step_details[] }
+                    -- step_details[].referenced_tables[]/referenced_procs[]/parse_status/unresolved_reason
+                       are populated only for subsystem="TSQL" steps, by running that step's command text
+                       through the same sql_lineage_parser.parse_lineage() used for stored procedure
+                       bodies (see orchestrator.py's agent-job enrichment loop). CmdExec/PowerShell/other
+                       subsystems are left unparsed (not T-SQL) -- these feed the agent_job -> table/
+                       procedure dependency edges (see dependency_graph_builder.py).
 stored_procedures[] { database, schema, name, loc, referenced_tables[], referenced_procs[], parameters[],
                        parameter_count, dynamic_sql_usage, parse_status, unresolved_reason, compatibility_flags[] }
                     -- parameters[] (sys.parameters joined to sys.types, ordered by parameter_id) also
@@ -486,14 +504,14 @@ python3 -m discovery_comparison.orchestrator
 `./output_comparison/` (`COMPARISON_OUTPUT_DIR`):
 
 - `comparison_report.json` — full structured comparison
-- `comparison_report.csv` — one row per object category (tables, views,
-  stored procedures, functions, triggers, synonyms, SSIS packages,
-  dependencies, unsupported objects) with both engines' counts and the
-  difference
+- `comparison_report.csv` — one row per object category, both engines'
+  counts and the difference
 - `comparison_report.md` — human-readable report: engine run status
   (success/partial/failed/not_run, duration, error/warning counts), the
-  same category table, and a best-effort sample of object names found by
-  one engine but not the other
+  category table, a best-effort sample of object names found by one engine
+  but not the other, a dependency-edge breakdown by relationship type and
+  discovery method, and a "Generated vs. native categories" section (see
+  below)
 
 Safe to run even if one or both engines haven't run yet or failed —
 missing output is reported as `not_run`/`failed` rather than raising.
@@ -501,6 +519,38 @@ Name-based "found by one engine but not the other" matching is
 best-effort (see `discovery_comparison/comparator.py`'s docstring) —
 **counts are the reliable signal**, name-level matching is a bonus, not a
 guaranteed-precise join.
+
+**Category coverage stays automatically synchronized with both engines.**
+`comparator.py` builds the category table in two passes: an explicit,
+name-matched list (`_CATEGORY_SPECS`) for categories where both engines
+write a JSON file of named objects with a compatible shape (tables, views,
+procs, functions, triggers, synonyms, SSIS packages, schemas, sequences,
+UDTs, XML schema collections, agent jobs, CLR assemblies, indexes,
+constraints); then an **auto-sync pass** that reads the `object_type`
+column of each engine's own rollup CSV (`discovery_rollup.csv` /
+`lakebridge_rollup.csv`) and adds a count-only comparison row for every
+`object_type` not already covered above. This means a brand-new rollup row
+added to either engine's `output_writer.py` in the future appears in the
+next comparison run automatically — no edit to `discovery_comparison/`
+required.
+
+**Generated vs. native categories.** A handful of categories are produced
+*by the discovery engines themselves*, not by any single SQL Server
+catalog object — the comparison report labels these explicitly so a count
+difference there isn't mistaken for the same kind of discrepancy as, say,
+a table count (which SSMS *can* verify directly with one query):
+
+| Category | Native SQL Server object? | What it actually is |
+|---|---|---|
+| `database_summary` | No | A generated rollup, assembled from several catalog views (`sys.databases`, `sys.tables`, `sys.indexes`, `sys.foreign_keys`, `sys.database_principals`, `DATABASEPROPERTYEX`, ...). There is no single `sys.database_summary` view — the shape can only be re-derived by composing the same views by hand, not queried directly. |
+| `data_quality_summary` | No | Computed entirely by the discovery engine from metadata it already collected (`sys.tables`/`sys.columns`/`sys.indexes`/`sys.foreign_keys`/`sys.triggers`/...). Not a native object; approximately reproducible by re-deriving the same per-table/per-column heuristics, never queryable as-is. |
+| `unsupported_objects` | No — and the two engines mean different things by it | SQLGlot: objects whose own T-SQL text failed to parse or only partially parsed (`parse_status`/`unresolved_reason`) — a **parser-capability** signal. Lakebridge: objects the Databricks Analyzer's own report flags as unconvertible — a **migration-feasibility** signal. SQL Server has no catalog concept of "unsupported for migration" in either sense. |
+| `warnings` | No | SQLGlot: per-object parser/lineage degradation messages (same condition as `unsupported_objects`, phrased as text). Lakebridge: per-pipeline-stage operational messages (missing directory, unreadable file, failed probe connection) — a different granularity. Neither is SQL Server metadata. |
+
+These four notes are also emitted at runtime into
+`comparison_report.md`'s "Generated vs. native categories" section
+(`discovery_comparison/comparator.py`'s `GENERATED_ARTIFACT_NOTES`), scoped
+to only the categories the current run actually produced.
 
 ## Adding a third Discovery engine later
 

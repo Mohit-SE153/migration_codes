@@ -390,13 +390,46 @@ JOIN sys.tables rt ON rt.object_id = fk.referenced_object_id
 JOIN sys.schemas rs ON rs.schema_id = rt.schema_id
 """
 
+# Every named index type SQL Server can put on a user table is included
+# here -- CLUSTERED/NONCLUSTERED (relational), XML (primary/secondary XML
+# indexes), SPATIAL, CLUSTERED COLUMNSTORE/NONCLUSTERED COLUMNSTORE
+# (analytical, and the closest structural signal to "this table is already
+# shaped for a columnar target"), and NONCLUSTERED HASH (memory-optimized
+# tables). Migration discovery's job is to inventory what physically
+# exists, not to pre-judge which index types will be recreated as-is on
+# the target -- a migration planner needs to see "this table has an XML
+# index" even though Databricks has no XML-index equivalent, precisely so
+# that gap gets flagged and redesigned deliberately rather than silently
+# dropped from the inventory.
+#
+# Two exclusions, both structural, not type-based:
+#   i.name IS NOT NULL   -- excludes the type=0 HEAP placeholder row every
+#                           heap table has in sys.indexes; a heap has no
+#                           named index object to inventory here (heap-ness
+#                           itself is already captured on TableEntity.table_type
+#                           and DataQualitySummaryEntity.heap_tables).
+#   i.is_hypothetical = 0 -- excludes indexes created by the Database Engine
+#                           Tuning Advisor's "what-if" analysis sessions.
+#                           These are not real schema objects: they can be
+#                           dropped/recreated by DTA at any time and were
+#                           never deployed by a DBA, so counting them would
+#                           overstate the real index inventory. (0 rows in
+#                           every database checked so far, but the filter
+#                           is defensive -- is_hypothetical is independent
+#                           of type_desc, so a hypothetical CLUSTERED/
+#                           NONCLUSTERED index would otherwise slip through
+#                           unnoticed.)
+#
+# System/internal-table indexes are already excluded structurally by the
+# JOIN sys.tables (sys.tables only ever returns user tables, never
+# SYSTEM_TABLE/INTERNAL_TABLE rows) -- no additional filter needed for that.
 QUERY_INDEXES = """
 SELECT s.name AS schema_name, t.name AS table_name, i.name AS index_name, i.type_desc, i.is_unique, i.has_filter, i.is_disabled,
        i.fill_factor, i.data_space_id, i.filter_definition, i.object_id, i.index_id, i.is_primary_key
 FROM sys.indexes i
 JOIN sys.tables t ON t.object_id = i.object_id
 JOIN sys.schemas s ON s.schema_id = t.schema_id
-WHERE i.name IS NOT NULL AND i.type_desc IN ('CLUSTERED','NONCLUSTERED')
+WHERE i.name IS NOT NULL AND i.is_hypothetical = 0
 ORDER BY s.name, t.name, i.name
 """
 

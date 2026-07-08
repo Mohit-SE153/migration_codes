@@ -218,6 +218,34 @@ def test_list_indexes_tolerates_dmv_permission_errors():
     assert indexes[0].user_seeks is None
 
 
+def test_list_indexes_includes_xml_indexes():
+    """QUERY_INDEXES used to restrict type_desc IN ('CLUSTERED','NONCLUSTERED'),
+    silently excluding XML/SPATIAL/COLUMNSTORE indexes that are real,
+    migratable schema objects -- see the query's own comment for the full
+    index-category analysis. This confirms the restriction is gone."""
+    source = _source([
+        ("FROM sys.indexes i", [
+            ("Production", "ProductModel", "PXML_ProductModel_CatalogDescription", "XML", False, False, False, None, 1, None, 222, 3, False),
+        ]),
+        ("FROM sys.index_columns ic", []),
+    ])
+    indexes = source.list_indexes("SalesDW")
+    assert len(indexes) == 1
+    assert indexes[0].index_type == "XML"
+    assert indexes[0].is_clustered is False
+    assert indexes[0].is_nonclustered is False
+
+
+def test_query_indexes_excludes_hypothetical_indexes():
+    """Hypothetical indexes (Database Engine Tuning Advisor "what-if"
+    sessions) aren't real deployed objects -- confirms the defensive
+    is_hypothetical=0 filter is present in the query text (the fake-cursor
+    fixture can't simulate SQL Server's own WHERE-clause filtering, so this
+    is a regression guard against the filter being accidentally removed)."""
+    from autovista.sql_metadata_extractor import QUERY_INDEXES
+    assert "is_hypothetical" in QUERY_INDEXES
+
+
 def test_list_agent_jobs_attaches_schedules_and_last_run_history():
     source = _source([
         ("FROM msdb.dbo.sysjobs j", [

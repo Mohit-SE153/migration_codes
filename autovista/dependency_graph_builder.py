@@ -30,6 +30,8 @@ Edge types produced:
   table       -> function       (computed column calls a UDF)     discovery_method=sqlglot
   table       -> sequence       (DEFAULT constraint's NEXT VALUE FOR,
                                   companion to the constraint edge below) discovery_method=sqlglot
+  agent_job   -> table/view     (TSQL-subsystem step body)               discovery_method=sqlglot | unresolved
+  agent_job   -> proc           (EXEC inside a TSQL-subsystem step body) discovery_method=sqlglot | unresolved
   function    -> user_defined_type (scalar return type is a UDT alias)  discovery_method=direct_metadata
   <object>    -> table/view/proc/function
                 (metadata backfill for objects whose own sqlglot
@@ -70,7 +72,29 @@ Not built here, and why:
   - CLR routine (assembly-backed proc/function) -> Assembly: CLR procs/
     functions are already filtered out of Discovery's object inventory
     entirely (no sys.sql_modules row to join against) -- surfacing this
-    needs a new object category, not just a new edge.
+    needs a new object category, not just a new edge. Investigated live
+    against AdventureWorks2022 (sys.assembly_modules): zero CLR-backed
+    routines exist in that database (its one assembly,
+    Microsoft.SqlServer.Types, is used only for the spatial CLR *type*,
+    never bound to a proc/function/trigger) -- there is no evidence-driven
+    case for adding a whole new object category for zero observed edges.
+    Revisit if a real target database has CLR-backed routines.
+  - Security dependencies (grants/role membership -> object): sys.database_
+    permissions/sys.database_role_members are inventoried in their own
+    right (security_principals[]/permissions[]) but deliberately excluded
+    from this dependency graph -- a GRANT doesn't gate deployment order or
+    blast-radius the way a foreign key or a proc's table reference does
+    (Microsoft's own dependency tooling, sys.sql_expression_dependencies/
+    sys.dm_sql_referenced_entities, draws the identical line: permissions
+    are never a "referenced entity"). Conflating "who can touch this
+    object" with "what does this object need to exist" would blur two
+    genuinely different migration workstreams (schema/code migration vs.
+    security/RBAC migration).
+  - SQL Agent Job -> Database/Server (a step's own database_name/server
+    context) is NOT modeled as an edge -- database_name is already a
+    plain field on AgentJobStepEntity, and "runs against database X" is a
+    server-level operational fact, not an object-level code dependency
+    the way a step's own T-SQL body (parsed below) is.
   - View/Function/CHECK-constraint/computed-column -> Sequence:
     structurally impossible, not a gap -- NEXT VALUE FOR is rejected by
     SQL Server itself in all four contexts (confirmed empirically: "NEXT
@@ -106,6 +130,7 @@ just not silently dropped, so blast-radius scoring can't undercount).
 from __future__ import annotations
 
 from autovista.schema import (
+    AgentJobEntity,
     ConstraintEntity,
     DependencyEntity,
     FunctionEntity,
@@ -362,6 +387,7 @@ def build_dependency_graph(
     tables: list[TableEntity] | None = None,
     user_defined_types: list[UserDefinedTypeEntity] | None = None,
     expression_dependencies: list[tuple[str, str, str, str, str, str]] | None = None,
+    agent_jobs: list[AgentJobEntity] | None = None,
 ) -> list[DependencyEntity]:
     functions = functions or []
     triggers = triggers or []
@@ -370,6 +396,7 @@ def build_dependency_graph(
     tables = tables or []
     user_defined_types = user_defined_types or []
     expression_dependencies = expression_dependencies or []
+    agent_jobs = agent_jobs or []
 
     known_views = {_normalize_key(f"{v.schema}.{v.name}") for v in views}
     known_synonyms = {_normalize_key(f"{s.schema}.{s.name}") for s in synonyms}
@@ -455,6 +482,13 @@ def build_dependency_graph(
             # tooling keys off, not the constraint object itself.
             table_id = f"{constraint.schema}.{constraint.table}"
             dependencies.extend(_sequence_edges(table_id, "table", constraint.referenced_sequences, "sqlglot"))
+
+    for job in agent_jobs:
+        for step in job.step_details:
+            if step.subsystem != "TSQL":
+                continue  # CmdExec/PowerShell/other subsystems have no T-SQL body to walk
+            dependencies.extend(_table_edges(job.name, "agent_job", step.referenced_tables, step.parse_status or "sqlglot", resolve_target_type))
+            dependencies.extend(_proc_edges(job.name, "agent_job", step.referenced_procs, step.parse_status or "sqlglot"))
 
     for synonym in synonyms:
         if synonym.base_object:

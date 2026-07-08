@@ -19,6 +19,14 @@ the "schema.name" convention the other catalog_metadata probes use.
 
 Heaps (sys.indexes rows with type=0, name IS NULL) are excluded -- a heap
 isn't a named, migratable index object.
+
+Also excludes is_hypothetical=1 rows (Database Engine Tuning Advisor
+"what-if" indexes -- not real deployed schema objects, and independent of
+type_desc, so a hypothetical CLUSTERED/NONCLUSTERED index wouldn't
+otherwise be caught by the name-based filter above). 0 rows affected on
+every database checked so far, same defensive reasoning as SQLGlot's
+QUERY_INDEXES -- see that module's comment for the full index-category
+analysis this filter is drawn from.
 """
 from __future__ import annotations
 
@@ -32,7 +40,7 @@ SELECT
 FROM sys.indexes i
 JOIN sys.tables t ON t.object_id = i.object_id
 JOIN sys.schemas s ON s.schema_id = t.schema_id
-WHERE i.name IS NOT NULL
+WHERE i.name IS NOT NULL AND i.is_hypothetical = 0
 ORDER BY s.name, t.name, i.name
 """
 

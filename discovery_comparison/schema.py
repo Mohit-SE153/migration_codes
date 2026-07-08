@@ -47,5 +47,21 @@ class ComparisonResult:
     lakebridge_dependency_count: int = 0
     notes: list[str] = field(default_factory=list)
 
+    # --- additive: dependency-type breakdown (each engine's own
+    # dependency_stats.json, read verbatim, not recomputed here) -- lets the
+    # report show relationship_type/discovery_method counts side by side
+    # without this module re-deriving them from dependencies.json itself.
+    sqlglot_dependency_stats: dict = field(default_factory=dict)
+    lakebridge_dependency_stats: dict = field(default_factory=dict)
+
+    # --- additive: category -> plain-English note for categories that are
+    # generated/derived artifacts rather than native SQL Server catalog
+    # objects (Database Summary, Data Quality Summary, Unsupported Objects,
+    # Warnings, ...) -- see comparator.GENERATED_ARTIFACT_NOTES. Kept
+    # separate from the free-text `notes` list above (which is for
+    # run-level operational notes) so report_writer.py can render these as
+    # their own labeled section.
+    category_notes: dict[str, str] = field(default_factory=dict)
+
     def to_dict(self) -> dict:
         return asdict(self)

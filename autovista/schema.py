@@ -244,6 +244,19 @@ class AgentJobStepEntity:
     retry_attempts: int | None = None
     retry_interval: int | None = None
 
+    # --- additive: dependency-discovery enhancement -- a TSQL-subsystem
+    # step's command is real T-SQL text (e.g. "EXEC dbo.usp_Load"), just as
+    # statically parseable as a stored procedure body -- see
+    # orchestrator.py's agent-job enrichment loop and
+    # dependency_graph_builder.py's agent_job -> table/procedure edges.
+    # Left empty (not None) for non-TSQL steps (CmdExec/PowerShell/SSIS/...),
+    # whose command text isn't T-SQL at all, so there is nothing to parse --
+    # this is a real scope boundary, not a parsing gap.
+    referenced_tables: list[str] = field(default_factory=list)
+    referenced_procs: list[str] = field(default_factory=list)
+    parse_status: ParseStatus | None = None
+    unresolved_reason: str | None = None
+
 
 @dataclass
 class AgentJobEntity:

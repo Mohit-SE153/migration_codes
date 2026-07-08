@@ -190,6 +190,21 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
                     result = parse_lineage(column.computed_expression, known_function_names=known_function_names)
                     column.referenced_functions = result.referenced_functions
 
+        # --- SQL Agent Job steps: TSQL-subsystem step commands are real
+        # T-SQL text, statically parseable the same way a stored procedure
+        # body is -- see AgentJobStepEntity.referenced_tables/referenced_procs.
+        # CmdExec/PowerShell/other-subsystem steps are left unparsed (their
+        # command text isn't T-SQL at all, so lineage parsing doesn't apply).
+        for job in manifest.agent_jobs:
+            for step in job.step_details:
+                if step.subsystem != "TSQL" or not step.command:
+                    continue
+                result = parse_lineage(step.command, known_function_names=known_function_names)
+                step.referenced_tables = result.referenced_tables
+                step.referenced_procs = result.referenced_procs
+                step.parse_status = result.parse_status
+                step.unresolved_reason = result.unresolved_reason
+
         # --- Data Quality Summary: metadata-only, computed from tables/indexes/constraints above ---
         manifest.data_quality_summary = [
             build_data_quality_summary(database_name, manifest.tables, manifest.indexes, manifest.constraints)
@@ -380,6 +395,7 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
             tables=manifest.tables,
             user_defined_types=manifest.user_defined_types,
             expression_dependencies=expression_dependencies,
+            agent_jobs=manifest.agent_jobs,
         )
 
         counters["failed"] = sum(1 for e in all_log_entries if e.status == "failed")

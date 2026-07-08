@@ -87,3 +87,12 @@ def test_discover_does_not_touch_dependencies():
 def test_indexes_probe_is_registered():
     names = [name for name, _ in catalog_metadata._REGISTRY]
     assert "indexes" in names
+
+
+def test_query_excludes_hypothetical_indexes():
+    """Regression guard: hypothetical (DTA what-if) indexes aren't real
+    deployed objects and shouldn't inflate the index inventory -- see
+    autovista.sql_metadata_extractor.QUERY_INDEXES's comment for the full
+    index-category analysis this defensive filter is drawn from."""
+    from lakebridge_discovery.catalog_metadata.indexes import _QUERY_INDEXES
+    assert "is_hypothetical" in _QUERY_INDEXES

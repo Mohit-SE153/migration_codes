@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from autovista.dependency_graph_builder import build_dependency_graph
 from autovista.schema import (
+    AgentJobEntity,
+    AgentJobStepEntity,
     ColumnEntity,
     ConstraintEntity,
     FunctionEntity,
@@ -346,3 +348,82 @@ def test_function_returning_a_builtin_type_produces_no_edge():
         stored_procedures=[], views=[], packages=[], foreign_keys=[], functions=functions, user_defined_types=udts,
     )
     assert not [d for d in deps if d.source_type == "function" and d.target_type == "user_defined_type"]
+
+
+# --- Round 3: SQL Agent Job (TSQL-subsystem step) -> Table/Procedure ---
+#
+# build_dependency_graph consumes AgentJobStepEntity.referenced_tables/
+# referenced_procs directly (already-enriched fields, same convention as
+# every other entity in this module) -- it never parses step.command
+# itself. In production these fields are populated by orchestrator.py's
+# agent-job enrichment loop calling parse_lineage(step.command, ...); these
+# tests set them directly, exactly like test_sequence_edge_generated_in_dependency_graph
+# sets referenced_sequences directly rather than re-parsing.
+
+def test_tsql_job_step_reading_a_table_produces_agent_job_edge():
+    step = AgentJobStepEntity(step_id=1, subsystem="TSQL", command="SELECT * FROM dbo.Orders", referenced_tables=["dbo.Orders"], parse_status="sqlglot")
+    job = AgentJobEntity(name="NightlyETL", enabled=True, step_details=[step])
+    deps = build_dependency_graph(stored_procedures=[], views=[], packages=[], foreign_keys=[], agent_jobs=[job])
+    edges = [d for d in deps if d.source_type == "agent_job"]
+    assert len(edges) == 1
+    assert edges[0].source_object == "NightlyETL"
+    assert edges[0].target_object == "dbo.Orders"
+    assert edges[0].target_type == "table"
+    assert edges[0].relationship_type == "reads"
+
+
+def test_tsql_job_step_calling_a_procedure_produces_calls_edge():
+    step = AgentJobStepEntity(step_id=1, subsystem="TSQL", command="EXEC dbo.usp_Load", referenced_procs=["dbo.usp_Load"], parse_status="sqlglot")
+    job = AgentJobEntity(name="NightlyETL", enabled=True, step_details=[step])
+    procs = [StoredProcedureEntity(database="db", schema="dbo", name="usp_Load", loc=1)]
+    deps = build_dependency_graph(stored_procedures=procs, views=[], packages=[], foreign_keys=[], agent_jobs=[job])
+    edges = [d for d in deps if d.source_type == "agent_job" and d.relationship_type == "calls"]
+    assert len(edges) == 1
+    assert edges[0].source_object == "NightlyETL"
+    assert edges[0].target_object == "dbo.usp_Load"
+    assert edges[0].target_type == "stored_procedure"
+
+
+def test_non_tsql_job_step_produces_no_edge():
+    """CmdExec/PowerShell step commands aren't T-SQL -- orchestrator.py's
+    enrichment loop never even calls parse_lineage for these, so
+    referenced_tables/referenced_procs stay empty; confirms the builder
+    also skips non-TSQL steps defensively even if they somehow carried
+    populated fields."""
+    step = AgentJobStepEntity(step_id=1, subsystem="PowerShell", command="Get-Service | Where Status -eq 'Stopped'", referenced_tables=["dbo.ShouldBeIgnored"])
+    job = AgentJobEntity(name="HealthCheck", enabled=True, step_details=[step])
+    deps = build_dependency_graph(stored_procedures=[], views=[], packages=[], foreign_keys=[], agent_jobs=[job])
+    assert not [d for d in deps if d.source_type == "agent_job"]
+
+
+def test_job_with_no_step_details_produces_no_edge():
+    job = AgentJobEntity(name="EmptyJob", enabled=True)
+    deps = build_dependency_graph(stored_procedures=[], views=[], packages=[], foreign_keys=[], agent_jobs=[job])
+    assert not [d for d in deps if d.source_type == "agent_job"]
+
+
+def test_job_step_reading_a_view_is_classified_as_view_not_table():
+    step = AgentJobStepEntity(step_id=1, subsystem="TSQL", command="SELECT * FROM dbo.vActiveOrders", referenced_tables=["dbo.vActiveOrders"], parse_status="sqlglot")
+    job = AgentJobEntity(name="ReportJob", enabled=True, step_details=[step])
+    views = [ViewEntity(database="db", schema="dbo", name="vActiveOrders")]
+    deps = build_dependency_graph(stored_procedures=[], views=views, packages=[], foreign_keys=[], agent_jobs=[job])
+    edges = [d for d in deps if d.source_type == "agent_job"]
+    assert len(edges) == 1
+    assert edges[0].target_type == "view"
+
+
+def test_orchestrator_enrichment_populates_step_fields_from_command_text():
+    """End-to-end check of the actual enrichment path (parse_lineage), as
+    distinct from the build_dependency_graph unit tests above which set
+    referenced_tables/referenced_procs directly."""
+    from autovista.sql_lineage_parser import parse_lineage
+
+    step = AgentJobStepEntity(step_id=1, subsystem="TSQL", command="EXEC dbo.usp_Load; SELECT * FROM dbo.Staging")
+    result = parse_lineage(step.command)
+    step.referenced_tables = result.referenced_tables
+    step.referenced_procs = result.referenced_procs
+    step.parse_status = result.parse_status
+
+    assert step.referenced_procs == ["dbo.usp_Load"]
+    assert step.referenced_tables == ["dbo.Staging"]
+    assert step.parse_status == "sqlglot"
