@@ -187,6 +187,111 @@ class DatabaseFileEntity:
 
 
 @dataclass
+class AgentJobStepEntity:
+    """One msdb.dbo.sysjobsteps row for a job -- retyped independently of
+    autovista.schema.AgentJobStepEntity (not shared code). See
+    catalog_metadata/agent_jobs.py."""
+
+    step_id: int | None = None
+    name: str | None = None
+    subsystem: str | None = None
+    database_name: str | None = None
+    command: str | None = None
+    on_success_action: str | None = None
+    on_fail_action: str | None = None
+    retry_attempts: int | None = None
+    retry_interval: int | None = None
+
+
+@dataclass
+class AgentJobEntity:
+    """msdb.dbo.sysjobs (+ sysjobsteps/sysschedules/sysjobschedules/
+    sysjobhistory) -- retyped independently of autovista.schema.AgentJobEntity
+    (not shared code), for feature parity between the two engines' SQL
+    Server Agent job inventory. See catalog_metadata/agent_jobs.py."""
+
+    name: str
+    enabled: bool
+    owner: str | None = None
+    category: str | None = None
+    description: str | None = None
+    date_created: str | None = None
+    date_modified: str | None = None
+    last_run_date: str | None = None
+    last_run_time: str | None = None
+    last_run_status: str | None = None
+    step_count: int = 0
+    schedule_names: list[str] = field(default_factory=list)
+    steps: list[AgentJobStepEntity] = field(default_factory=list)
+
+
+@dataclass
+class DatabaseSummaryEntity:
+    """Single-row, per-database rollup of counts already gathered by this
+    run's other catalog_metadata probes (schemas/indexes/constraints/
+    sequences/synonyms/database_users/database_roles), plus a handful of
+    cheap, direct sys.* facts not otherwise collected (largest_table). See
+    catalog_metadata/database_summary.py for exactly which probes must have
+    already run (registered earlier in _REGISTRY) for a given count to be
+    non-zero. Deliberately a narrower field set than autovista's
+    DatabaseSummaryEntity -- same reasoning DatabaseEntity's own docstring
+    (databases.py) gives."""
+
+    database: str
+    total_tables: int = 0
+    total_views: int = 0
+    total_stored_procedures: int = 0
+    total_functions: int = 0
+    total_triggers: int = 0
+    total_users: int = 0
+    total_roles: int = 0
+    total_schemas: int = 0
+    total_indexes: int = 0
+    total_foreign_keys: int = 0
+    total_synonyms: int = 0
+    total_sequences: int = 0
+    total_constraints: int = 0
+    database_size_mb: float = 0.0
+    recovery_model: str | None = None
+    compatibility_level: str | None = None
+    largest_table: str | None = None
+
+
+@dataclass
+class DataQualitySummaryEntity:
+    """Metadata-driven migration-readiness indicators, computed directly
+    from SQL Server catalog views (sys.tables/sys.columns/sys.indexes/
+    sys.foreign_keys/...) -- independent reimplementation of
+    autovista.data_quality_analyzer.build_data_quality_summary's category
+    set (not shared code, not derived from autovista's TableEntity/
+    ColumnEntity, which this engine doesn't have). Deliberately a narrower
+    field set matching what a handful of direct catalog queries can produce
+    -- see catalog_metadata/data_quality_summary.py for exactly which
+    columns are (and aren't) covered."""
+
+    database: str
+    total_tables: int = 0
+    empty_tables: int = 0
+    tables_without_primary_key: int = 0
+    tables_without_foreign_key: int = 0
+    heap_tables: int = 0
+    tables_with_triggers: int = 0
+    tables_with_identity_columns: int = 0
+    tables_with_computed_columns: int = 0
+    tables_with_cdc_enabled: int = 0
+    tables_with_change_tracking_enabled: int = 0
+    tables_with_temporal_tables: int = 0
+    nullable_columns: int = 0
+    non_nullable_columns: int = 0
+    deprecated_data_type_columns: int = 0
+    sql_variant_columns: int = 0
+    text_ntext_image_columns: int = 0
+    large_max_columns: int = 0
+    largest_tables: list[str] = field(default_factory=list)
+    excessive_index_tables: list[str] = field(default_factory=list)
+
+
+@dataclass
 class LakebridgeDependencyRef:
     source_object: str
     target_object: str
@@ -299,6 +404,26 @@ class LakebridgeDiscoveryResult:
     unsupported_objects: list[LakebridgeObjectRef] = field(default_factory=list)
     dependencies: list[LakebridgeDependencyRef] = field(default_factory=list)
     dependency_stats: dict = field(default_factory=dict)
+
+    # --- additive: SQLGlot/autovista parity probes (catalog_metadata's
+    # agent_jobs.py/clr_assemblies.py/database_users.py/database_roles.py/
+    # database_permissions.py/database_summary.py/data_quality_summary.py)
+    # -- see this package's __init__.py docstring. agent_jobs is msdb-scoped
+    # (not per-database, but msdb lives on the same server/connection);
+    # assemblies reuses LakebridgeObjectRef (same shape as the other pure
+    # inventory-only categories above); database_users/database_roles reuse
+    # ServerPrincipalEntity and database_permissions reuses
+    # ServerPermissionEntity (identical shape, database-scoped instead of
+    # server-scoped -- the field name is the scope discriminator, same
+    # convention autovista.schema.SecurityPrincipalEntity/PermissionEntity
+    # use their own `scope` attribute for).
+    agent_jobs: list[AgentJobEntity] = field(default_factory=list)
+    assemblies: list[LakebridgeObjectRef] = field(default_factory=list)
+    database_users: list[ServerPrincipalEntity] = field(default_factory=list)
+    database_roles: list[ServerPrincipalEntity] = field(default_factory=list)
+    database_permissions: list[ServerPermissionEntity] = field(default_factory=list)
+    database_summary: list[DatabaseSummaryEntity] = field(default_factory=list)
+    data_quality_summary: list[DataQualitySummaryEntity] = field(default_factory=list)
 
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)

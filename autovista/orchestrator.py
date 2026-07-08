@@ -37,11 +37,14 @@ from autovista.compatibility_scanner import scan_compatibility_flags
 from autovista.config import AutovistaConfig, load_config
 from autovista.data_quality_analyzer import build_data_quality_summary
 from autovista.dependency_graph_builder import build_dependency_graph
+from autovista.dependency_stats import compute_dependency_stats
 from autovista.dtsx_xml_parser import parse_dtsx_file
 from autovista.llm_fallback_extractor import build_llm_client, extract_with_llm_fallback
 from autovista.logging_setup import configure_logging, logger
 from autovista.output_writer import write_csv_rollup, write_manifest_json, write_run_log_summary
+from autovista.run_diagnostics import collect_errors, collect_warnings
 from autovista.schema import DiscoveryManifest
+from autovista.unsupported_objects import collect_unsupported_objects
 from autovista.sql_lineage_parser import (
     build_view_entity,
     enrich_constraint,
@@ -380,6 +383,15 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
         )
 
         counters["failed"] = sum(1 for e in all_log_entries if e.status == "failed")
+
+        # --- Lakebridge Discovery parity: dependency_stats/unsupported_objects/
+        # warnings/errors, all derived purely from data already computed
+        # above (manifest.dependencies, parse_status/unresolved_reason
+        # fields, this run's own log entries) -- see each module's docstring. ---
+        manifest.dependency_stats = compute_dependency_stats(manifest.dependencies)
+        manifest.unsupported_objects = collect_unsupported_objects(manifest)
+        manifest.errors = collect_errors(all_log_entries)
+        manifest.warnings = collect_warnings(manifest)
 
     logger.info(
         "=== Discovery run %s finished: scanned=%d skipped_unchanged=%d failed=%d ===",

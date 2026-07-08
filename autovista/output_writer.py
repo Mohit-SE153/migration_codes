@@ -48,6 +48,12 @@ ENTITY_OUTPUT_FILES = {
     "database_files": "database_files.json",
     "schemas": "schemas.json",
     "data_quality_summary": "data_quality_summary.json",
+    # --- additive: Lakebridge Discovery parity fields (see
+    # dependency_stats.py/unsupported_objects.py/run_diagnostics.py) ---
+    "unsupported_objects": "unsupported_objects.json",
+    "dependency_stats": "dependency_stats.json",
+    "warnings": "warnings.json",
+    "errors": "errors.json",
 }
 
 
@@ -169,6 +175,98 @@ def write_csv_rollup(
     })
     rows.append({
         "object_type": "dependency_edge", "object_name": "(all)", "count": len(manifest.dependencies),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    # --- additive: expose categories that were already being discovered
+    # (populated on the manifest by orchestrator.py/sql_metadata_extractor.py)
+    # but had no corresponding discovery_rollup.csv row -- pure exposure,
+    # zero new queries and zero changes to any existing field's value.
+    # Naming matches lakebridge_discovery.output_writer's rollup row names
+    # for the same categories 1:1, so the two engines' rollups are directly
+    # comparable by object_type.
+    rows.append({
+        "object_type": "server_instance", "object_name": "(all)", "count": 1 if manifest.server_instance else 0,
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "trigger", "object_name": "(all)", "count": len(manifest.triggers),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "user_defined_type", "object_name": "(all)", "count": len(manifest.user_defined_types),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "xml_schema_collection", "object_name": "(all)", "count": len(manifest.xml_schema_collections),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "agent_job", "object_name": "(all)", "count": len(manifest.agent_jobs),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "clr_assembly", "object_name": "(all)", "count": len(manifest.assemblies),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "linked_server", "object_name": "(all)", "count": len(manifest.linked_servers),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "database_summary", "object_name": "(all)", "count": len(manifest.database_summary),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "data_quality_summary", "object_name": "(all)", "count": len(manifest.data_quality_summary),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    # security_principals/permissions already carry a `scope` discriminator
+    # ("database" vs "server") and, for scope="database" rows, a
+    # principal_type of "USER" or "ROLE" -- see SecurityPrincipalEntity/
+    # PermissionEntity in schema.py. These rows split the one existing list
+    # into the same four categories Lakebridge Discovery already exposes as
+    # four separate JSON files/rollup rows (database_users.py/
+    # database_roles.py/database_permissions.py + source_exporter.py's
+    # server-scoped server_principals/server_permissions), without adding a
+    # single new query or duplicating security_principals.json/
+    # permissions.json (which remain the complete, authoritative lists).
+    rows.append({
+        "object_type": "database_user", "object_name": "(all)",
+        "count": sum(1 for p in manifest.security_principals if p.scope == "database" and p.principal_type == "USER"),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "database_role", "object_name": "(all)",
+        "count": sum(1 for p in manifest.security_principals if p.scope == "database" and p.principal_type == "ROLE"),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "server_principal", "object_name": "(all)",
+        "count": sum(1 for p in manifest.security_principals if p.scope == "server"),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "database_permission", "object_name": "(all)",
+        "count": sum(1 for p in manifest.permissions if p.scope == "database"),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "server_permission", "object_name": "(all)",
+        "count": sum(1 for p in manifest.permissions if p.scope == "server"),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    # --- additive: Lakebridge Discovery parity fields -- manifest.warnings/
+    # manifest.errors/manifest.unsupported_objects are populated by
+    # orchestrator.py from data already computed above (see
+    # run_diagnostics.py/unsupported_objects.py); mirrors Lakebridge's own
+    # rollup, which has had "warning"/"error"/"unsupported_object" rows
+    # since that engine's original catalog_metadata work.
+    rows.append({
+        "object_type": "unsupported_object", "object_name": "(all)", "count": len(manifest.unsupported_objects),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "warning", "object_name": "(all)", "count": len(manifest.warnings),
         "size_mb": "", "tables": "", "procs": "", "views": "",
     })
     # A proc/embedded-SQL object needs human review either because it's

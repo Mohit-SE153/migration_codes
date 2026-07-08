@@ -45,10 +45,17 @@ from collections import Counter
 from typing import Callable
 
 from lakebridge_discovery.catalog_metadata import (
+    agent_jobs,
+    clr_assemblies,
     computed_column_functions,
     constraints,
     database_files,
+    database_permissions,
+    database_roles,
+    database_summary,
+    database_users,
     databases,
+    data_quality_summary,
     foreign_keys,
     indexes,
     schemas,
@@ -85,6 +92,23 @@ _REGISTRY: list[tuple[str, CatalogProbe]] = [
     (databases.NAME, databases.discover),
     (database_files.NAME, database_files.discover),
     (synonyms.NAME, synonyms.discover),
+    # --- additive: SQLGlot/autovista parity probes (agent jobs, CLR
+    # assemblies, database-level security, and the two summary rollups).
+    # agent_jobs/clr_assemblies/database_users/database_roles/
+    # database_permissions are independent inventory probes like the ones
+    # above; database_summary and data_quality_summary are registered LAST
+    # deliberately -- both aggregate counts from result.tables/.schemas/
+    # .indexes/.constraints/.sequences/.synonyms/.database_users/
+    # .database_roles/.indexes already populated by the probes above them
+    # in this same list, rather than re-querying the same catalog views a
+    # second time (see each probe's own module docstring).
+    (agent_jobs.NAME, agent_jobs.discover),
+    (clr_assemblies.NAME, clr_assemblies.discover),
+    (database_users.NAME, database_users.discover),
+    (database_roles.NAME, database_roles.discover),
+    (database_permissions.NAME, database_permissions.discover),
+    (data_quality_summary.NAME, data_quality_summary.discover),
+    (database_summary.NAME, database_summary.discover),
 ]
 
 

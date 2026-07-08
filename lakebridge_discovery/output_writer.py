@@ -40,6 +40,16 @@ ENTITY_OUTPUT_FILES = {
     "table_features": "table_features.json",
     "procedure_parameters": "procedure_parameters.json",
     "linked_servers": "linked_servers.json",
+    # --- additive: SQLGlot/autovista parity probes (see catalog_metadata's
+    # agent_jobs.py/clr_assemblies.py/database_users.py/database_roles.py/
+    # database_permissions.py/database_summary.py/data_quality_summary.py) ---
+    "agent_jobs": "agent_jobs.json",
+    "assemblies": "assemblies.json",
+    "database_users": "database_users.json",
+    "database_roles": "database_roles.json",
+    "database_permissions": "database_permissions.json",
+    "database_summary": "database_summary.json",
+    "data_quality_summary": "data_quality_summary.json",
 }
 
 
@@ -113,6 +123,14 @@ def write_csv_rollup(result: LakebridgeDiscoveryResult, output_dir: str, filenam
         {"object_type": "server_principal", "object_name": "(all)", "count": len(result.server_principals)},
         {"object_type": "server_permission", "object_name": "(all)", "count": len(result.server_permissions)},
         {"object_type": "linked_server", "object_name": "(all)", "count": len(result.linked_servers)},
+        # --- additive: SQLGlot/autovista parity probes ---
+        {"object_type": "agent_job", "object_name": "(all)", "count": len(result.agent_jobs)},
+        {"object_type": "clr_assembly", "object_name": "(all)", "count": len(result.assemblies)},
+        {"object_type": "database_user", "object_name": "(all)", "count": len(result.database_users)},
+        {"object_type": "database_role", "object_name": "(all)", "count": len(result.database_roles)},
+        {"object_type": "database_permission", "object_name": "(all)", "count": len(result.database_permissions)},
+        {"object_type": "database_summary", "object_name": "(all)", "count": len(result.database_summary)},
+        {"object_type": "data_quality_summary", "object_name": "(all)", "count": len(result.data_quality_summary)},
     ]
 
     # SQL-Server-feature compatibility scan (compatibility_scanner.py): one

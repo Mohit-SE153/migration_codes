@@ -683,6 +683,25 @@ class PackageEntity:
 
 
 @dataclass
+class UnsupportedObjectEntity:
+    """An object this run's own sqlglot/lineage parsing could not fully
+    resolve -- derived entirely from parse_status/unresolved_reason fields
+    entities already carry (see unsupported_objects.py), never a second,
+    independent parsing pass. Added for feature parity with Lakebridge
+    Discovery's own unsupported_objects.json (populated there from the
+    Analyzer report's "unsupported" category -- see
+    lakebridge_discovery.report_parser); this engine's equivalent signal is
+    "sqlglot/lineage parsing gave up on this object", which is exactly what
+    parse_status=="unresolved" (or a non-null unresolved_reason) already
+    means for every entity that carries those fields."""
+
+    object_type: str
+    name: str
+    parse_status: ParseStatus | None = None
+    reason: str | None = None
+
+
+@dataclass
 class DependencyEntity:
     source_object: str
     source_type: str
@@ -721,6 +740,16 @@ class DiscoveryManifest:
     database_summary: list[DatabaseSummaryEntity] = field(default_factory=list)
     constraints: list[ConstraintEntity] = field(default_factory=list)
     data_quality_summary: list[DataQualitySummaryEntity] = field(default_factory=list)
+
+    # --- additive: Lakebridge Discovery parity fields (see
+    # dependency_stats.py/unsupported_objects.py/run_diagnostics.py) --
+    # all three are derived purely from data this manifest already carries
+    # (dependencies/parse_status/unresolved_reason/the run's own log
+    # entries), never a new parsing pass or a fabricated estimate.
+    unsupported_objects: list[UnsupportedObjectEntity] = field(default_factory=list)
+    dependency_stats: dict = field(default_factory=dict)
+    warnings: list[str] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return asdict(self)
