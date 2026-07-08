@@ -384,6 +384,20 @@ class FunctionEntity:
 
 
 @dataclass
+class SchemaEntity:
+    """sys.schemas, excluding SQL Server's built-in fixed schemas (sys,
+    INFORMATION_SCHEMA, guest) and the auto-created, always-empty schema
+    every fixed database role gets -- see QUERY_SCHEMAS in
+    sql_metadata_extractor.py for why the latter filter is needed. Added
+    for feature parity with Lakebridge Discovery's own schemas.json (which
+    predates this addition on the SQLGlot side)."""
+
+    database: str
+    name: str
+    parse_status: ParseStatus = "direct_metadata"
+
+
+@dataclass
 class SynonymEntity:
     database: str
     schema: str
@@ -670,6 +684,7 @@ class DiscoveryManifest:
     packages: list[PackageEntity] = field(default_factory=list)
     dependencies: list[DependencyEntity] = field(default_factory=list)
     database_files: list[FileEntity] = field(default_factory=list)
+    schemas: list[SchemaEntity] = field(default_factory=list)
     indexes: list[IndexEntity] = field(default_factory=list)
     functions: list[FunctionEntity] = field(default_factory=list)
     synonyms: list[SynonymEntity] = field(default_factory=list)

@@ -5,13 +5,16 @@ those files rather than replaced by them).
 """
 from __future__ import annotations
 
+import csv
 import json
 
-from autovista.output_writer import ENTITY_OUTPUT_FILES, write_entity_outputs, write_manifest_json
+from autovista.output_writer import ENTITY_OUTPUT_FILES, write_csv_rollup, write_entity_outputs, write_manifest_json
 from autovista.schema import (
     ConstraintEntity,
     DatabaseEntity,
+    DiscoveryLogEntry,
     DiscoveryManifest,
+    SchemaEntity,
     TableEntity,
 )
 
@@ -104,3 +107,55 @@ def test_write_manifest_json_matches_manifest_to_dict_exactly(tmp_path):
         assembled = json.load(f)
 
     assert assembled == expected
+
+
+def test_write_entity_outputs_writes_schemas_file(tmp_path):
+    """Added for Lakebridge Discovery parity -- schemas is a new manifest
+    category (see sql_metadata_extractor.QUERY_SCHEMAS)."""
+    manifest = _sample_manifest()
+    manifest.schemas = [SchemaEntity(database="SalesDW", name="dbo"), SchemaEntity(database="SalesDW", name="staging")]
+
+    paths = write_entity_outputs(manifest, str(tmp_path))
+
+    assert "schemas" in paths
+    with open(tmp_path / "schemas.json", encoding="utf-8") as f:
+        schemas = json.load(f)
+    assert len(schemas) == 2
+    assert {s["name"] for s in schemas} == {"dbo", "staging"}
+
+
+def test_write_csv_rollup_schema_count_matches_manifest(tmp_path):
+    manifest = _sample_manifest()
+    manifest.schemas = [SchemaEntity(database="SalesDW", name="dbo")]
+
+    rollup_path = write_csv_rollup(manifest, str(tmp_path))
+
+    with open(rollup_path, newline="", encoding="utf-8") as f:
+        rows = {row["object_type"]: row for row in csv.DictReader(f)}
+    assert int(rows["schema"]["count"]) == 1
+
+
+def test_write_csv_rollup_error_row_omitted_when_log_entries_not_passed(tmp_path):
+    """Backward compatibility: existing callers that don't pass log_entries
+    must keep working exactly as before -- no "error" row appears."""
+    manifest = _sample_manifest()
+    rollup_path = write_csv_rollup(manifest, str(tmp_path))
+
+    with open(rollup_path, newline="", encoding="utf-8") as f:
+        rows = [row["object_type"] for row in csv.DictReader(f)]
+    assert "error" not in rows
+
+
+def test_write_csv_rollup_error_row_counts_failed_log_entries():
+    import tempfile
+
+    manifest = _sample_manifest()
+    log_entries = [
+        DiscoveryLogEntry(object_type="trigger", object_name="X", status="failed", error="boom"),
+        DiscoveryLogEntry(object_type="table", object_name="Y", status="success"),
+    ]
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        rollup_path = write_csv_rollup(manifest, tmp_dir, log_entries=log_entries)
+        with open(rollup_path, newline="", encoding="utf-8") as f:
+            rows = {row["object_type"]: row for row in csv.DictReader(f)}
+    assert int(rows["error"]["count"]) == 1

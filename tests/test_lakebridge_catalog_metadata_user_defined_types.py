@@ -13,15 +13,22 @@ from lakebridge_discovery.schema import LakebridgeDependencyRef, LakebridgeDisco
 
 
 class _FakeCursor:
-    def __init__(self, table_udt_rows, routine_udt_rows):
+    def __init__(self, table_udt_rows, routine_udt_rows, type_inventory_rows):
         self._table_udt_rows = table_udt_rows
         self._routine_udt_rows = routine_udt_rows
+        self._type_inventory_rows = type_inventory_rows
         self._rows: list[tuple] = []
 
     def execute(self, sql: str):
-        # Dispatch on which of the two queries ran -- "sys.parameters" only
-        # appears in the routine-UDT query.
-        self._rows = self._routine_udt_rows if "sys.parameters" in sql else self._table_udt_rows
+        # Dispatch on which of the three queries ran -- "sys.parameters"
+        # only appears in the routine-UDT query, "sys.columns" only in the
+        # table-UDT query; the type-inventory query has neither.
+        if "sys.parameters" in sql:
+            self._rows = self._routine_udt_rows
+        elif "sys.columns" in sql:
+            self._rows = self._table_udt_rows
+        else:
+            self._rows = self._type_inventory_rows
         return self
 
     def fetchall(self):
@@ -29,12 +36,13 @@ class _FakeCursor:
 
 
 class _FakeConnection:
-    def __init__(self, table_udt_rows=(), routine_udt_rows=()):
+    def __init__(self, table_udt_rows=(), routine_udt_rows=(), type_inventory_rows=()):
         self._table_udt_rows = table_udt_rows
         self._routine_udt_rows = routine_udt_rows
+        self._type_inventory_rows = type_inventory_rows
 
     def cursor(self):
-        return _FakeCursor(self._table_udt_rows, self._routine_udt_rows)
+        return _FakeCursor(self._table_udt_rows, self._routine_udt_rows, self._type_inventory_rows)
 
 
 def _base_result() -> LakebridgeDiscoveryResult:
@@ -172,3 +180,35 @@ def test_discover_runs_both_table_and_routine_sub_queries_together():
 def test_user_defined_types_probe_is_registered():
     names = [name for name, _ in catalog_metadata._REGISTRY]
     assert "user_defined_types" in names
+
+
+def test_discover_populates_type_inventory_separately_from_dependency_edges():
+    """result.user_defined_types (distinct TYPE objects) is separate from,
+    and much smaller than, result.dependencies (uses_type edges) -- this is
+    the parity addition: same probe, an additional inventory list, not a
+    duplicate of the edge count."""
+    result = _base_result()
+    connection = _FakeConnection(
+        table_udt_rows=[("Person", "Person", "dbo", "NameStyle"), ("Person", "Person", "dbo", "Flag")],
+        type_inventory_rows=[("dbo", "NameStyle", False), ("dbo", "Flag", False), ("dbo", "OrderNumberTable", True)],
+    )
+
+    user_defined_types.discover(connection, result, seen_edges=set())
+
+    assert len(result.dependencies) == 2  # unaffected by the new inventory step
+    assert len(result.user_defined_types) == 3
+    names = {obj.name for obj in result.user_defined_types}
+    assert names == {"dbo.NameStyle", "dbo.Flag", "dbo.OrderNumberTable"}
+    notes = {obj.name: obj.notes for obj in result.user_defined_types}
+    assert notes["dbo.OrderNumberTable"] == "TABLE_TYPE"
+    assert notes["dbo.NameStyle"] == "ALIAS_TYPE"
+    assert all(obj.object_type == "user_defined_type" and obj.raw_category == "sys.types" for obj in result.user_defined_types)
+
+
+def test_discover_deduplicates_type_inventory_rows():
+    result = _base_result()
+    connection = _FakeConnection(type_inventory_rows=[("dbo", "Flag", False), ("dbo", "Flag", False)])
+
+    user_defined_types.discover(connection, result, seen_edges=set())
+
+    assert len(result.user_defined_types) == 1

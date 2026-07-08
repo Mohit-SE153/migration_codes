@@ -145,6 +145,40 @@ class LinkedServerEntity:
 
 
 @dataclass
+class DatabaseEntity:
+    """Single-row database-level summary -- retyped independently of
+    autovista.schema.DatabaseEntity (a deliberately narrower field set; see
+    catalog_metadata/databases.py's module docstring for why), not shared
+    code. Exactly one of these per Discovery run."""
+
+    name: str
+    size_mb: float
+    table_count: int
+    proc_count: int
+    view_count: int
+    recovery_model: str | None = None
+    compatibility_level: str | None = None
+    collation_name: str | None = None
+
+
+@dataclass
+class DatabaseFileEntity:
+    """sys.database_files -- retyped independently of
+    autovista.schema.FileEntity (not shared code), for feature parity
+    between the two engines' inventory coverage. See
+    catalog_metadata/database_files.py."""
+
+    logical_name: str
+    physical_name: str
+    file_type: str | None = None  # sys.database_files.type_desc, e.g. "ROWS" | "LOG"
+    filegroup: str | None = None
+    current_size_mb: float = 0.0
+    max_size_mb: float | None = None
+    growth_mb: float | None = None  # holds a percentage number instead when growth_type="PERCENT"
+    growth_type: str | None = None  # "MB" | "PERCENT"
+
+
+@dataclass
 class LakebridgeDependencyRef:
     source_object: str
     target_object: str
@@ -238,6 +272,22 @@ class LakebridgeDiscoveryResult:
     indexes: list[LakebridgeObjectRef] = field(default_factory=list)
     constraints: list[LakebridgeObjectRef] = field(default_factory=list)
     sequences: list[LakebridgeObjectRef] = field(default_factory=list)
+    # Populated only by catalog_metadata's databases.py/database_files.py
+    # probes -- same "Analyzer has no visibility into this" reasoning as
+    # indexes/constraints/sequences above.
+    databases: list[DatabaseEntity] = field(default_factory=list)
+    database_files: list[DatabaseFileEntity] = field(default_factory=list)
+    # Distinct TYPE/COLLECTION *objects* (e.g. "dbo.Flag", one row per
+    # user-defined type that exists), populated by catalog_metadata's
+    # user_defined_types.py/xml_schema_collections.py probes -- separate
+    # from and NOT a duplicate of the much larger uses_type *dependency
+    # edge* counts those same probes already contribute to
+    # result.dependencies (edges = how many columns/parameters USE a type;
+    # this = how many distinct type objects exist). Matches autovista's own
+    # user_defined_types/xml_schema_collections inventory lists, which are
+    # likewise separate from its dependency graph.
+    user_defined_types: list[LakebridgeObjectRef] = field(default_factory=list)
+    xml_schema_collections: list[LakebridgeObjectRef] = field(default_factory=list)
     unsupported_objects: list[LakebridgeObjectRef] = field(default_factory=list)
     dependencies: list[LakebridgeDependencyRef] = field(default_factory=list)
     dependency_stats: dict = field(default_factory=dict)

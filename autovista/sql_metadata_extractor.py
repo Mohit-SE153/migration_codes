@@ -36,6 +36,7 @@ from autovista.schema import (
     LinkedServerEntity,
     ParameterEntity,
     PermissionEntity,
+    SchemaEntity,
     SequenceEntity,
     SecurityPrincipalEntity,
     ServerInstanceEntity,
@@ -472,6 +473,22 @@ FROM sys.synonyms sy
 JOIN sys.schemas s ON s.schema_id = sy.schema_id
 """
 
+# Excludes SQL Server's built-in fixed schemas (sys, INFORMATION_SCHEMA,
+# guest) by name, and requires the schema to own at least one row in
+# sys.objects -- SQL Server auto-creates a schema for each of its 9 fixed
+# database roles (db_owner, db_datareader, ...) even though none of them
+# ever own an object, so a name-only exclusion isn't sufficient (same
+# finding this exact filter needed on the Lakebridge Discovery side --
+# see lakebridge_discovery/catalog_metadata/schemas.py -- independently
+# re-derived here, not shared code).
+QUERY_SCHEMAS = """
+SELECT s.name AS schema_name
+FROM sys.schemas s
+WHERE s.name NOT IN ('sys', 'INFORMATION_SCHEMA', 'guest')
+  AND EXISTS (SELECT 1 FROM sys.objects o WHERE o.schema_id = s.schema_id)
+ORDER BY s.name
+"""
+
 QUERY_SEQUENCES = """
 SELECT s.name AS schema_name, seq.name AS sequence_name, CAST(start_value AS bigint) AS current_value,
        CAST(increment AS bigint) AS increment_value, CAST(minimum_value AS bigint) AS min_value,
@@ -623,6 +640,7 @@ class MetadataSource(Protocol):
     def list_indexes(self, database: str) -> list[IndexEntity]: ...
     def list_functions(self, database: str) -> list[tuple[FunctionEntity, str]]: ...  # (entity, definition text)
     def list_synonyms(self, database: str) -> list[SynonymEntity]: ...
+    def list_schemas(self, database: str) -> list[SchemaEntity]: ...
     def list_sequences(self, database: str) -> list[SequenceEntity]: ...
     def list_user_defined_types(self, database: str) -> list[UserDefinedTypeEntity]: ...
     def list_xml_schema_collections(self, database: str) -> list[XmlSchemaCollectionEntity]: ...
@@ -1262,6 +1280,12 @@ class LiveSqlServerSource:
             for schema_name, synonym_name, base_object_name in cur.fetchall()
         ]
 
+    def list_schemas(self, database: str) -> list[SchemaEntity]:
+        self._use_database(database)
+        cur = self.connection.cursor()
+        cur.execute(QUERY_SCHEMAS)
+        return [SchemaEntity(database=database, name=schema_name) for (schema_name,) in cur.fetchall()]
+
     def list_sequences(self, database: str) -> list[SequenceEntity]:
         self._use_database(database)
         cur = self.connection.cursor()
@@ -1727,6 +1751,12 @@ class FixtureMetadataSource:
     def list_synonyms(self, database: str) -> list[SynonymEntity]:
         return [SynonymEntity(database=database, schema="dbo", name="CustomerAlias", base_object="dbo.Customers")]
 
+    def list_schemas(self, database: str) -> list[SchemaEntity]:
+        return [
+            SchemaEntity(database=database, name="dbo"),
+            SchemaEntity(database=database, name="staging"),
+        ]
+
     def list_sequences(self, database: str) -> list[SequenceEntity]:
         return [SequenceEntity(database=database, schema="dbo", name="Seq_OrderId", current_value=1000, increment=1, minimum_value=1, maximum_value=2147483647, cache=50)]
 
@@ -1862,6 +1892,10 @@ def extract_database_metadata(source: MetadataSource, database: str):
     def _synonyms(name):
         return source.list_synonyms(database), "direct_metadata"
 
+    @log_object_result("schema")
+    def _schemas(name):
+        return source.list_schemas(database), "direct_metadata"
+
     @log_object_result("sequence")
     def _sequences(name):
         return source.list_sequences(database), "direct_metadata"
@@ -1910,6 +1944,7 @@ def extract_database_metadata(source: MetadataSource, database: str):
     indexes, e = _indexes(database); log_entries.append(e)
     functions, e = _functions(database); log_entries.append(e)
     synonyms, e = _synonyms(database); log_entries.append(e)
+    schemas, e = _schemas(database); log_entries.append(e)
     sequences, e = _sequences(database); log_entries.append(e)
     user_defined_types, e = _user_defined_types(database); log_entries.append(e)
     xml_schema_collections, e = _xml_schema_collections(database); log_entries.append(e)
@@ -1938,6 +1973,7 @@ def extract_database_metadata(source: MetadataSource, database: str):
             summary.total_indexes = len(indexes or [])
             summary.total_foreign_keys = len(foreign_keys or [])
             summary.total_synonyms = len(synonyms or [])
+            summary.total_schemas = len(schemas or [])
             summary.total_sequences = len(sequences or [])
             summary.total_users = sum(1 for p in security_principals or [] if p.principal_type == "USER")
             summary.total_roles = sum(1 for p in security_principals or [] if p.principal_type == "ROLE")
@@ -1961,6 +1997,7 @@ def extract_database_metadata(source: MetadataSource, database: str):
         "views": views or [],
         "foreign_keys": foreign_keys or [],
         "database_files": database_files or [],
+        "schemas": schemas or [],
         "indexes": indexes or [],
         "functions": functions or [],
         "synonyms": synonyms or [],

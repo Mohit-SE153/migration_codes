@@ -360,3 +360,16 @@ def test_list_database_summary_populates_size_and_backup_dates():
     assert summary.compatibility_level == "150"
     assert summary.last_backup == "2024-06-15"
     assert summary.database_size_mb == 750.0
+
+
+def test_list_schemas_maps_name_only():
+    """Added for Lakebridge Discovery parity -- QUERY_SCHEMAS itself
+    already excludes built-in/role schemas at the SQL level (see its own
+    comment), so this only needs to check the row -> SchemaEntity mapping."""
+    source = _source([
+        ("FROM sys.schemas s", [("Sales",), ("HumanResources",)]),
+    ])
+    schemas = source.list_schemas("SalesDW")
+    assert len(schemas) == 2
+    assert {s.name for s in schemas} == {"Sales", "HumanResources"}
+    assert all(s.database == "SalesDW" for s in schemas)

@@ -46,6 +46,7 @@ ENTITY_OUTPUT_FILES = {
     "xml_schema_collections": "xml_schema_collections.json",
     "user_defined_types": "user_defined_types.json",
     "database_files": "database_files.json",
+    "schemas": "schemas.json",
     "data_quality_summary": "data_quality_summary.json",
 }
 
@@ -97,9 +98,21 @@ def write_manifest_json(manifest: DiscoveryManifest, output_dir: str, filename: 
     return out_path
 
 
-def write_csv_rollup(manifest: DiscoveryManifest, output_dir: str, filename: str = "discovery_rollup.csv") -> Path:
+def write_csv_rollup(
+    manifest: DiscoveryManifest, output_dir: str, filename: str = "discovery_rollup.csv",
+    log_entries: list[DiscoveryLogEntry] | None = None,
+) -> Path:
     """Counts and sizes only -- meant to be opened in Excel by someone
-    who wants a 30-second sanity check, not the full graph."""
+    who wants a 30-second sanity check, not the full graph.
+
+    log_entries is optional (defaults to None -> "error" row omitted) so
+    every existing caller/test that doesn't pass it keeps working
+    unchanged -- added for feature parity with Lakebridge Discovery's
+    rollup, which already has an explicit "error" row (this engine's own
+    failure signal already existed per-object in discovery_log_summary.csv
+    via DiscoveryLogEntry.status=="failed"; this just also surfaces a
+    count of it in the rollup, the same way "unresolved_or_llm_inferred"
+    already surfaces a different existing signal)."""
     out_path = Path(output_dir) / filename
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -120,6 +133,10 @@ def write_csv_rollup(manifest: DiscoveryManifest, output_dir: str, filename: str
     })
     rows.append({
         "object_type": "database_file", "object_name": "(all)", "count": len(manifest.database_files),
+        "size_mb": "", "tables": "", "procs": "", "views": "",
+    })
+    rows.append({
+        "object_type": "schema", "object_name": "(all)", "count": len(manifest.schemas),
         "size_mb": "", "tables": "", "procs": "", "views": "",
     })
     rows.append({
@@ -173,6 +190,13 @@ def write_csv_rollup(manifest: DiscoveryManifest, output_dir: str, filename: str
         "object_type": "unresolved_or_llm_inferred", "object_name": "(needs human review)", "count": needs_review,
         "size_mb": "", "tables": "", "procs": "", "views": "",
     })
+
+    if log_entries is not None:
+        rows.append({
+            "object_type": "error", "object_name": "(all)",
+            "count": sum(1 for e in log_entries if e.status == "failed"),
+            "size_mb": "", "tables": "", "procs": "", "views": "",
+        })
 
     # SQL-Server-feature compatibility scan (autovista/compatibility_scanner.py):
     # one row per distinct flag across every scanned object (stored procs,

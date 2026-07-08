@@ -13,10 +13,15 @@ from lakebridge_discovery.schema import LakebridgeDependencyRef, LakebridgeDisco
 
 
 class _FakeCursor:
-    def __init__(self, rows: list[tuple]):
-        self._rows = rows
+    def __init__(self, edge_rows, inventory_rows):
+        self._edge_rows = edge_rows
+        self._inventory_rows = inventory_rows
+        self._rows: list[tuple] = []
 
     def execute(self, sql: str):
+        # Dispatch on which of the two queries ran -- "sys.columns" only
+        # appears in the edge (Table -> Collection) query.
+        self._rows = self._edge_rows if "sys.columns" in sql else self._inventory_rows
         return self
 
     def fetchall(self):
@@ -24,11 +29,12 @@ class _FakeCursor:
 
 
 class _FakeConnection:
-    def __init__(self, rows: list[tuple]):
-        self._rows = rows
+    def __init__(self, edge_rows=(), inventory_rows=()):
+        self._edge_rows = edge_rows
+        self._inventory_rows = inventory_rows
 
     def cursor(self):
-        return _FakeCursor(self._rows)
+        return _FakeCursor(self._edge_rows, self._inventory_rows)
 
 
 def _base_result() -> LakebridgeDiscoveryResult:
@@ -112,3 +118,38 @@ def test_discover_does_not_duplicate_an_edge_already_known_from_a_prior_pass():
 def test_xml_schema_collections_probe_is_registered():
     names = [name for name, _ in catalog_metadata._REGISTRY]
     assert "xml_schema_collections" in names
+
+
+def test_discover_populates_collection_inventory_separately_from_dependency_edges():
+    """result.xml_schema_collections (distinct COLLECTION objects) is
+    separate from, and much smaller than, result.dependencies (uses_type
+    edges) -- the parity addition: same probe, an additional inventory
+    list, not a duplicate of the edge count."""
+    result = _base_result()
+    connection = _FakeConnection(
+        edge_rows=[("Person", "Person", "Person", "AdditionalContactInfoSchemaCollection")],
+        inventory_rows=[("Person", "AdditionalContactInfoSchemaCollection"), ("Sales", "StoreSurveySchemaCollection")],
+    )
+
+    xml_schema_collections.discover(connection, result, seen_edges=set())
+
+    assert len(result.dependencies) == 1  # unaffected by the new inventory step
+    assert len(result.xml_schema_collections) == 2
+    names = {obj.name for obj in result.xml_schema_collections}
+    assert names == {"Person.AdditionalContactInfoSchemaCollection", "Sales.StoreSurveySchemaCollection"}
+    assert all(
+        obj.object_type == "xml_schema_collection" and obj.raw_category == "sys.xml_schema_collections"
+        for obj in result.xml_schema_collections
+    )
+
+
+def test_discover_deduplicates_collection_inventory_rows():
+    result = _base_result()
+    connection = _FakeConnection(inventory_rows=[
+        ("Person", "AdditionalContactInfoSchemaCollection"),
+        ("Person", "AdditionalContactInfoSchemaCollection"),
+    ])
+
+    xml_schema_collections.discover(connection, result, seen_edges=set())
+
+    assert len(result.xml_schema_collections) == 1

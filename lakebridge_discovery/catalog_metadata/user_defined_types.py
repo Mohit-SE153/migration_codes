@@ -38,9 +38,23 @@ from __future__ import annotations
 
 from lakebridge_discovery.catalog_metadata import vocabulary
 from lakebridge_discovery.catalog_metadata.naming import name_by_key
-from lakebridge_discovery.schema import LakebridgeDependencyRef, LakebridgeDiscoveryResult
+from lakebridge_discovery.schema import LakebridgeDependencyRef, LakebridgeDiscoveryResult, LakebridgeObjectRef
 
 NAME = "user_defined_types"
+
+# Distinct TYPE *objects* (e.g. "dbo.Flag") -- separate from, and much
+# smaller than, the uses_type *dependency edge* count the two queries above
+# already produce (edges = how many columns/parameters use a type; this =
+# how many distinct type objects exist). Added for parity with autovista's
+# own user_defined_types inventory list, which is likewise separate from
+# its dependency graph.
+_QUERY_TYPE_INVENTORY = """
+SELECT s.name AS schema_name, t.name AS type_name, t.is_table_type
+FROM sys.types t
+JOIN sys.schemas s ON s.schema_id = t.schema_id
+WHERE t.is_user_defined = 1
+ORDER BY s.name, t.name
+"""
 
 _QUERY_TABLE_UDT = """
 SELECT DISTINCT
@@ -121,6 +135,25 @@ def _discover_routine_udt(connection, result: LakebridgeDiscoveryResult, seen_ed
         _emit(result, seen_edges, source_object, source_type, type_schema, type_name, vocabulary.RAW_CATEGORY_PROC_UDT)
 
 
+def _discover_type_inventory(connection, result: LakebridgeDiscoveryResult) -> None:
+    cursor = connection.cursor()
+    cursor.execute(_QUERY_TYPE_INVENTORY)
+    seen_names: set[str] = set()
+    for schema_name, type_name, is_table_type in cursor.fetchall():
+        name = f"{schema_name}.{type_name}"
+        if name in seen_names:
+            continue
+        seen_names.add(name)
+        result.user_defined_types.append(LakebridgeObjectRef(
+            object_type="user_defined_type",
+            name=name,
+            source_tech="MS SQL Server",
+            raw_category="sys.types",
+            notes="TABLE_TYPE" if is_table_type else "ALIAS_TYPE",
+        ))
+
+
 def discover(connection, result: LakebridgeDiscoveryResult, seen_edges: set[tuple]) -> None:
     _discover_table_udt(connection, result, seen_edges)
     _discover_routine_udt(connection, result, seen_edges)
+    _discover_type_inventory(connection, result)

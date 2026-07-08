@@ -90,6 +90,7 @@ def _fixture_config(run_mode: str = "fixture", host: str = "localhost") -> Lakeb
         analyze_timeout_seconds=60,
         output_dir="./_test_output_lakebridge",
         source_export_dir="./_test_output_lakebridge/_source_export",
+        catalog_metadata_sources="*",
     )
 
 

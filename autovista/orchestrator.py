@@ -141,6 +141,7 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
         manifest.databases = db_result["databases"]
         manifest.agent_jobs = db_result["agent_jobs"]
         manifest.database_files = db_result.get("database_files", [])
+        manifest.schemas = db_result.get("schemas", [])
         manifest.indexes = db_result.get("indexes", [])
         manifest.synonyms = db_result.get("synonyms", [])
         manifest.sequences = db_result.get("sequences", [])
@@ -344,7 +345,7 @@ def run_discovery(config: AutovistaConfig | None = None) -> DiscoveryManifest:
     )
 
     manifest_path = write_manifest_json(manifest, config.output_dir)
-    csv_path = write_csv_rollup(manifest, config.output_dir)
+    csv_path = write_csv_rollup(manifest, config.output_dir, log_entries=all_log_entries)
     log_csv_path = write_run_log_summary(all_log_entries, config.output_dir)
     logger.info("Wrote manifest=%s rollup=%s log_summary=%s", manifest_path, csv_path, log_csv_path)
 

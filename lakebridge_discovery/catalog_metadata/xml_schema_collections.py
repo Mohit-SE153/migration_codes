@@ -30,7 +30,7 @@ from __future__ import annotations
 
 from lakebridge_discovery.catalog_metadata import vocabulary
 from lakebridge_discovery.catalog_metadata.naming import name_by_key
-from lakebridge_discovery.schema import LakebridgeDependencyRef, LakebridgeDiscoveryResult
+from lakebridge_discovery.schema import LakebridgeDependencyRef, LakebridgeDiscoveryResult, LakebridgeObjectRef
 
 NAME = "xml_schema_collections"
 
@@ -46,6 +46,35 @@ JOIN sys.schemas xss ON xss.schema_id = xsc.schema_id
 WHERE c.xml_collection_id > 0
 ORDER BY ts.name, t.name, xss.name, xsc.name
 """
+
+# Distinct COLLECTION *objects* (e.g. "Person.AdditionalContactInfoSchemaCollection")
+# -- separate from, and much smaller than, the uses_type *dependency edge*
+# count the query above already produces. Added for parity with autovista's
+# own xml_schema_collections inventory list.
+_QUERY_COLLECTION_INVENTORY = """
+SELECT s.name AS schema_name, xsc.name AS collection_name
+FROM sys.xml_schema_collections xsc
+JOIN sys.schemas s ON s.schema_id = xsc.schema_id
+WHERE xsc.name <> 'sys'  -- exclude the built-in "sys" collection every database has
+ORDER BY s.name, xsc.name
+"""
+
+
+def _discover_collection_inventory(connection, result: LakebridgeDiscoveryResult) -> None:
+    cursor = connection.cursor()
+    cursor.execute(_QUERY_COLLECTION_INVENTORY)
+    seen_names: set[str] = set()
+    for schema_name, collection_name in cursor.fetchall():
+        name = f"{schema_name}.{collection_name}"
+        if name in seen_names:
+            continue
+        seen_names.add(name)
+        result.xml_schema_collections.append(LakebridgeObjectRef(
+            object_type="xml_schema_collection",
+            name=name,
+            source_tech="MS SQL Server",
+            raw_category="sys.xml_schema_collections",
+        ))
 
 
 def discover(connection, result: LakebridgeDiscoveryResult, seen_edges: set[tuple]) -> None:
@@ -75,3 +104,5 @@ def discover(connection, result: LakebridgeDiscoveryResult, seen_edges: set[tupl
             discovery_method=vocabulary.DISCOVERY_METHOD,
             resolved=True,
         ))
+
+    _discover_collection_inventory(connection, result)

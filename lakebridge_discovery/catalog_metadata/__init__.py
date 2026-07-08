@@ -47,6 +47,8 @@ from typing import Callable
 from lakebridge_discovery.catalog_metadata import (
     computed_column_functions,
     constraints,
+    database_files,
+    databases,
     foreign_keys,
     indexes,
     schemas,
@@ -80,6 +82,8 @@ _REGISTRY: list[tuple[str, CatalogProbe]] = [
     (constraints.NAME, constraints.discover),
     (sequences.NAME, sequences.discover),
     (schemas.NAME, schemas.discover),
+    (databases.NAME, databases.discover),
+    (database_files.NAME, database_files.discover),
     (synonyms.NAME, synonyms.discover),
 ]
 
