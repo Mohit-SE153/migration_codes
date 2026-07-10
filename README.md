@@ -283,7 +283,9 @@ above, so a downstream confidence-weighting step can treat both consistently.
 This phase does **not** do complexity/effort scoring, PySpark or any other
 migration code generation, or reconciliation/validation. Constructs this
 pipeline can't confidently parse are flagged (`llm_inferred` / `unresolved`)
-for human review, never guessed at.
+for human review, never guessed at. Complexity/effort scoring is now covered
+by the Assessment phase (`assessment/`) — see the "Assessment Phase" section
+at the end of this file.
 
 ---
 
@@ -561,3 +563,336 @@ write a new package following that shape, add it as a third independent
 step in `run_all_discovery.py` (wrapped in its own try/except, same as the
 other two), and extend `discovery_comparison/comparator.py`'s category
 loop to also read its output directory. No existing engine's code changes.
+
+---
+
+# Assessment Phase
+
+Everything above this line is Discovery (inventory + dependency graph,
+does no scoring). This section covers the **Assessment phase**
+(`assessment/`), which reads the **sqlglot Discovery engine's** manifest
+(`./output/discovery_manifest.json`) only — never Lakebridge's
+(`./output_lakebridge/`), which is a structurally different schema (see
+"Multi-engine Discovery" above) — and turns it into a migration-planning
+deliverable: per-object complexity/effort, a risk register, a
+dependency-ordered migration wave plan, a data-readiness rollup, and a
+security/permissions migration note.
+
+Reads Discovery's manifest as plain JSON, never by importing `autovista`'s
+internal dataclasses, so the two phases stay independently runnable —
+Assessment can be re-run against a re-generated Discovery manifest without
+touching Discovery, and vice versa.
+
+## Running Assessment
+
+```bash
+python3 -m autovista.orchestrator      # produces ./output/discovery_manifest.json first, if not already run
+python3 -m assessment.orchestrator     # reads it, writes ./output_assessment/
+```
+
+Override the input/output paths (e.g. to assess a different Discovery run)
+via `ASSESSMENT_INPUT_MANIFEST` / `ASSESSMENT_OUTPUT_DIR`. See
+`assessment/config.py` for every override, including the effort-hours-per-
+tier rubric (`ASSESSMENT_HOURS_LOW/MEDIUM/HIGH/CRITICAL`) and the
+complexity-tier score thresholds — both are stated *assumptions*, not
+measured facts; replace them with your own team's actuals as soon as you
+have a few objects' real remediation time.
+
+## What each module produces
+
+- **`complexity_scorer.py`** — scores every table, view, stored procedure,
+  function, trigger, and SSIS embedded-SQL task into a `Low/Medium/High/
+  Critical` tier + an estimated-hours figure, from signals Discovery
+  already computed (LOC, reference breadth, `compatibility_flags`, dynamic
+  SQL usage, parse health, dependency fan-in/out for code objects; DDL
+  feature richness — temporal/CDC/memory-optimized/computed columns/etc. —
+  for tables). Every score carries `scoring_reasons` so a reviewer can see
+  *why*, not just the number.
+
+  One data-shape wrinkle worth knowing: SQL Server represents a single
+  multi-event trigger (`CREATE TRIGGER ... FOR INSERT, UPDATE, DELETE`) as
+  one row per event, and Discovery's extractor carries that straight
+  through as multiple same-named `TriggerEntity` rows — confirmed against
+  this build's own AdventureWorks2022 run (13 trigger rows for 11 distinct
+  trigger definitions; also the root cause of the "13 vs 10 triggers"
+  sqlglot/Lakebridge mismatch in `output_comparison/comparison_report.md`,
+  since Lakebridge counts `sys.triggers` directly). `complexity_scorer.py`
+  merges same-named trigger rows before scoring so effort isn't counted
+  2-3x for one real trigger.
+
+- **`risk_register.py`** — one finding per unresolved/partially-parsed
+  object (from Discovery's own `unsupported_objects`), per compatibility-
+  flagged object (severity mapped per flag — e.g. `LINKED_SERVER`/
+  `XP_CMDSHELL` are Critical, `PIVOT` is Low, since Databricks SQL supports
+  it natively), per CLR assembly, and per linked server.
+
+- **`migration_wave_planner.py`** — orders tables/views/procs/functions/
+  triggers into migration waves via topological leveling of the dependency
+  graph (Tarjan SCC for cycle detection — mutually-dependent objects
+  collapse into one wave, flagged `has_circular_dependency`), so wave N
+  never depends on anything not already migrated in wave N-1 or earlier.
+
+- **`data_readiness.py`** — rolls up Discovery's `data_quality_summary`
+  (metadata-only, no new queries) into severity + a Databricks/Delta Lake
+  migration recommendation per signal (e.g. CDC-enabled tables → High,
+  needs a CDC ingestion re-design; heap tables → Low, no clustered-index
+  concept on Databricks).
+
+- **`security_review.py`** — privileged server logins, linked-server
+  credential relationships, unsafe CLR assemblies, and high-privilege
+  permission grants, framed around what needs deliberate re-design for
+  Unity Catalog's principal/grant model (not a security audit).
+
+- **`output_writer.py`** — per-category JSON + an aggregate
+  `assessment_manifest.json` + CSV rollups (`assessment_rollup.csv`,
+  `risk_register.csv`, `object_complexity.csv`, `migration_waves.csv`) +
+  a human-readable `assessment_report.md`.
+
+## Project layout addition
+
+```
+assessment/
+  schema.py                   # output contract dataclasses
+  config.py                   # env-var-driven config incl. the effort/threshold rubric
+  dependency_index.py         # shared fan-in/fan-out adjacency view over Discovery's dependencies[]
+  complexity_scorer.py        # per-object Low/Medium/High/Critical + estimated hours
+  risk_register.py            # unresolved objects + compatibility flags + CLR + linked servers
+  migration_wave_planner.py   # dependency-ordered wave plan (Tarjan SCC + leveling)
+  data_readiness.py           # data_quality_summary -> readiness findings
+  security_review.py          # security/permissions migration notes
+  summary.py                  # executive-summary rollup
+  output_writer.py            # JSON + CSV + Markdown report
+  orchestrator.py             # wires it all together; `python -m assessment.orchestrator`
+
+tests/test_assessment_*.py    # unit tests per module + one end-to-end orchestrator test
+```
+
+---
+
+# Lakebridge Assessment (comparing our scoring vs. Lakebridge's own)
+
+`lakebridge_assessment/` is a second, independently-coded Assessment
+package, read `./output_lakebridge/lakebridge_manifest.json` (the
+Lakebridge Discovery engine's output) and producing
+`./output_lakebridge_assessment/` -- the same shape of deliverable as
+`assessment/` (complexity tiers, risk register, migration waves, data
+readiness, security notes), so the two can be compared side by side.
+
+**Key difference from `assessment/`:** while building this, we found that
+Lakebridge's own Analyzer report already carries a native per-object
+complexity rating (`LakebridgeObjectRef.complexity`, e.g. `LOW`/`MEDIUM` --
+see `lakebridge_discovery/report_parser.py`'s `_COMPLEXITY_KEYS`), already
+present in `lakebridge_manifest.json` from a real (`run_mode: live`)
+Analyzer run. Rather than re-deriving complexity with our own heuristic
+against Lakebridge's data, `lakebridge_assessment/complexity_mapper.py`
+trusts Lakebridge's own rating as-is -- this is meant to be genuinely
+"Lakebridge's assessment," not our logic re-applied to their data. Objects
+the Analyzer report gave no complexity value at all (e.g. schemas,
+synonyms, CLR assemblies in this project's own output) are skipped, not
+guessed at -- see `AssessmentSummary.objects_without_native_complexity`.
+
+Same non-negotiable caveat as the rest of the Lakebridge integration in
+this repo: the Analyzer's report schema is undocumented at the field
+level, so `mapping_verified`/`mapping_notes` from the Discovery manifest
+are carried straight through into this package's own output -- don't
+trust the complexity ratings more than you'd trust any other Lakebridge-
+sourced field until that mapping is independently verified.
+
+Independent of `assessment/` by design (same "engines never share code"
+convention `lakebridge_discovery/` already follows relative to
+`autovista/`) -- same field names/shapes, retyped rather than imported, so
+the two output directories are directly comparable by hand. No automatic
+comparison module was built (by choice, for now) -- diff
+`output_assessment/` vs. `output_lakebridge_assessment/` yourself (the
+Markdown reports or the `*_rollup.csv`/`object_complexity.csv` files are
+the easiest starting point).
+
+## Running it
+
+```bash
+python3 -m lakebridge_discovery.orchestrator   # produces ./output_lakebridge/lakebridge_manifest.json first, if not already run
+python3 -m lakebridge_assessment.orchestrator  # reads it, writes ./output_lakebridge_assessment/
+```
+
+Override paths via `LAKEBRIDGE_ASSESSMENT_INPUT_MANIFEST` /
+`LAKEBRIDGE_ASSESSMENT_OUTPUT_DIR`; the effort-hours-per-tier rubric
+(`LAKEBRIDGE_ASSESSMENT_HOURS_*`) defaults to the same values as
+`assessment/config.py`'s rubric so the two reports' hour totals are
+comparable out of the box -- override independently if you want to test
+the two rubrics diverging.
+
+On this project's own AdventureWorks2022 run: sqlglot-based `assessment/`
+estimated **386 hours** across 122 objects; Lakebridge-based
+`lakebridge_assessment/` estimated **320 hours** across the same 122
+objects, using Lakebridge's own tiers (103 Low / 19 Medium vs. sqlglot's
+computed 89 Low / 35 Medium / 1 High). That gap is itself a useful signal
+worth digging into by hand before trusting either number outright.
+
+## Project layout addition
+
+```
+lakebridge_assessment/
+  schema.py                   # output contract dataclasses (retyped from assessment/schema.py, not shared)
+  config.py                   # env-var-driven config; same default hours rubric as assessment/config.py
+  dependency_index.py         # case-insensitive fan-in/fan-out index (Lakebridge's own casing is inconsistent)
+  complexity_mapper.py        # normalizes Lakebridge's OWN native complexity rating -- no scoring formula
+  risk_register.py            # unsupported objects + compatibility flags + CLR + linked servers
+  migration_wave_planner.py   # same Tarjan SCC + leveling algorithm, case-insensitive object matching
+  data_readiness.py           # data_quality_summary + table_features -> readiness findings
+  security_review.py          # security/permissions migration notes
+  summary.py                  # executive-summary rollup
+  output_writer.py            # JSON + CSV + Markdown report
+  orchestrator.py             # wires it all together; `python -m lakebridge_assessment.orchestrator`
+
+tests/test_lakebridge_assessment_*.py   # unit tests per module + one end-to-end orchestrator test
+```
+
+---
+
+# LLM Assessment (a third, fully independent method)
+
+`llm_assessment/` is a third way of scoring migration complexity, alongside
+`assessment/`'s fixed point-formula heuristic and `lakebridge_assessment/`'s
+use of Lakebridge's own native rating. Instead of either of those, this
+phase asks an LLM (Claude) to judge each object's complexity tier directly.
+
+**Fully self-contained -- zero imports from `assessment/`, `lakebridge_assessment/`,
+or `autovista/`.** Every module this package needs (schema, dependency
+index, risk register, migration wave planner, data readiness, security
+review, summary, output writer, even its own `.env` loader) is its own
+copy under `llm_assessment/`, not an import of the equivalent module
+elsewhere in this repo. This was originally built reusing `assessment/`'s
+deterministic modules directly (since both read the same sqlglot
+manifest, not two independent engines being compared against each other),
+but was deliberately decoupled on request so this package keeps working
+even if `assessment/` and `lakebridge_assessment/` are deleted later --
+its only real dependency is the Discovery manifest JSON *file* already on
+disk, not any package that produced it. Same field names/shapes as
+`assessment/schema.py` are kept (retyped, not imported) purely so the
+three tools' output stays comparable by eye -- the same "independent copy,
+comparable shape" convention `lakebridge_discovery/` already uses relative
+to `autovista/`.
+
+**Deliberately metadata-only** for the complexity judgment (per this
+build's own scope decision): the LLM is given the same structured signals
+the heuristic scorer computes -- LOC, reference breadth,
+`compatibility_flags`, dynamic SQL usage, parse health, dependency
+fan-in/fan-out -- never raw SQL source text. That keeps this phase working
+directly off the sqlglot Discovery manifest with no extra source-export
+step, and isolates the comparison to "does an LLM judge the same facts
+differently than our formula."
+
+Hard rules, same non-negotiable contract as `autovista/llm_fallback_extractor.py`
+and `autovista/compatibility_remediation.py`:
+- Never a source of truth -- every tier is explicitly labeled "LLM
+  judgment" in `scoring_reasons`, plus a mandatory disclaimer in
+  `manifest.warnings` and at the top of the Markdown report.
+- Hard cap on LLM calls per run (`LLM_ASSESSMENT_MAX_OBJECTS_PER_RUN`,
+  default 200) -- objects beyond the cap are excluded, not guessed at.
+- No API key configured -> every object is left unscored, not guessed.
+- One object's LLM failure (network error, malformed JSON, an
+  unrecognized tier string) never fails the run -- that object is simply
+  excluded and counted under the run's `failed` stat.
+
+## Databricks infra-sizing recommendations (new, deterministic -- no LLM call)
+
+`infra_sizing.py` looks at Discovery's database/table size metadata
+(`databases[].size_mb`, `tables[].size_mb`/`row_count`) and produces
+concrete Databricks infrastructure recommendations: a SQL Warehouse
+t-shirt size, an ingestion/migration cluster size, and a
+partitioning-vs-Liquid-Clustering call per table. This is deterministic
+(threshold lookups against known specs), not an LLM judgment call --
+sizing a warehouse is a lookup, not something LLM reasoning adds value to,
+and keeping it deterministic means it's free and instant to re-run.
+
+Grounded in Databricks' own published guidance, fetched directly from
+their docs while building this (not from training-data memory, since
+sizing tables drift):
+- SQL warehouse t-shirt sizes (2X-Small through 5X-Large) and their AWS
+  reference driver/worker instance types -- [SQL warehouse sizing, scaling, and queuing behavior](https://docs.databricks.com/aws/en/compute/sql-warehouse/warehouse-behavior).
+- "Don't partition tables under 1TB; use Liquid Clustering instead,"
+  Liquid Clustering being Databricks' current (2026) default
+  recommendation for all new Delta tables -- [When to partition tables](https://docs.databricks.com/aws/en/tables/partitions),
+  [Use liquid clustering for tables](https://docs.databricks.com/aws/en/tables/clustering).
+
+The GB/TB-to-warehouse-size thresholds themselves are this module's own
+assumption, not a Databricks-published rule -- real warehouse sizing
+depends on query concurrency/complexity, which static Discovery metadata
+can't see at all. Treat every recommendation as a capacity-planning
+starting point to validate once you have real query patterns, not a
+committed spec (see `infra_sizing.py`'s module docstring).
+
+## A real bug found and fixed while building this
+
+Haiku 4.5 wrapped its JSON responses in a markdown code fence
+(` ```json ... ``` `) despite the system prompt's explicit "respond ONLY
+with JSON, no prose" instruction, which broke `json.loads()` on every
+single call in the first live smoke test. Fixed in `llm_client.py` by
+stripping a leading/trailing code fence before parsing -- don't rely on
+prompt wording alone to guarantee bare JSON from a real model.
+
+## Running it
+
+```bash
+python3 -m autovista.orchestrator     # produces ./output/discovery_manifest.json first, if not already run
+python3 -m llm_assessment.orchestrator  # reads it, writes ./output_llm_assessment/
+```
+
+Requires `ANTHROPIC_API_KEY`. Defaults to `claude-haiku-4-5-20251001`
+(cheap/fast, appropriate for a bulk one-call-per-object classification
+task) -- override via `LLM_ASSESSMENT_MODEL` for a stronger model at
+higher cost/latency. Calls are made sequentially (not batched), so a
+~120-object estate takes roughly 15-20 minutes end to end at Haiku's
+typical latency for this prompt. Effort-hours-per-tier rubric
+(`LLM_ASSESSMENT_HOURS_*`) defaults to 0.5/2/6/8 hours for Low/Medium/
+High/Critical -- this package's own copy of that assumption, independent
+of `assessment/config.py`'s rubric (see config.py).
+
+## Result on this project's own AdventureWorks2022 run
+
+| | `assessment/` (heuristic) | `lakebridge_assessment/` (Lakebridge native) | `llm_assessment/` (Claude Haiku) |
+|---|---|---|---|
+| Objects scored | 122 | 122 | 122 (0 failed) |
+| Tier breakdown | 89 Low / 35 Medium / 1 High | 103 Low / 19 Medium | 97 Low / 15 Medium / 7 High / 3 Critical |
+| Total estimated hours | 386 | 320 | 144.5 (using this package's own 0.5/2/6/8 rubric -- not directly comparable to the other two columns' 2/6/16/32 rubric) |
+
+Databricks infra-sizing recommendations for this same estate (272 MB, 71
+tables, largest table 30.55 MB): **2X-Small SQL Warehouse**, a
+**single-node ingestion cluster** for the one-time migration load, and
+**no partitioning needed anywhere** (every table is far below the 1TB
+threshold) -- see `output_llm_assessment/infra_sizing.json` for the full
+rationale on each.
+
+The most interesting divergence in the first full run: the LLM rated
+every trigger High or Critical, while the other two tools mostly rated
+them Low/Medium. Its rationale, verbatim from one of the Critical-rated
+triggers: *"Trigger objects have no direct equivalent in Databricks/Delta
+Lake. Delta Lake does not support triggers for automated DML actions...
+would require manual re-architecture using alternative patterns."* That's
+a real, correct architectural fact neither the heuristic formula nor
+Lakebridge's native rating captured -- both of those score off
+syntax-level signals (LOC, named constructs), not "does this category of
+object exist at all on the target platform." Worth treating as a genuine
+finding to investigate, not just an LLM being pessimistic.
+
+## Project layout addition
+
+```
+llm_assessment/
+  schema.py                 # output contract dataclasses (own copy, incl. InfraSizingRecommendation)
+  config.py                 # env-var-driven config; own EffortRubric + own .env loader, no cross-package imports
+  dependency_index.py       # own fan-in/fan-out adjacency index (case-sensitive -- sqlglot manifest only)
+  llm_client.py              # self-contained Anthropic client wrapper (markdown-fence stripping, request timeout)
+  complexity_scorer.py       # builds per-object metadata descriptions, calls the LLM, parses tier/confidence/rationale
+  risk_register.py           # own copy: unresolved objects + compatibility flags + CLR + linked servers
+  migration_wave_planner.py  # own copy: Tarjan SCC + leveling
+  data_readiness.py          # own copy: data_quality_summary -> readiness findings
+  security_review.py         # own copy: security/permissions migration notes
+  infra_sizing.py            # NEW: DB/table size -> Databricks SQL Warehouse/cluster/partitioning recommendations
+  summary.py                 # own copy: executive-summary rollup
+  output_writer.py           # own copy: JSON + CSV + Markdown report (now includes an infra-sizing section)
+  orchestrator.py            # wires it all together; `python -m llm_assessment.orchestrator`
+  logging_setup.py           # per-object progress logging (a long live run needs this to be observable)
+
+tests/test_llm_assessment_*.py   # unit tests; complexity_scorer/orchestrator use a fake in-memory LlmClient -- never a real API call in the test suite
+```
